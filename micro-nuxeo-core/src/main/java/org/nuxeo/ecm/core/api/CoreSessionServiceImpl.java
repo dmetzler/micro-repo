@@ -32,7 +32,7 @@ import org.nuxeo.ecm.core.filter.CharacterFilteringService;
 import org.nuxeo.ecm.core.lifecycle.LifeCycleService;
 import org.nuxeo.ecm.core.model.Repository;
 import org.nuxeo.ecm.core.security.SecurityService;
-import org.nuxeo.micro.external.event.EventService;
+import org.nuxeo.micro.event.EventService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

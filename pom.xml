@@ -11,6 +11,7 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>micro-nuxeo-api</module>
     <module>micro-nuxeo-core</module>
     <module>micro-nuxeo-dsl</module>
     <module>micro-nuxeo-event</module>
@@ -52,8 +53,8 @@
   </properties>
 
   <dependencyManagement>
-      <dependencies>
-        <dependency>
+    <dependencies>
+      <dependency>
         <groupId>io.grpc</groupId>
         <artifactId>grpc-bom</artifactId>
         <version>${grpc.version}</version>
@@ -61,9 +62,22 @@
         <scope>import</scope>
       </dependency>
 
+
+      <dependency>
+        <groupId>org.nuxeo</groupId>
+        <artifactId>micro-nuxeo-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <dependency>
         <groupId>org.nuxeo</groupId>
         <artifactId>micro-nuxeo-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.nuxeo</groupId>
+        <artifactId>micro-nuxeo-event-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -80,6 +94,11 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
         <version>1.7.25</version>
+      </dependency>
+      <dependency>
+        <groupId>joda-time</groupId>
+        <artifactId>joda-time</artifactId>
+        <version>2.10.4</version>
       </dependency>
       <dependency>
         <groupId>io.dropwizard.metrics</groupId>

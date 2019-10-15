@@ -34,7 +34,7 @@ import org.nuxeo.ecm.core.schema.SchemaDescriptor;
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.schema.SchemaManagerImpl;
 import org.nuxeo.ecm.core.security.SecurityService;
-import org.nuxeo.micro.external.event.EventService;
+import org.nuxeo.micro.event.EventService;
 import org.nuxeo.runtime.jtajca.JtaActivator;
 import org.nuxeo.runtime.mongodb.MongoDBComponent;
 import org.nuxeo.runtime.mongodb.MongoDBConnectionConfig;
@@ -74,7 +74,8 @@ public class RepositoryManagerTest {
     public SchemaDescriptor[] getSchemaDescriptors(String... schemas) {
         SchemaDescriptor[] result = new SchemaDescriptor[schemas.length];
         for (int i = 0; i < schemas.length; i++) {
-            result[i] = new SchemaDescriptor(schemas[i]);
+            String name = schemas[i];
+            result[i] = new SchemaDescriptor(name);
         }
         return result;
     }
@@ -107,12 +108,11 @@ public class RepositoryManagerTest {
                 .lifeCycleService(mock(LifeCycleService.class))
                 .coreService(new CoreService())
                 .build();
-
         try (CloseableCoreSession session = css.createCoreSession(repository, principal)) {
             assertThat(session).isNotNull();
             for (int i = 0; i < NB_DOCS; i++) {
                 DocumentModel doc = session.createDocumentModel("/", "test" + i, "Folder");
-                doc.setPropertyValue("dublincore:title", "Test");
+                doc.setPropertyValue("dc:title", "Test");
                 doc = session.createDocument(doc);
             }
             session.save();
@@ -132,6 +132,8 @@ public class RepositoryManagerTest {
         TransactionHelper.commitOrRollbackTransaction();
 
     }
+
+
 
     private Repository getRepository(String repoName, SchemaManager schemaManager) {
         RepositoryFactory repositoryFactory = new MongoDBRepositoryFactory(repoName,
@@ -155,6 +157,7 @@ public class RepositoryManagerTest {
         for (String schemaName : schemas) {
             SchemaBindingDescriptor sd = new SchemaBindingDescriptor(schemaName, schemaName);
             sd.src = schemaName + ".xsd";
+            sd.prefix = "dublincore".equals(schemaName) ? "dc" : schemaName;
             sm.registerSchema(sd);
         }
 

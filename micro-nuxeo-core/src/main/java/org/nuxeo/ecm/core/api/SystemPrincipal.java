@@ -19,19 +19,19 @@
 
 package org.nuxeo.ecm.core.api;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.nuxeo.ecm.core.api.security.SecurityConstants;
-import org.nuxeo.runtime.api.login.LoginComponent;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  */
 public class SystemPrincipal implements NuxeoPrincipal {
+
+    private static final String SYSTEM_USER = "System";
 
     private static final long serialVersionUID = -3381784063138281706L;
 
@@ -46,15 +46,15 @@ public class SystemPrincipal implements NuxeoPrincipal {
     private int hash;
 
     public SystemPrincipal(String origUserName) {
-        this.origUserName = origUserName == null ? LoginComponent.SYSTEM_USERNAME : origUserName;
+        this.origUserName = origUserName == null ? SYSTEM_USER : origUserName;
         computeHash();
     }
 
     private void computeHash() {
         if (origUserName != null) {
-            hash = (LoginComponent.SYSTEM_USERNAME + "-" + origUserName).hashCode();
+            hash = (SYSTEM_USER + "-" + origUserName).hashCode();
         } else {
-            hash = LoginComponent.SYSTEM_USERNAME.hashCode();
+            hash = SYSTEM_USER.hashCode();
         }
     }
 
@@ -91,15 +91,15 @@ public class SystemPrincipal implements NuxeoPrincipal {
     }
 
     public String getFirstName() {
-        return "System";
+        return SYSTEM_USER;
     }
 
     public String getLastName() {
-        return "System";
+        return SYSTEM_USER;
     }
 
     public String getName() {
-        return LoginComponent.SYSTEM_USERNAME;
+        return SYSTEM_USER;
     }
 
     public List<String> getGroups() {

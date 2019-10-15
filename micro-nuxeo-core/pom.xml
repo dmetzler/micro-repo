@@ -9,13 +9,25 @@
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.nuxeo</groupId>
   <artifactId>micro-nuxeo-core</artifactId>
   <name>Micro Nuxeo :: parent</name>
   <description></description>
 
 
   <dependencies>
+    <dependency>
+      <groupId>org.nuxeo</groupId>
+      <artifactId>micro-nuxeo-event-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.nuxeo</groupId>
+      <artifactId>micro-nuxeo-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
@@ -70,12 +82,8 @@
     <dependency>
       <groupId>org.apache.geronimo.components</groupId>
       <artifactId>geronimo-connector</artifactId>
-      <!--exclusions>
-        <exclusion>
-          <groupId>org.apache.geronimo.specs</groupId>
-          <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
-        </exclusion>
-      </exclusions-->
+      <!--exclusions> <exclusion> <groupId>org.apache.geronimo.specs</groupId>
+        <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId> </exclusion> </exclusions -->
     </dependency>
     <dependency>
       <groupId>org.tranql</groupId>
@@ -84,16 +92,9 @@
     <dependency>
       <groupId>org.apache.geronimo.components</groupId>
       <artifactId>geronimo-transaction</artifactId>
-      <!--exclusions>
-        <exclusion>
-          <groupId>org.apache.geronimo.specs</groupId>
-          <artifactId>geronimo-jta_1.1_spec</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.geronimo.specs</groupId>
-          <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
-        </exclusion>
-      </exclusions-->
+      <!--exclusions> <exclusion> <groupId>org.apache.geronimo.specs</groupId>
+        <artifactId>geronimo-jta_1.1_spec</artifactId> </exclusion> <exclusion> <groupId>org.apache.geronimo.specs</groupId>
+        <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId> </exclusion> </exclusions -->
     </dependency>
     <dependency>
       <groupId>javax.transaction</groupId>

@@ -30,12 +30,9 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.nuxeo.ecm.core.api.security.ACE;
 import org.nuxeo.ecm.core.api.security.ACL;
-import org.nuxeo.ecm.core.api.security.AdministratorGroupsProvider;
 import org.nuxeo.ecm.core.api.security.SecurityConstants;
-import org.nuxeo.runtime.api.Framework;
 
 import com.google.common.collect.Lists;
 
@@ -107,12 +104,12 @@ public class ACLImpl extends ArrayList<ACE>implements ACL {
     }
 
     @Override
-    public boolean blockInheritance(String username) {
+    public boolean blockInheritance(String username, List<String> administratorsGroups) {
         boolean aclChanged = false;
         List<ACE> aces = Lists.newArrayList(getACEs());
         if (!aces.contains(ACE.BLOCK)) {
             aces.add(ACE.builder(username, SecurityConstants.EVERYTHING).creator(username).build());
-            aces.addAll(getAdminEverythingACES());
+            aces.addAll(getAdminEverythingACES(administratorsGroups));
             aces.add(ACE.BLOCK);
             aclChanged = true;
             setACEs(aces.toArray(new ACE[aces.size()]));
@@ -150,10 +147,8 @@ public class ACLImpl extends ArrayList<ACE>implements ACL {
         return aclChanged;
     }
 
-    protected List<ACE> getAdminEverythingACES() {
+    protected List<ACE> getAdminEverythingACES(List<String> administratorsGroups) {
         List<ACE> aces = new ArrayList<>();
-        AdministratorGroupsProvider provider = Framework.getService(AdministratorGroupsProvider.class);
-        List<String> administratorsGroups = provider.getAdministratorsGroups();
         for (String adminGroup : administratorsGroups) {
             aces.add(new ACE(adminGroup, SecurityConstants.EVERYTHING, true));
         }

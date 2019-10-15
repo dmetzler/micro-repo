@@ -20,9 +20,9 @@ package org.nuxeo.ecm.core.model;
 
 import org.nuxeo.common.utils.IdUtils;
 import org.nuxeo.ecm.core.api.event.CoreEventConstants;
-import org.nuxeo.ecm.core.event.Event;
-import org.nuxeo.ecm.core.event.EventListener;
-import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
+import org.nuxeo.micro.event.DocumentEventContext;
+import org.nuxeo.micro.event.Event;
+import org.nuxeo.micro.event.EventListener;
 
 public class EmptyNameFixer implements EventListener {
 

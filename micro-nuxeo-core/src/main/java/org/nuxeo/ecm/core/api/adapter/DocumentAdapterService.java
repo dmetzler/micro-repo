@@ -25,27 +25,19 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.nuxeo.runtime.model.ComponentContext;
-import org.nuxeo.runtime.model.ComponentInstance;
-import org.nuxeo.runtime.model.ComponentName;
-import org.nuxeo.runtime.model.DefaultComponent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  */
-public class DocumentAdapterService extends DefaultComponent {
-
-    public static final ComponentName NAME = new ComponentName(ComponentName.DEFAULT_TYPE,
-            "org.nuxeo.ecm.core.api.DocumentAdapterService");
-
-    private static final Log log = LogFactory.getLog(DocumentAdapterService.class);
+public class DocumentAdapterService {
+    private static final Logger log = LoggerFactory.getLogger(DocumentAdapterService.class);
 
     /**
      * Document adapters
      */
-    protected Map<Class<?>, DocumentAdapterDescriptor> adapters;
+    protected Map<Class<?>, DocumentAdapterDescriptor> adapters = new ConcurrentHashMap<Class<?>, DocumentAdapterDescriptor>();;
 
     public DocumentAdapterDescriptor getAdapterDescriptor(Class<?> itf) {
         return adapters.get(itf);
@@ -68,33 +60,6 @@ public class DocumentAdapterService extends DefaultComponent {
         DocumentAdapterDescriptor dae = adapters.remove(itf);
         if (dae != null) {
             log.info("Unregistered document adapter factory: " + dae);
-        }
-    }
-
-    @Override
-    public void activate(ComponentContext context) {
-        adapters = new ConcurrentHashMap<Class<?>, DocumentAdapterDescriptor>();
-    }
-
-    @Override
-    public void deactivate(ComponentContext context) {
-        adapters.clear();
-        adapters = null;
-    }
-
-    @Override
-    public void registerContribution(Object contribution, String extensionPoint, ComponentInstance contributor) {
-        if (extensionPoint.equals("adapters")) {
-            DocumentAdapterDescriptor dae = (DocumentAdapterDescriptor) contribution;
-            registerAdapterFactory(dae);
-        }
-    }
-
-    @Override
-    public void unregisterContribution(Object contribution, String extensionPoint, ComponentInstance contributor) {
-        if (extensionPoint.equals("adapters")) {
-            DocumentAdapterDescriptor dae = (DocumentAdapterDescriptor) contribution;
-            unregisterAdapterFactory(dae.getInterface());
         }
     }
 

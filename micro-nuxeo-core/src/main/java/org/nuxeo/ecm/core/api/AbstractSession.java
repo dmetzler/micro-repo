@@ -97,9 +97,9 @@ import org.nuxeo.ecm.core.schema.types.Schema;
 import org.nuxeo.ecm.core.security.LockSecurityPolicy;
 import org.nuxeo.ecm.core.security.SecurityService;
 import org.nuxeo.micro.MetricsService;
-import org.nuxeo.micro.external.event.DocumentEventContext;
-import org.nuxeo.micro.external.event.Event;
-import org.nuxeo.micro.external.event.EventService;
+import org.nuxeo.micro.event.DocumentEventContext;
+import org.nuxeo.micro.event.Event;
+import org.nuxeo.micro.event.EventService;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;

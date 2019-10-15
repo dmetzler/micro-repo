@@ -27,8 +27,6 @@ import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
 import org.nuxeo.ecm.core.api.impl.blob.JSONBlob;
 import org.nuxeo.ecm.core.api.impl.blob.StringBlob;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * This class consists exclusively of static methods that operate on {@link Blob}s.
  */
@@ -220,17 +218,6 @@ public class Blobs {
         return new JSONBlob(json);
     }
 
-    /**
-     * Create a {@link Blob} backed by the JSON for an arbitrary value.
-     * <p>
-     * The value's internal classes may be annotated with Jackson 2 annotations.
-     *
-     * @param value the value
-     * @since 9.2
-     */
-    public static Blob createJSONBlobFromValue(Object value) throws IOException {
-        String json = new ObjectMapper().writeValueAsString(value);
-        return new JSONBlob(json);
-    }
+
 
 }
