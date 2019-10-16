@@ -31,8 +31,6 @@ import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
 import org.nuxeo.ecm.core.api.NuxeoPrincipal;
-import org.nuxeo.ecm.core.api.SystemPrincipal;
-import org.nuxeo.runtime.api.login.LoginComponent;
 
 /**
  * A login module that is propagating the login information into the core login stack.
@@ -91,8 +89,8 @@ public class ClientLoginModule implements LoginModule {
             Principal p = entry.getPrincipal();
             if (p instanceof NuxeoPrincipal) {
                 return (NuxeoPrincipal) p;
-            } else if (LoginComponent.isSystemLogin(p)) {
-                return new SystemPrincipal(p.getName());
+//            } else if (LoginComponent.isSystemLogin(p)) {
+//                return new SystemPrincipal(p.getName());
             }
         }
         return null;

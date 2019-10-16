@@ -44,12 +44,12 @@ import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.core.api.event.CoreEventConstants;
 import org.nuxeo.ecm.core.api.event.DocumentEventCategories;
 import org.nuxeo.ecm.core.api.security.SecurityConstants;
-import org.nuxeo.ecm.core.event.Event;
-import org.nuxeo.ecm.core.event.EventService;
-import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
+import org.nuxeo.ecm.core.api.trash.TrashService;
 import org.nuxeo.ecm.core.query.sql.NXQL;
 import org.nuxeo.ecm.core.schema.FacetNames;
-import org.nuxeo.runtime.api.Framework;
+import org.nuxeo.micro.event.DocumentEventContext;
+import org.nuxeo.micro.event.Event;
+import org.nuxeo.micro.event.EventService;
 
 /**
  * Basic implementation of {@link TrashService}.
@@ -60,33 +60,12 @@ public abstract class AbstractTrashService implements TrashService {
 
     public static final String TRASHED_QUERY = "SELECT * FROM Document WHERE ecm:mixinType != 'HiddenInNavigation' AND ecm:isVersion = 0 AND ecm:isTrashed = 1 AND ecm:parentId = '%s'";
 
-    @Override
-    public boolean folderAllowsDelete(DocumentModel folder) {
-        return folder.getCoreSession().hasPermission(folder.getRef(), SecurityConstants.REMOVE_CHILDREN);
-    }
+    private EventService eventService;
 
-    @Override
-    public boolean checkDeletePermOnParents(List<DocumentModel> docs) {
-        if (docs.isEmpty()) {
-            return false;
-        }
-        CoreSession session = docs.get(0).getCoreSession();
-        for (DocumentModel doc : docs) {
-            if (session.hasPermission(doc.getParentRef(), SecurityConstants.REMOVE_CHILDREN)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
-    @Override
-    public boolean canDelete(List<DocumentModel> docs, NuxeoPrincipal principal, boolean checkProxies) {
-        if (docs.isEmpty()) {
-            return false;
-        }
-        // used to do only check on parent perm
-        TrashInfo info = getInfo(docs, principal, checkProxies, false);
-        return info.docs.size() > 0;
+
+    public AbstractTrashService(EventService eventService) {
+        this.eventService = eventService;
     }
 
     @Override
@@ -169,7 +148,6 @@ public abstract class AbstractTrashService implements TrashService {
 
     }
 
-    @Override
     public TrashInfo getTrashInfo(List<DocumentModel> docs, NuxeoPrincipal principal, boolean checkProxies,
             boolean checkDeleted) {
         TrashInfo info = getInfo(docs, principal, checkProxies, checkDeleted);
@@ -194,7 +172,6 @@ public abstract class AbstractTrashService implements TrashService {
         return info;
     }
 
-    @Override
     public DocumentModel getAboveDocument(DocumentModel doc, Set<Path> rootPaths) {
         CoreSession session = doc.getCoreSession();
         while (underOneOf(doc.getPath(), rootPaths)) {
@@ -277,7 +254,6 @@ public abstract class AbstractTrashService implements TrashService {
         Event event = ctx.newEvent(eventId);
         event.setInline(false);
         event.setImmediate(immediate);
-        EventService eventService = Framework.getService(EventService.class);
         eventService.fireEvent(event);
     }
 
@@ -291,6 +267,8 @@ public abstract class AbstractTrashService implements TrashService {
     public void untrashDocuments(List<DocumentModel> docs) {
         undeleteDocuments(docs);
     }
+
+    protected abstract Set<DocumentRef> undeleteDocuments(List<DocumentModel> docs);
 
     /**
      * Matches names of documents in the trash, created by {@link #trashDocuments(List)}.

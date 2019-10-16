@@ -18,9 +18,6 @@
  */
 package org.nuxeo.ecm.core.trash;
 
-import static org.nuxeo.ecm.core.bulk.action.TrashAction.ACTION_NAME;
-import static org.nuxeo.ecm.core.bulk.action.TrashAction.PARAM_NAME;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,9 +28,8 @@ import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.DocumentSecurityException;
-import org.nuxeo.ecm.core.bulk.BulkService;
-import org.nuxeo.ecm.core.bulk.message.BulkCommand;
-import org.nuxeo.runtime.api.Framework;
+import org.nuxeo.ecm.core.api.trash.TrashService;
+import org.nuxeo.micro.event.EventService;
 
 /**
  * A {@link TrashService} implementation relying on {@code ecm:isTrashed}.
@@ -45,6 +41,11 @@ public class PropertyTrashService extends AbstractTrashService {
     private static final Log log = LogFactory.getLog(PropertyTrashService.class);
 
     public static final String SYSPROP_IS_TRASHED = "isTrashed";
+
+
+    public PropertyTrashService(EventService eventService) {
+        super(eventService);
+    }
 
     @Override
     public boolean isTrashed(CoreSession session, DocumentRef docRef) {
@@ -93,15 +94,6 @@ public class PropertyTrashService extends AbstractTrashService {
         }
     }
 
-    @Override
-    public Set<DocumentRef> undeleteDocuments(List<DocumentModel> docs) {
-        Set<DocumentRef> docRefs = new HashSet<>();
-        for (DocumentModel doc : docs) {
-            docRefs.addAll(doUntrashDocument(doc, true));
-        }
-        docs.stream().map(DocumentModel::getCoreSession).findFirst().ifPresent(CoreSession::save);
-        return docRefs;
-    }
 
     protected Set<DocumentRef> doUntrashDocument(DocumentModel doc, boolean processChildren) {
         CoreSession session = doc.getCoreSession();
@@ -139,12 +131,22 @@ public class PropertyTrashService extends AbstractTrashService {
 
     protected void trashDescendants(DocumentModel model, Boolean value) {
         CoreSession session = model.getCoreSession();
-        BulkService service = Framework.getService(BulkService.class);
         String nxql = String.format("SELECT * from Document where ecm:ancestorId='%s'", model.getId());
         String user = session.getPrincipal().getName();
-        service.submit(new BulkCommand.Builder(ACTION_NAME, nxql, user).repository(session.getRepositoryName())
-                                                                       .param(PARAM_NAME, value)
-                                                                       .build());
+//        service.submit(new BulkCommand.Builder(ACTION_NAME, nxql, user).repository(session.getRepositoryName())
+//                                                                       .param(PARAM_NAME, value)
+//                                                                       .build());
+    }
+
+
+    @Override
+    public Set<DocumentRef> undeleteDocuments(List<DocumentModel> docs) {
+        Set<DocumentRef> docRefs = new HashSet<>();
+        for (DocumentModel doc : docs) {
+            docRefs.addAll(doUntrashDocument(doc, true));
+        }
+        docs.stream().map(DocumentModel::getCoreSession).findFirst().ifPresent(CoreSession::save);
+        return docRefs;
     }
 
     @Override
@@ -159,5 +161,7 @@ public class PropertyTrashService extends AbstractTrashService {
                 throw new UnsupportedOperationException(feature.name());
         }
     }
+
+
 
 }

@@ -38,11 +38,11 @@ import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.IterableQueryResult;
 import org.nuxeo.ecm.core.api.security.ACE;
 import org.nuxeo.ecm.core.api.security.ACP;
-import org.nuxeo.ecm.core.event.EventContext;
-import org.nuxeo.ecm.core.event.EventService;
-import org.nuxeo.ecm.core.event.impl.EventContextImpl;
 import org.nuxeo.ecm.core.query.sql.NXQL;
 import org.nuxeo.ecm.core.work.AbstractWork;
+import org.nuxeo.micro.event.EventContext;
+import org.nuxeo.micro.event.EventContextImpl;
+import org.nuxeo.micro.event.EventService;
 import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.transaction.TransactionRuntimeException;
 

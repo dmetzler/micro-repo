@@ -34,8 +34,6 @@ import org.nuxeo.ecm.core.api.security.ACP;
 import org.nuxeo.ecm.core.api.security.Access;
 import org.nuxeo.ecm.core.api.security.SecurityConstants;
 import org.nuxeo.ecm.core.api.security.UserEntry;
-import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.runtime.services.config.ConfigurationService;
 
 /**
  * The ACP implementation uses a cache used when calling getAccess().
@@ -368,7 +366,7 @@ public class ACPImpl implements ACP {
     }
 
     @Override
-    public boolean blockInheritance(String aclName, String username) {
+    public boolean blockInheritance(String aclName, String username, List<String> administratorsGroups) {
         if (aclName == null) {
             throw new NullPointerException("'aclName' cannot be null");
         }
@@ -377,7 +375,7 @@ public class ACPImpl implements ACP {
         }
 
         ACL acl = getOrCreateACL(aclName);
-        boolean aclChanged = acl.blockInheritance(username);
+        boolean aclChanged = acl.blockInheritance(username, administratorsGroups);
         if (aclChanged) {
             addACL(acl);
         }
@@ -469,12 +467,6 @@ public class ACPImpl implements ACP {
 
     @SuppressWarnings("AutoBoxing")
     protected boolean useLegacyBehavior() {
-        if (legacyBehavior == null) {
-            // check runtime is present - as ACP is a simple object, it could be used outside of a runtime context
-            // otherwise don't use legacy behavior
-            legacyBehavior = Framework.getRuntime() != null
-                    && Framework.getService(ConfigurationService.class).isBooleanPropertyTrue(LEGACY_BEHAVIOR_PROPERTY);
-        }
-        return legacyBehavior.booleanValue();
+        return false;
     }
 }

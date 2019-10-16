@@ -21,10 +21,7 @@
 package org.nuxeo.ecm.core.filter;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import org.apache.commons.text.StringEscapeUtils;
 import org.nuxeo.ecm.core.api.DataModel;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.impl.DataModelImpl;
@@ -34,15 +31,13 @@ import org.nuxeo.ecm.core.api.model.impl.ArrayProperty;
 import org.nuxeo.ecm.core.api.model.impl.ComplexProperty;
 import org.nuxeo.ecm.core.api.model.impl.ListProperty;
 import org.nuxeo.ecm.core.api.model.impl.primitives.StringProperty;
-import org.nuxeo.runtime.model.ComponentInstance;
-import org.nuxeo.runtime.model.DefaultComponent;
 
 import com.google.common.base.CharMatcher;
 
 /**
  * @since 9.1
  */
-public class CharacterFilteringServiceImpl extends DefaultComponent implements CharacterFilteringService {
+public class CharacterFilteringServiceImpl implements CharacterFilteringService {
 
     public static final String FILTERING_XP = "filtering";
 
@@ -50,27 +45,27 @@ public class CharacterFilteringServiceImpl extends DefaultComponent implements C
 
     protected CharMatcher charsToRemove;
 
-    @Override
-    public void registerContribution(Object contrib, String point, ComponentInstance contributor) {
-        if (FILTERING_XP.equals(point)) {
-
-            desc = (CharacterFilteringServiceDescriptor) contrib;
-
-            CharMatcher charsToPreserve = CharMatcher.anyOf("\r\n\t");
-            CharMatcher allButPreserved = charsToPreserve.negate();
-            charsToRemove = CharMatcher.javaIsoControl().and(allButPreserved);
-            charsToRemove = charsToRemove.or(CharMatcher.invisible().and(CharMatcher.whitespace().negate()));
-
-            List<String> additionalChars = desc.getDisallowedChars();
-            if (additionalChars != null && !additionalChars.isEmpty()) {
-                String otherCharsToRemove = additionalChars.stream().map(StringEscapeUtils::unescapeJava).collect(
-                        Collectors.joining());
-                charsToRemove = charsToRemove.or(CharMatcher.anyOf(otherCharsToRemove));
-            }
-        } else {
-            throw new RuntimeException("Unknown extension point: " + point);
-        }
-    }
+//    @Override
+//    public void registerContribution(Object contrib, String point, ComponentInstance contributor) {
+//        if (FILTERING_XP.equals(point)) {
+//
+//            desc = (CharacterFilteringServiceDescriptor) contrib;
+//
+//            CharMatcher charsToPreserve = CharMatcher.anyOf("\r\n\t");
+//            CharMatcher allButPreserved = charsToPreserve.negate();
+//            charsToRemove = CharMatcher.javaIsoControl().and(allButPreserved);
+//            charsToRemove = charsToRemove.or(CharMatcher.invisible().and(CharMatcher.whitespace().negate()));
+//
+//            List<String> additionalChars = desc.getDisallowedChars();
+//            if (additionalChars != null && !additionalChars.isEmpty()) {
+//                String otherCharsToRemove = additionalChars.stream().map(StringEscapeUtils::unescapeJava).collect(
+//                        Collectors.joining());
+//                charsToRemove = charsToRemove.or(CharMatcher.anyOf(otherCharsToRemove));
+//            }
+//        } else {
+//            throw new RuntimeException("Unknown extension point: " + point);
+//        }
+//    }
 
     @Override
     public String filter(String value) {

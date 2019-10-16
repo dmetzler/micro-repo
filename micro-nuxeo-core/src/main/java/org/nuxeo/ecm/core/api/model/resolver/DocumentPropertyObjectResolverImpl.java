@@ -26,7 +26,6 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.schema.types.Field;
 import org.nuxeo.ecm.core.schema.types.resolver.ObjectResolver;
-import org.nuxeo.runtime.api.Framework;
 
 /**
  * @since 7.1
@@ -39,8 +38,8 @@ public class DocumentPropertyObjectResolverImpl implements PropertyObjectResolve
 
     protected ObjectResolver resolver;
 
-    public static DocumentPropertyObjectResolverImpl create(DocumentModel doc, String xpath) {
-        Field field = Framework.getService(SchemaManager.class).getField(xpath);
+    public static DocumentPropertyObjectResolverImpl create(DocumentModel doc, String xpath, SchemaManager sm) {
+        Field field = sm.getField(xpath);
         if (field != null) {
             ObjectResolver resolver = field.getType().getObjectResolver();
             if (resolver != null) {

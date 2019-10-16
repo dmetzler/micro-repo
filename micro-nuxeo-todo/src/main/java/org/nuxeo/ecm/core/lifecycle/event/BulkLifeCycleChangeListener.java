@@ -20,8 +20,6 @@ package org.nuxeo.ecm.core.lifecycle.event;
 
 import java.util.List;
 
-import javax.naming.event.EventContext;
-
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -30,13 +28,12 @@ import org.nuxeo.ecm.core.api.event.CoreEventConstants;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
 import org.nuxeo.ecm.core.api.trash.TrashService;
-import org.nuxeo.ecm.core.event.PostCommitEventListener;
 import org.nuxeo.ecm.core.lifecycle.LifeCycleService;
 import org.nuxeo.micro.event.DocumentEventContext;
 import org.nuxeo.micro.event.Event;
 import org.nuxeo.micro.event.EventBundle;
-import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.runtime.services.config.ConfigurationService;
+import org.nuxeo.micro.event.EventContext;
+import org.nuxeo.micro.event.PostCommitEventListener;
 import org.nuxeo.runtime.transaction.TransactionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,15 +41,18 @@ import org.slf4j.LoggerFactory;
 /**
  * Listener for life cycle change events.
  * <p>
- * If event occurs on a folder, it will recurse on children to perform the same transition if possible.
+ * If event occurs on a folder, it will recurse on children to perform the same
+ * transition if possible.
  * <p>
- * If the transition event is about marking documents as "deleted", and a child cannot perform the transition, it will
- * be removed.
+ * If the transition event is about marking documents as "deleted", and a child
+ * cannot perform the transition, it will be removed.
  * <p>
- * Undelete transitions are not processed, but this listener instead looks for a specific documentUndeleted event. This
- * is because we want to undelete documents (parents) under which we don't want to recurse.
+ * Undelete transitions are not processed, but this listener instead looks for a
+ * specific documentUndeleted event. This is because we want to undelete
+ * documents (parents) under which we don't want to recurse.
  * <p>
- * Reinit document copy lifeCycle (BulkLifeCycleChangeListener is bound to the event documentCreatedByCopy)
+ * Reinit document copy lifeCycle (BulkLifeCycleChangeListener is bound to the
+ * event documentCreatedByCopy)
  */
 public class BulkLifeCycleChangeListener implements PostCommitEventListener {
 
@@ -146,7 +146,7 @@ public class BulkLifeCycleChangeListener implements PostCommitEventListener {
 
     protected boolean isNonRecursiveTransition(String transition, String type) {
         List<String> nonRecursiveTransitions = Framework.getService(LifeCycleService.class)
-                                                        .getNonRecursiveTransitionForDocType(type);
+                .getNonRecursiveTransitionForDocType(type);
         return nonRecursiveTransitions.contains(transition);
     }
 
@@ -155,42 +155,36 @@ public class BulkLifeCycleChangeListener implements PostCommitEventListener {
      */
     protected void changeChildrenState(CoreSession session, String transition, String targetState, DocumentModel doc) {
         // Check if we need to paginate children fetch
-        ConfigurationService confService = Framework.getService(ConfigurationService.class);
-        boolean paginate = confService.isBooleanTrue(PAGINATE_GET_CHILDREN_PROPERTY);
-        if (paginate) {
-            long pageSize = confService.getLong(GET_CHILDREN_PAGE_SIZE_PROPERTY, 500);
-            // execute a first query to know total size
-            String query = String.format("SELECT * FROM Document where ecm:parentId ='%s'", doc.getId());
-            DocumentModelList documents = session.query(query, null, pageSize, 0, true);
-            changeDocumentsState(session, transition, targetState, documents);
-            session.save();
-            // commit the first page
-            TransactionHelper.commitOrRollbackTransaction();
 
-            // loop on other children
-            long nbChildren = documents.totalSize();
-            for (long offset = pageSize; offset < nbChildren; offset += pageSize) {
-                long i = offset;
-                // start a new transaction
-                TransactionHelper.runInTransaction(() -> {
-                    DocumentModelList docs = session.query(query, null, pageSize, i, false);
-                    changeDocumentsState(session, transition, targetState, docs);
-                    session.save();
-                });
-            }
+        long pageSize = 500;
+        // execute a first query to know total size
+        String query = String.format("SELECT * FROM Document where ecm:parentId ='%s'", doc.getId());
+        DocumentModelList documents = session.query(query, null, pageSize, 0, true);
+        changeDocumentsState(session, transition, targetState, documents);
+        session.save();
+        // commit the first page
+        TransactionHelper.commitOrRollbackTransaction();
 
-            // start a new transaction for following
-            TransactionHelper.startTransaction();
-        } else {
-            DocumentModelList documents = session.getChildren(doc.getRef());
-            changeDocumentsState(session, transition, targetState, documents);
-            session.save();
+        // loop on other children
+        long nbChildren = documents.totalSize();
+        for (long offset = pageSize; offset < nbChildren; offset += pageSize) {
+            long i = offset;
+            // start a new transaction
+            TransactionHelper.runInTransaction(() -> {
+                DocumentModelList docs = session.query(query, null, pageSize, i, false);
+                changeDocumentsState(session, transition, targetState, docs);
+                session.save();
+            });
         }
+
+        // start a new transaction for following
+        TransactionHelper.startTransaction();
+
     }
 
     /**
-     * Change doc state. Don't recurse on children as following transition trigger an event which will be handled by
-     * this listener.
+     * Change doc state. Don't recurse on children as following transition trigger
+     * an event which will be handled by this listener.
      *
      * @since 9.2
      */
@@ -206,7 +200,8 @@ public class BulkLifeCycleChangeListener implements PostCommitEventListener {
                 if (LifeCycleConstants.DELETE_TRANSITION.equals(transition)
                         || LifeCycleConstants.UNDELETE_TRANSITION.equals(transition)) {
                     // just skip renaming for trash mechanism
-                    // here we leverage backward compatibility mechanism in AbstractSession#followTransition
+                    // here we leverage backward compatibility mechanism in
+                    // AbstractSession#followTransition
                     doc.putContextData(TrashService.DISABLE_TRASH_RENAMING, Boolean.TRUE);
                 }
                 doc.followTransition(transition);

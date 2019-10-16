@@ -19,18 +19,7 @@
  */
 package org.nuxeo.ecm.core.api;
 
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
-import org.apache.commons.lang3.mutable.MutableObject;
-import org.nuxeo.ecm.core.api.impl.UserPrincipal;
 import org.nuxeo.ecm.core.api.local.ClientLoginModule;
-import org.nuxeo.ecm.core.api.local.LoginStack;
-import org.nuxeo.ecm.core.api.repository.RepositoryManager;
-import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.runtime.api.login.LoginComponent;
 
 /**
  * The CoreInstance is the main access point to a CoreSession.
@@ -49,9 +38,9 @@ public class CoreInstance {
      * @return the session
      * @since 5.9.3
      */
-    public static CloseableCoreSession openCoreSession(String repositoryName) {
-        return openCoreSession(repositoryName, getPrincipal(null));
-    }
+//    public static CloseableCoreSession openCoreSession(String repositoryName) {
+//        return openCoreSession(repositoryName, getPrincipal(null));
+//    }
 
     /**
      * MUST ONLY BE USED IN UNIT TESTS to open a {@link CoreSession} for the given user.
@@ -63,9 +52,9 @@ public class CoreInstance {
      * @return the session
      * @since 5.9.3
      */
-    public static CloseableCoreSession openCoreSession(String repositoryName, String username) {
-        return openCoreSession(repositoryName, getPrincipal(username));
-    }
+//    public static CloseableCoreSession openCoreSession(String repositoryName, String username) {
+//        return openCoreSession(repositoryName, getPrincipal(username));
+//    }
 
     /**
      * Opens a {@link CoreSession} for a system user.
@@ -76,9 +65,9 @@ public class CoreInstance {
      * @return the session
      * @since 5.9.3
      */
-    public static CloseableCoreSession openCoreSessionSystem(String repositoryName) {
-        return openCoreSession(repositoryName, new SystemPrincipal(null));
-    }
+//    public static CloseableCoreSession openCoreSessionSystem(String repositoryName) {
+//        return openCoreSession(repositoryName, new SystemPrincipal(null));
+//    }
 
     /**
      * Opens a {@link CoreSession} for a system user with an optional originating username.
@@ -90,9 +79,9 @@ public class CoreInstance {
      * @return the session
      * @since 8.1
      */
-    public static CloseableCoreSession openCoreSessionSystem(String repositoryName, String originatingUsername) {
-        return openCoreSession(repositoryName, new SystemPrincipal(originatingUsername));
-    }
+//    public static CloseableCoreSession openCoreSessionSystem(String repositoryName, String originatingUsername) {
+//        return openCoreSession(repositoryName, new SystemPrincipal(originatingUsername));
+//    }
 
     /**
      * Opens a {@link CoreSession} for the given principal.
@@ -104,13 +93,13 @@ public class CoreInstance {
      * @return the session
      * @since 5.9.3
      */
-    public static CloseableCoreSession openCoreSession(String repositoryName, NuxeoPrincipal principal) {
-        if (repositoryName == null) {
-            RepositoryManager repositoryManager = Framework.getService(RepositoryManager.class);
-            repositoryName = repositoryManager.getDefaultRepositoryName();
-        }
-        return Framework.getService(CoreSessionService.class).createCoreSession(repositoryName, principal);
-    }
+//    public static CloseableCoreSession openCoreSession(String repositoryName, NuxeoPrincipal principal) {
+//        if (repositoryName == null) {
+//            RepositoryManager repositoryManager = Framework.getService(RepositoryManager.class);
+//            repositoryName = repositoryManager.getDefaultRepositoryName();
+//        }
+//        return Framework.getService(CoreSessionService.class).createCoreSession(repositoryName, principal);
+//    }
 
     /**
      * Gets an existing open session for the given session id.
@@ -120,13 +109,13 @@ public class CoreInstance {
      * @param sessionId the session id
      * @return the session, which must not be closed
      */
-    public CoreSession getSession(String sessionId) {
-        return Framework.getService(CoreSessionService.class).getCoreSession(sessionId);
-    }
+//    public CoreSession getSession(String sessionId) {
+//        return Framework.getService(CoreSessionService.class).getCoreSession(sessionId);
+//    }
 
     /**
      * Use {@link CloseableCoreSession#close} instead.
-     * 
+     *
      * @param css
      * @since 5.9.3
      */
@@ -134,30 +123,30 @@ public class CoreInstance {
         css.releaseCoreSession(session);
     }
 
-    protected static NuxeoPrincipal getPrincipal(String username) {
-        if (username != null) {
-            return new UserPrincipal(username, new ArrayList<>(), false, false);
-        } else {
-            LoginStack.Entry entry = ClientLoginModule.getCurrentLogin();
-            if (entry != null) {
-                Principal p = entry.getPrincipal();
-                if (p instanceof NuxeoPrincipal) {
-                    return (NuxeoPrincipal) p;
-                } else if (LoginComponent.isSystemLogin(p)) {
-                    return new SystemPrincipal(p.getName());
-                } else {
-                    throw new RuntimeException("Unsupported principal: " + p.getClass());
-                }
-            } else {
-                if (Framework.isTestModeSet()) {
-                    return new SystemPrincipal(null);
-                } else {
-                    throw new NuxeoException(
-                            "Cannot create a CoreSession outside a security context, " + " login() missing.");
-                }
-            }
-        }
-    }
+//    protected static NuxeoPrincipal getPrincipal(String username) {
+//        if (username != null) {
+//            return new UserPrincipal(username, new ArrayList<>(), false, false);
+//        } else {
+//            LoginStack.Entry entry = ClientLoginModule.getCurrentLogin();
+//            if (entry != null) {
+//                Principal p = entry.getPrincipal();
+//                if (p instanceof NuxeoPrincipal) {
+//                    return (NuxeoPrincipal) p;
+//                } else if (LoginComponent.isSystemLogin(p)) {
+//                    return new SystemPrincipal(p.getName());
+//                } else {
+//                    throw new RuntimeException("Unsupported principal: " + p.getClass());
+//                }
+//            } else {
+//                if (Framework.isTestModeSet()) {
+//                    return new SystemPrincipal(null);
+//                } else {
+//                    throw new NuxeoException(
+//                            "Cannot create a CoreSession outside a security context, " + " login() missing.");
+//                }
+//            }
+//        }
+//    }
 
     /**
      * Gets the name of the currently logged-in principal.
@@ -179,16 +168,16 @@ public class CoreInstance {
      * @return the result of the function
      * @since 8.4
      */
-    public static <R> R doPrivileged(String repositoryName, Function<CoreSession, R> function) {
-        MutableObject<R> result = new MutableObject<>();
-        new UnrestrictedSessionRunner(repositoryName, getCurrentPrincipalName()) {
-            @Override
-            public void run() {
-                result.setValue(function.apply(session));
-            }
-        }.runUnrestricted();
-        return result.getValue();
-    }
+//    public static <R> R doPrivileged(String repositoryName, Function<CoreSession, R> function) {
+//        MutableObject<R> result = new MutableObject<>();
+//        new UnrestrictedSessionRunner(repositoryName, getCurrentPrincipalName()) {
+//            @Override
+//            public void run() {
+//                result.setValue(function.apply(session));
+//            }
+//        }.runUnrestricted();
+//        return result.getValue();
+//    }
 
     /**
      * Runs the given {@link Function} with a system {@link CoreSession} while logged in as a system user.
@@ -199,16 +188,16 @@ public class CoreInstance {
      * @return the result of the function
      * @since 8.4
      */
-    public static <R> R doPrivileged(CoreSession session, Function<CoreSession, R> function) {
-        MutableObject<R> result = new MutableObject<>();
-        new UnrestrictedSessionRunner(session) {
-            @Override
-            public void run() {
-                result.setValue(function.apply(session));
-            }
-        }.runUnrestricted();
-        return result.getValue();
-    }
+//    public static <R> R doPrivileged(CoreSession session, Function<CoreSession, R> function) {
+//        MutableObject<R> result = new MutableObject<>();
+//        new UnrestrictedSessionRunner(session) {
+//            @Override
+//            public void run() {
+//                result.setValue(function.apply(session));
+//            }
+//        }.runUnrestricted();
+//        return result.getValue();
+//    }
 
     /**
      * Runs the given {@link Consumer} with a system {@link CoreSession} while logged in as a system user.
@@ -217,15 +206,15 @@ public class CoreInstance {
      * @param consumer the consumer taking a system {@link CoreSession}
      * @since 8.4
      */
-    public static void doPrivileged(String repositoryName, Consumer<CoreSession> consumer) {
-        new UnrestrictedSessionRunner(repositoryName, getCurrentPrincipalName()) {
-            @Override
-            public void run() {
-                consumer.accept(session);
-            }
-        }.runUnrestricted();
-    }
-
+//    public static void doPrivileged(String repositoryName, Consumer<CoreSession> consumer) {
+//        new UnrestrictedSessionRunner(repositoryName, getCurrentPrincipalName()) {
+//            @Override
+//            public void run() {
+//                consumer.accept(session);
+//            }
+//        }.runUnrestricted();
+//    }
+//
     /**
      * Runs the given {@link Consumer} with a system {@link CoreSession} while logged in as a system user.
      *
@@ -233,13 +222,13 @@ public class CoreInstance {
      * @param consumer the consumer taking a system {@link CoreSession}
      * @since 8.4
      */
-    public static void doPrivileged(CoreSession session, Consumer<CoreSession> consumer) {
-        new UnrestrictedSessionRunner(session) {
-            @Override
-            public void run() {
-                consumer.accept(session);
-            }
-        }.runUnrestricted();
-    }
+//    public static void doPrivileged(CoreSession session, Consumer<CoreSession> consumer) {
+//        new UnrestrictedSessionRunner(session) {
+//            @Override
+//            public void run() {
+//                consumer.accept(session);
+//            }
+//        }.runUnrestricted();
+//    }
 
 }

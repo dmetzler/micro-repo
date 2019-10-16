@@ -27,7 +27,9 @@ import java.util.Map;
 
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.impl.DocumentModelImpl;
 import org.nuxeo.ecm.core.api.model.Property;
+import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.utils.BlobsExtractor;
 
 /**
@@ -130,7 +132,10 @@ public class DocumentBlobHolder extends AbstractBlobHolder {
      * @since 9.3
      */
     protected List<Property> computeBlobList() {
-        List<Property> properties = new BlobsExtractor().getBlobsProperties(doc);
+        SchemaManager sm = ((DocumentModelImpl)doc).getSchemaManager();
+
+
+        List<Property> properties = new BlobsExtractor(sm).getBlobsProperties(doc);
         // be sure that the "main" blob is always in first position
         Iterator<Property> it = properties.iterator();
         boolean hasMainBlob = false;

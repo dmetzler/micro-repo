@@ -21,7 +21,6 @@ package org.nuxeo.ecm.core.api.blobholder;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -32,18 +31,16 @@ import org.nuxeo.ecm.core.api.adapter.DocumentAdapterFactory;
 import org.nuxeo.ecm.core.api.externalblob.ExternalBlobAdapter;
 import org.nuxeo.ecm.core.api.externalblob.ExternalBlobAdapterDescriptor;
 import org.nuxeo.ecm.core.api.model.PropertyException;
-import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.runtime.model.ComponentInstance;
-import org.nuxeo.runtime.model.DefaultComponent;
 
 /**
- * Runtime component to manage the pluggable factory for {@link DocumentAdapterFactory}.
+ * Runtime component to manage the pluggable factory for
+ * {@link DocumentAdapterFactory}.
  * <p>
  * Also provides the service interface {@link BlobHolderAdapterService}
  *
  * @author tiry
  */
-public class BlobHolderAdapterComponent extends DefaultComponent implements BlobHolderAdapterService {
+public class BlobHolderAdapterComponent implements BlobHolderAdapterService {
 
     private static final Log log = LogFactory.getLog(BlobHolderAdapterComponent.class);
 
@@ -59,8 +56,7 @@ public class BlobHolderAdapterComponent extends DefaultComponent implements Blob
 
     protected static final Map<String, ExternalBlobAdapter> externalBlobAdapters = new HashMap<>();
 
-    @Override
-    public void registerContribution(Object contribution, String extensionPoint, ComponentInstance contributor) {
+    public void registerContribution(Object contribution, String extensionPoint) {
 
         if (BLOBHOLDERFACTORY_EP.equals(extensionPoint)) {
             BlobHolderFactoryDescriptor desc = (BlobHolderFactoryDescriptor) contribution;
@@ -93,16 +89,7 @@ public class BlobHolderAdapterComponent extends DefaultComponent implements Blob
         }
     }
 
-    @Override
-    public void unregisterContribution(Object contribution, String extensionPoint, ComponentInstance contributor) {
-    }
 
-    /* for test */
-
-    public static Set<String> getFactoryNames() {
-        return ((BlobHolderAdapterComponent) Framework.getService(
-                BlobHolderAdapterService.class)).factories.keySet();
-    }
 
     /* Service Interface */
 

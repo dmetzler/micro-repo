@@ -24,10 +24,8 @@ import static java.lang.Boolean.TRUE;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -52,8 +50,6 @@ import org.nuxeo.ecm.core.schema.types.primitives.BooleanType;
 import org.nuxeo.ecm.core.schema.types.primitives.DateType;
 import org.nuxeo.ecm.core.storage.ExpressionEvaluator;
 import org.nuxeo.ecm.core.storage.QueryOptimizer.PrefixInfo;
-import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.runtime.services.config.ConfigurationService;
 
 import com.mongodb.QueryOperators;
 
@@ -94,7 +90,7 @@ public abstract class MongoDBAbstractQueryBuilder {
     public MongoDBAbstractQueryBuilder(MongoDBConverter converter, Expression expression) {
         this.converter = converter;
         this.expression = expression;
-        likeAnchored = !Framework.getService(ConfigurationService.class).isBooleanPropertyFalse(LIKE_ANCHORED_PROP);
+        likeAnchored = true;
     }
 
     public void walk() {

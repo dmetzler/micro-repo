@@ -540,7 +540,7 @@ public class MongoDBRepository extends DBSRepositoryBase {
             OrderByClause orderByClause, boolean distinctDocuments, int limit, int offset, int countUpTo) {
         // orderByClause may be null and different from evaluator.getOrderByClause() in case we want to post-filter
         MongoDBRepositoryQueryBuilder builder = new MongoDBRepositoryQueryBuilder(this, evaluator.getExpression(),
-                evaluator.getSelectClause(), orderByClause, evaluator.pathResolver, evaluator.fulltextSearchDisabled);
+                evaluator.getSelectClause(), orderByClause, evaluator.pathResolver, evaluator.fulltextSearchDisabled, schemaManager);
         builder.walk();
         if (builder.hasFulltext && isFulltextSearchDisabled()) {
             throw new QueryParseException("Fulltext search disabled by configuration");
@@ -618,7 +618,7 @@ public class MongoDBRepository extends DBSRepositoryBase {
     public ScrollResult<String> scroll(DBSExpressionEvaluator evaluator, int batchSize, int keepAliveSeconds) {
         cursorService.checkForTimedOutScroll();
         MongoDBRepositoryQueryBuilder builder = new MongoDBRepositoryQueryBuilder(this, evaluator.getExpression(),
-                evaluator.getSelectClause(), null, evaluator.pathResolver, evaluator.fulltextSearchDisabled);
+                evaluator.getSelectClause(), null, evaluator.pathResolver, evaluator.fulltextSearchDisabled, schemaManager);
         builder.walk();
         if (builder.hasFulltext && isFulltextSearchDisabled()) {
             throw new QueryParseException("Fulltext search disabled by configuration");

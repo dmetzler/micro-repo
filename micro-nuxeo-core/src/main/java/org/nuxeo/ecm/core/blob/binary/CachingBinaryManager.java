@@ -113,7 +113,7 @@ public abstract class CachingBinaryManager extends AbstractBinaryManager {
                 + maxCount + " minAge: " + minAge);
 
         // be sure FileTracker won't steal our files !
-        FileEventTracker.registerProtectedPath(cachedir.getAbsolutePath());
+        //FileEventTracker.registerProtectedPath(cachedir.getAbsolutePath());
     }
 
     @Override
@@ -144,9 +144,6 @@ public abstract class CachingBinaryManager extends AbstractBinaryManager {
         File cachedFile = fileCache.getFile(digest);
         if (cachedFile != null) {
             // file already in cache
-            if (Framework.isTestModeSet()) {
-                Framework.getProperties().setProperty("cachedBinary", digest);
-            }
             // delete tmp file, not needed anymore
             tmp.delete();
         } else {

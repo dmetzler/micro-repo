@@ -19,6 +19,7 @@
 package org.nuxeo.ecm.core.api.security;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -148,7 +149,7 @@ public interface ACP extends Serializable, Cloneable {
      * @return true if the ACP was changed.
      * @since 7.4
      */
-    boolean blockInheritance(String aclName, String username);
+    boolean blockInheritance(String aclName, String username, List<String> administratorsGroups);
 
     /**
      * Unblock the inheritance on the given {@code aclName}.

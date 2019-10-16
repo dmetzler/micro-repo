@@ -54,7 +54,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.NuxeoException;
-import org.nuxeo.runtime.api.Framework;
 
 /**
  * A binary manager that encrypts binaries on the filesystem using AES.

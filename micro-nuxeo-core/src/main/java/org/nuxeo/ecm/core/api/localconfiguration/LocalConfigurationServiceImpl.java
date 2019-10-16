@@ -24,7 +24,6 @@ import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentRef;
-import org.nuxeo.runtime.model.DefaultComponent;
 
 /**
  * Default implementation of {@code LocalConfigurationService}.
@@ -32,7 +31,7 @@ import org.nuxeo.runtime.model.DefaultComponent;
  * @author <a href="mailto:troger@nuxeo.com">Thomas Roger</a>
  * @since 5.4.2
  */
-public class LocalConfigurationServiceImpl extends DefaultComponent implements LocalConfigurationService {
+public class LocalConfigurationServiceImpl implements LocalConfigurationService {
 
     private static final Log log = LogFactory.getLog(LocalConfigurationServiceImpl.class);
 

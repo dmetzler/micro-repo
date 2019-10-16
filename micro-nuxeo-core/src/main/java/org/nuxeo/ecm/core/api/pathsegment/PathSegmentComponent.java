@@ -24,14 +24,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.NuxeoException;
-import org.nuxeo.runtime.model.ComponentContext;
-import org.nuxeo.runtime.model.ComponentInstance;
-import org.nuxeo.runtime.model.DefaultComponent;
 
 /**
  * Central service for the generation of a path segment for a document.
  */
-public class PathSegmentComponent extends DefaultComponent implements PathSegmentService {
+public class PathSegmentComponent implements PathSegmentService {
 
     private static final Log log = LogFactory.getLog(PathSegmentComponent.class);
 
@@ -43,68 +40,10 @@ public class PathSegmentComponent extends DefaultComponent implements PathSegmen
 
     protected boolean recompute;
 
-    @Override
-    public void activate(ComponentContext context) {
+    public PathSegmentComponent() {
         contribs = new LinkedList<Class<? extends PathSegmentService>>();
         recompute = true;
         service = null;
-    }
-
-    @Override
-    public void deactivate(ComponentContext context) {
-        contribs.clear();
-        service = null;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public void registerContribution(Object contrib, String xp, ComponentInstance contributor) {
-        if (!XP.equals(xp)) {
-            log.error("Unknown extension point " + xp);
-            return;
-        }
-        if (!(contrib instanceof PathSegmentServiceDescriptor)) {
-            log.error("Invalid contribution: " + contrib.getClass().getName());
-            return;
-        }
-        PathSegmentServiceDescriptor desc = (PathSegmentServiceDescriptor) contrib;
-        Class<?> klass;
-        try {
-            klass = Class.forName(desc.className);
-        } catch (ClassNotFoundException e) {
-            log.error("Invalid contribution class: " + desc.className);
-            return;
-        }
-        if (!PathSegmentService.class.isAssignableFrom(klass)) {
-            log.error("Invalid contribution class: " + desc.className);
-            return;
-        }
-        contribs.add((Class<PathSegmentService>) klass);
-        log.info("Registered path segment service: " + desc.className);
-        recompute = true;
-    }
-
-    @Override
-    public void unregisterContribution(Object contrib, String xp, ComponentInstance contributor) {
-        if (!XP.equals(xp)) {
-            return;
-        }
-        if (!(contrib instanceof PathSegmentServiceDescriptor)) {
-            return;
-        }
-        PathSegmentServiceDescriptor desc = (PathSegmentServiceDescriptor) contrib;
-        Class<?> klass;
-        try {
-            klass = Class.forName(desc.className);
-        } catch (ClassNotFoundException e) {
-            return;
-        }
-        if (!klass.isAssignableFrom(PathSegmentService.class)) {
-            return;
-        }
-        contribs.remove(klass);
-        log.info("Unregistered path segment service: " + desc.className);
-        recompute = true;
     }
 
     @Override

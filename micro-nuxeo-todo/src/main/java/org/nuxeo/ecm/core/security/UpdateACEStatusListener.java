@@ -19,9 +19,10 @@
 
 package org.nuxeo.ecm.core.security;
 
-import org.nuxeo.ecm.core.event.Event;
-import org.nuxeo.ecm.core.event.EventListener;
-import org.nuxeo.ecm.core.work.api.WorkManager;
+import javax.resource.spi.work.WorkManager;
+
+import org.nuxeo.micro.event.Event;
+import org.nuxeo.micro.event.EventListener;
 import org.nuxeo.runtime.api.Framework;
 
 /**

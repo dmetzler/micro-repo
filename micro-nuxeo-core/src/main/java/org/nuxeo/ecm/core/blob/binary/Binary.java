@@ -25,11 +25,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.nuxeo.ecm.core.blob.BlobManager;
 import org.nuxeo.ecm.core.blob.BlobProvider;
-import org.nuxeo.runtime.api.Framework;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A binary object that can be read, and has a length and a digest.
@@ -41,7 +40,7 @@ public class Binary implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger log = LogManager.getLogger(Binary.class);
+    private static final Logger log = LoggerFactory.getLogger(Binary.class);
 
     protected final String digest;
 
@@ -126,8 +125,7 @@ public class Binary implements Serializable {
     /**
      * Recomputes the file attribute by getting it from a new Binary for the same digest.
      */
-    protected File recomputeFile() {
-        BlobManager bm = Framework.getService(BlobManager.class);
+    protected File recomputeFile(BlobManager bm) {
         BlobProvider bp = bm.getBlobProvider(blobProviderId);
         Binary binary = bp.getBinaryManager().getBinary(digest);
         if (binary == null) {

@@ -78,13 +78,12 @@ import org.nuxeo.ecm.core.storage.FulltextQueryAnalyzer.FulltextQuery;
 import org.nuxeo.ecm.core.storage.FulltextQueryAnalyzer.Op;
 import org.nuxeo.ecm.core.storage.dbs.DBSDocument;
 import org.nuxeo.ecm.core.storage.dbs.DBSSession;
-import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.runtime.services.config.ConfigurationService;
 
 import com.mongodb.QueryOperators;
 
 /**
- * Query builder for a MongoDB query of the repository from an {@link Expression}.
+ * Query builder for a MongoDB query of the repository from an
+ * {@link Expression}.
  *
  * @since 5.9.4
  */
@@ -118,16 +117,17 @@ public class MongoDBRepositoryQueryBuilder extends MongoDBAbstractQueryBuilder {
     private boolean fulltextSearchDisabled;
 
     public MongoDBRepositoryQueryBuilder(MongoDBRepository repository, Expression expression, SelectClause selectClause,
-            OrderByClause orderByClause, PathResolver pathResolver, boolean fulltextSearchDisabled) {
+            OrderByClause orderByClause, PathResolver pathResolver, boolean fulltextSearchDisabled,
+            SchemaManager schemaManager) {
         super(repository.converter, expression);
-        schemaManager = Framework.getService(SchemaManager.class);
+        this.schemaManager = schemaManager;
         idKey = repository.idKey;
         this.selectClause = selectClause;
         this.orderByClause = orderByClause;
         this.pathResolver = pathResolver;
         this.fulltextSearchDisabled = fulltextSearchDisabled;
         this.propertyKeys = new HashMap<>();
-        likeAnchored = !Framework.getService(ConfigurationService.class).isBooleanPropertyFalse(LIKE_ANCHORED_PROP);
+        likeAnchored = true;
     }
 
     @Override
@@ -340,18 +340,21 @@ public class MongoDBRepositoryQueryBuilder extends MongoDBAbstractQueryBuilder {
     /**
      * Transforms the NXQL fulltext syntax into MongoDB syntax.
      * <p>
-     * The MongoDB fulltext query syntax is badly documented, but is actually the following:
+     * The MongoDB fulltext query syntax is badly documented, but is actually the
+     * following:
      * <ul>
      * <li>a term is a word,
      * <li>a phrase is a set of spaced-separated words enclosed in double quotes,
      * <li>negation is done by prepending a -,
-     * <li>the query is a space-separated set of terms, negated terms, phrases, or negated phrases.
+     * <li>the query is a space-separated set of terms, negated terms, phrases, or
+     * negated phrases.
      * <li>all the words of non-negated phrases are also added to the terms.
      * </ul>
      * <p>
      * The matching algorithm is (excluding stemming and stop words):
      * <ul>
-     * <li>filter out documents with the negative terms, the negative phrases, or missing the phrases,
+     * <li>filter out documents with the negative terms, the negative phrases, or
+     * missing the phrases,
      * <li>then if any term is present in the document then it's a match.
      * </ul>
      */
@@ -485,7 +488,8 @@ public class MongoDBRepositoryQueryBuilder extends MongoDBAbstractQueryBuilder {
      * <p>
      * Replaces {@code a/foo[123]/b} with {@code a/123/b}
      * <p>
-     * A star or a star followed by digits can be used instead of just the digits as well.
+     * A star or a star followed by digits can be used instead of just the digits as
+     * well.
      *
      * @param xpath the xpath
      * @return the canonicalized xpath.

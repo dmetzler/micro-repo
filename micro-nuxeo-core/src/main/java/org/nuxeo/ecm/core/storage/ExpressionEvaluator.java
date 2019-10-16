@@ -275,21 +275,7 @@ public abstract class ExpressionEvaluator {
         if (op != Operator.EQ && op != Operator.NOTEQ) {
             throw new QueryParseException(NXQL.ECM_ISTRASHED + " requires = or <> operator");
         }
-        TrashService trashService = Framework.getService(TrashService.class);
-        if (trashService.hasFeature(TRASHED_STATE_IS_DEDUCED_FROM_LIFECYCLE)) {
-            return walkIsTrashed(new Reference(NXQL.ECM_LIFECYCLESTATE), op, rvalue,
-                    new StringLiteral(LifeCycleConstants.DELETED_STATE));
-        } else if (trashService.hasFeature(TRASHED_STATE_IN_MIGRATION)) {
-            Boolean lifeCycleTrashed = walkIsTrashed(new Reference(NXQL.ECM_LIFECYCLESTATE), op, rvalue,
-                    new StringLiteral(LifeCycleConstants.DELETED_STATE));
-            Boolean propertyTrashed = walkIsTrashed(new Reference(NXQL.ECM_ISTRASHED), op, rvalue,
-                    new IntegerLiteral(1L));
-            return or(lifeCycleTrashed, propertyTrashed);
-        } else if (trashService.hasFeature(TRASHED_STATE_IS_DEDICATED_PROPERTY)) {
-            return walkIsTrashed(new Reference(NXQL.ECM_ISTRASHED), op, rvalue, new IntegerLiteral(1L));
-        } else {
-            throw new UnsupportedOperationException("TrashService is in an unknown state");
-        }
+        return walkIsTrashed(new Reference(NXQL.ECM_ISTRASHED), op, rvalue, new IntegerLiteral(1L));
     }
 
     protected Boolean walkIsTrashed(Reference ref, Operator op, Operand initialRvalue, Literal deletedRvalue) {
@@ -521,7 +507,8 @@ public abstract class ExpressionEvaluator {
     protected Boolean walkStartsWithPath(String path) {
         // resolve path
         String ancestorId = pathResolver.getIdForPath(path);
-        // don't return early on null ancestorId, we want to walk all references deterministically
+        // don't return early on null ancestorId, we want to walk all references
+        // deterministically
         Object[] ancestorIds = (Object[]) walkReference(new Reference(NXQL_ECM_ANCESTOR_IDS));
         if (ancestorId == null) {
             // no such path
@@ -772,7 +759,7 @@ public abstract class ExpressionEvaluator {
      * <li>ecm:mixinTypes NOT IN ('foo', 'bar')
      * </ul>
      *
-     * @param mixins the mixin(s) to match
+     * @param mixins  the mixin(s) to match
      * @param include {@code true} for = and IN
      * @since 7.4
      */
@@ -794,7 +781,8 @@ public abstract class ExpressionEvaluator {
     private static final Set<String> STOP_WORDS = new HashSet<>(Arrays.asList(StringUtils.split(STOP_WORDS_STR, ' ')));
 
     /**
-     * Checks if the fulltext combination of string1 and string2 matches the query expression.
+     * Checks if the fulltext combination of string1 and string2 matches the query
+     * expression.
      */
     protected static Boolean fulltext(String string1, String string2, String queryString) {
         if (queryString == null || (string1 == null && string2 == null)) {

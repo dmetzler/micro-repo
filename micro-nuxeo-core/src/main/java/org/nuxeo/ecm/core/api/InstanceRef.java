@@ -20,9 +20,9 @@ package org.nuxeo.ecm.core.api;
 
 import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;
-import java.security.Principal;
 
 import org.nuxeo.runtime.transaction.TransactionHelper;
+
 
 /**
  * Document repository reference including the principal owner of the session.
@@ -62,29 +62,29 @@ public class InstanceRef implements DocumentRef {
         return referent;
     }
 
-    private Object readResolve() throws ObjectStreamException {
-        // we need a transaction for this
-        boolean started = false;
-        if (!TransactionHelper.isTransactionActiveOrMarkedRollback()) {
-            started = TransactionHelper.startTransaction();
-        }
-        try {
-            try (CloseableCoreSession session = CoreInstance.openCoreSession(repositoryName, principal)) {
-                referent = session.getDocument(ref);
-                referent.detach(true);
-                return referent;
-            }
-        } catch (RuntimeException cause) {
-            InvalidObjectException error = new InvalidObjectException(
-                    "Cannot refetch " + ref + " from " + repositoryName);
-            error.initCause(cause);
-            throw error;
-        } finally {
-            if (started) {
-                TransactionHelper.commitOrRollbackTransaction();
-            }
-        }
-    }
+//    private Object readResolve() throws ObjectStreamException {
+//        // we need a transaction for this
+//        boolean started = false;
+//        if (!TransactionHelper.isTransactionActiveOrMarkedRollback()) {
+//            started = TransactionHelper.startTransaction();
+//        }
+//        try {
+//            try (CloseableCoreSession session = CoreInstance.openCoreSession(repositoryName, principal)) {
+//                referent = session.getDocument(ref);
+//                referent.detach(true);
+//                return referent;
+//            }
+//        } catch (RuntimeException cause) {
+//            InvalidObjectException error = new InvalidObjectException(
+//                    "Cannot refetch " + ref + " from " + repositoryName);
+//            error.initCause(cause);
+//            throw error;
+//        } finally {
+//            if (started) {
+//                TransactionHelper.commitOrRollbackTransaction();
+//            }
+//        }
+//    }
 
     @Override
     public int hashCode() {

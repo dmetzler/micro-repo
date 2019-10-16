@@ -23,6 +23,7 @@ package org.nuxeo.ecm.core.lifecycle.impl;
 import static java.util.function.Predicate.isEqual;
 import static org.nuxeo.ecm.core.api.LifeCycleConstants.DELETED_STATE;
 
+import java.security.cert.Extension;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -36,9 +37,6 @@ import org.nuxeo.ecm.core.lifecycle.LifeCycleState;
 import org.nuxeo.ecm.core.lifecycle.extensions.LifeCycleDescriptor;
 import org.nuxeo.ecm.core.lifecycle.extensions.LifeCycleTypesDescriptor;
 import org.nuxeo.ecm.core.model.Document;
-import org.nuxeo.runtime.model.ComponentName;
-import org.nuxeo.runtime.model.DefaultComponent;
-import org.nuxeo.runtime.model.Extension;
 
 /**
  * Life cycle service implementation.
@@ -47,9 +45,7 @@ import org.nuxeo.runtime.model.Extension;
  * @author Julien Anguenot
  * @author Florent Guillaume
  */
-public class LifeCycleServiceImpl extends DefaultComponent implements LifeCycleService {
-
-    public static final ComponentName NAME = new ComponentName("org.nuxeo.ecm.core.lifecycle.LifeCycleService");
+public class LifeCycleServiceImpl implements LifeCycleService {
 
     private static final Log log = LogFactory.getLog(LifeCycleServiceImpl.class);
 
@@ -146,59 +142,18 @@ public class LifeCycleServiceImpl extends DefaultComponent implements LifeCycleS
         doc.setCurrentLifeCycleState(documentLifeCycle.getDefaultInitialStateName());
     }
 
-    /**
-     * Register extensions.
-     */
-    @Override
-    public void registerExtension(Extension extension) {
-        Object[] contributions = extension.getContributions();
-        if (contributions != null) {
-            String point = extension.getExtensionPoint();
-            if (point.equals("lifecycle")) {
-                for (Object contribution : contributions) {
-                    LifeCycleDescriptor desc = (LifeCycleDescriptor) contribution;
-                    lifeCycles.addContribution(desc);
-                    // look for delete state to warn about usage
-                    if (!"default".equals(desc.getName())
-                            && desc.getStates().stream().map(LifeCycleState::getName).anyMatch(
-                                    isEqual(DELETED_STATE))) {
-                        log.warn("The 'deleted' state is deprecated and shouldn't be use anymore."
-                                + " Please consider removing it from you life cycle policy and use trash service instead.");
-                    }
-                }
-            } else if (point.equals("lifecyclemanager")) {
-                log.warn("Ignoring deprecated lifecyclemanager extension point");
-            } else if (point.equals("types")) {
-                for (Object mapping : contributions) {
-                    LifeCycleTypesDescriptor desc = (LifeCycleTypesDescriptor) mapping;
-                    lifeCycleTypes.addContribution(desc);
-                }
-            }
+    public void registerLifeCycle(LifeCycleDescriptor desc) {
+        lifeCycles.addContribution(desc);
+        // look for delete state to warn about usage
+        if (!"default".equals(desc.getName())
+                && desc.getStates().stream().map(LifeCycleState::getName).anyMatch(isEqual(DELETED_STATE))) {
+            log.warn("The 'deleted' state is deprecated and shouldn't be use anymore."
+                    + " Please consider removing it from you life cycle policy and use trash service instead.");
         }
     }
 
-    /**
-     * Unregisters an extension.
-     */
-    @Override
-    public void unregisterExtension(Extension extension) {
-        super.unregisterExtension(extension);
-        Object[] contributions = extension.getContributions();
-        if (contributions != null) {
-            String point = extension.getExtensionPoint();
-            if (point.equals("lifecycle")) {
-                for (Object lifeCycle : contributions) {
-                    LifeCycleDescriptor lifeCycleDescriptor = (LifeCycleDescriptor) lifeCycle;
-                    lifeCycles.removeContribution(lifeCycleDescriptor);
-                }
-            } else if (point.equals("types")) {
-                for (Object contrib : contributions) {
-                    LifeCycleTypesDescriptor desc = (LifeCycleTypesDescriptor) contrib;
-                    lifeCycleTypes.removeContribution(desc);
-                }
-
-            }
-        }
+    public void registerLifeCycleType(LifeCycleTypesDescriptor desc) {
+        lifeCycleTypes.addContribution(desc);
     }
 
     @Override

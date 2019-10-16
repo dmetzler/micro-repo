@@ -47,39 +47,25 @@ import org.nuxeo.ecm.core.schema.types.Schema;
 import org.nuxeo.ecm.core.schema.types.Type;
 import org.nuxeo.ecm.core.schema.types.constraints.Constraint;
 import org.nuxeo.ecm.core.schema.types.constraints.NotNullConstraint;
-import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.runtime.model.ComponentContext;
-import org.nuxeo.runtime.model.ComponentInstance;
-import org.nuxeo.runtime.model.DefaultComponent;
 
-public class DocumentValidationServiceImpl extends DefaultComponent implements DocumentValidationService {
+public class DocumentValidationServiceImpl implements DocumentValidationService {
 
     private SchemaManager schemaManager;
 
-    protected SchemaManager getSchemaManager() {
-        if (schemaManager == null) {
-            schemaManager = Framework.getService(SchemaManager.class);
-        }
-        return schemaManager;
-    }
-
     private Map<String, Boolean> validationActivations = new HashMap<>();
 
-    @Override
-    public void activate(ComponentContext context) {
-        super.activate(context);
+    public DocumentValidationServiceImpl(SchemaManager schemaManager) {
+        this.schemaManager = schemaManager;
     }
 
-    @Override
-    public void registerContribution(Object contribution, String extensionPoint, ComponentInstance contributor) {
+    public void registerContribution(Object contribution, String extensionPoint) {
         if (extensionPoint.equals("activations")) {
             DocumentValidationDescriptor dvd = (DocumentValidationDescriptor) contribution;
             validationActivations.put(dvd.getContext(), dvd.isActivated());
         }
     }
 
-    @Override
-    public void unregisterContribution(Object contribution, String extensionPoint, ComponentInstance contributor) {
+    public void unregisterContribution(Object contribution, String extensionPoint) {
         if (extensionPoint.equals("activations")) {
             DocumentValidationDescriptor dvd = (DocumentValidationDescriptor) contribution;
             validationActivations.remove(dvd.getContext());
@@ -120,7 +106,7 @@ public class DocumentValidationServiceImpl extends DefaultComponent implements D
         DocumentType docType = document.getDocumentType();
         if (dirtyOnly) {
             for (DataModel dataModel : document.getDataModels().values()) {
-                Schema schemaDef = getSchemaManager().getSchema(dataModel.getSchema());
+                Schema schemaDef = schemaManager.getSchema(dataModel.getSchema());
                 for (String fieldName : dataModel.getDirtyFields()) {
                     Field field = schemaDef.getField(fieldName);
                     Property property = document.getProperty(field.getName().getPrefixedName());
@@ -147,7 +133,8 @@ public class DocumentValidationServiceImpl extends DefaultComponent implements D
 
     @Override
     public DocumentValidationReport validate(Field field, Object value, boolean validateSubProperties) {
-        Schema schema = field.getDeclaringType().getSchema();
+
+        Schema schema = schemaManager.getSchema(field.getDeclaringType().getSchemaName());
         return new DocumentValidationReport(validate(schema, field, value, validateSubProperties));
     }
 
@@ -176,7 +163,7 @@ public class DocumentValidationServiceImpl extends DefaultComponent implements D
     @Override
     public DocumentValidationReport validate(String xpath, Object value, boolean validateSubProperties)
             throws IllegalArgumentException {
-        SchemaManager tm = Framework.getService(SchemaManager.class);
+
         String[] splittedXpath = xpath.split("/");
         List<PathNode> path = new ArrayList<>();
         Field field = null;
@@ -188,7 +175,8 @@ public class DocumentValidationServiceImpl extends DefaultComponent implements D
                 // get the list field type
                 Field itemField = ((ListType) field.getType()).getField();
                 if (xpathToken.matches("\\d+")) {
-                    // if the current token is an index, append the token and append an indexed PathNode to the path
+                    // if the current token is an index, append the token and append an indexed
+                    // PathNode to the path
                     fieldXpath.append('/').append(xpathToken);
                     field = itemField;
                     int index = Integer.parseInt(xpathToken);
@@ -200,11 +188,12 @@ public class DocumentValidationServiceImpl extends DefaultComponent implements D
                     path.add(new PathNode(field));
                 } else {
                     // otherwise, the token in an item's element
-                    // append the token and append the item's field and the item's element's field to the path node
+                    // append the token and append the item's field and the item's element's field
+                    // to the path node
                     fieldXpath.append('/').append(xpathToken);
                     field = itemField;
                     path.add(new PathNode(field));
-                    field = tm.getField(fieldXpath.toString());
+                    field = schemaManager.getField(fieldXpath.toString());
                     if (field == null) {
                         throw new IllegalArgumentException("Invalid xpath " + fieldXpath);
                     }
@@ -216,7 +205,7 @@ public class DocumentValidationServiceImpl extends DefaultComponent implements D
                 }
                 fieldXpath.append(xpathToken);
                 // get the field
-                field = tm.getField(fieldXpath.toString());
+                field = schemaManager.getField(fieldXpath.toString());
                 // check it exists
                 if (field == null) {
                     throw new IllegalArgumentException("Invalid xpath " + fieldXpath);
@@ -225,7 +214,7 @@ public class DocumentValidationServiceImpl extends DefaultComponent implements D
                 path.add(new PathNode(field));
             }
         }
-        Schema schema = field.getDeclaringType().getSchema(); // NOSONAR
+        Schema schema = schemaManager.getSchema(field.getDeclaringType().getSchemaName()); // NOSONAR
         return new DocumentValidationReport(validateAnyTypeField(schema, path, field, value, validateSubProperties));
     }
 
@@ -371,7 +360,8 @@ public class DocumentValidationServiceImpl extends DefaultComponent implements D
             if (field.getType().isSimpleType()) {
                 return validateSimpleTypeProperty(schema, path, prop, dirtyOnly);
             } else if (field.getType().isComplexType()) {
-                // ignore for now the case when the complex property is null with a null contraints because it's
+                // ignore for now the case when the complex property is null with a null
+                // contraints because it's
                 // currently impossible
                 if (validateSubProperties) {
                     return validateComplexTypeProperty(schema, path, prop, dirtyOnly);
@@ -396,7 +386,8 @@ public class DocumentValidationServiceImpl extends DefaultComponent implements D
         List<ConstraintViolation> violations = new ArrayList<>();
         Serializable value = prop.getValue();
         Object defaultValue = field.getDefaultValue();
-        // check nullity constraint only if field doesn't have a default value (phantom case)
+        // check nullity constraint only if field doesn't have a default value (phantom
+        // case)
         if (prop.isPhantom() && defaultValue == null || value == null) {
             if (!field.isNillable()) {
                 addNotNullViolation(violations, schema, path);

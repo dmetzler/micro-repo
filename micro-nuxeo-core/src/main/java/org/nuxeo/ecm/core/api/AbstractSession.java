@@ -41,7 +41,6 @@ import static org.nuxeo.ecm.core.api.security.SecurityConstants.WRITE_PROPERTIES
 import static org.nuxeo.ecm.core.api.security.SecurityConstants.WRITE_SECURITY;
 import static org.nuxeo.ecm.core.api.security.SecurityConstants.WRITE_VERSION;
 import static org.nuxeo.ecm.core.api.trash.TrashService.Feature.TRASHED_STATE_IS_DEDUCED_FROM_LIFECYCLE;
-import static org.nuxeo.ecm.core.trash.LifeCycleTrashService.FROM_LIFE_CYCLE_TRASH_SERVICE;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -2087,22 +2086,6 @@ public abstract class AbstractSession implements CoreSession, Serializable {
         // backward compat - used to forward deprecated call followTransition("deleted") to trash service
         boolean deleteTransitions = LifeCycleConstants.DELETE_TRANSITION.equals(transition)
                 || LifeCycleConstants.UNDELETE_TRANSITION.equals(transition);
-        if (deleteTransitions && !trashService.hasFeature(TRASHED_STATE_IS_DEDUCED_FROM_LIFECYCLE)
-                && !Boolean.TRUE.equals(options.get(FROM_LIFE_CYCLE_TRASH_SERVICE))) {
-            String message = "Following the transition '" + transition + "' is deprecated. Please use TrashService.";
-            if (log.isTraceEnabled()) {
-                log.warn(message, new Throwable("stack trace"));
-            } else {
-                log.warn(message);
-            }
-            DocumentModel docModel = readModel(doc);
-            if (LifeCycleConstants.DELETE_TRANSITION.equals(transition)) {
-                trashService.trashDocument(docModel);
-            } else {
-                trashService.untrashDocument(docModel);
-            }
-            return true;
-        }
 
         if (!doc.isVersion() && !doc.isProxy() && !doc.isCheckedOut()) {
             if (!deleteTransitions) {

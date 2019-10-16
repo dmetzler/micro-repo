@@ -38,7 +38,6 @@ import org.nuxeo.ecm.core.schema.types.Field;
 import org.nuxeo.ecm.core.schema.types.ListType;
 import org.nuxeo.ecm.core.schema.types.Schema;
 import org.nuxeo.ecm.core.schema.types.Type;
-import org.nuxeo.runtime.api.Framework;
 
 /**
  * Extractor for all the blobs of a document.
@@ -54,6 +53,12 @@ public class BlobsExtractor {
     private boolean allBlobs;
 
     private boolean isDefaultConfiguration = true;
+
+    private SchemaManager schemaManager;
+
+    public BlobsExtractor(SchemaManager schemaManager) {
+        this.schemaManager = schemaManager;
+    }
 
     /**
      * Sets extractor properties, controlling what properties or values are returned by {@link #getBlobsProperties} or
@@ -91,7 +96,6 @@ public class BlobsExtractor {
         if (paths == null) {
             return null;
         }
-        SchemaManager schemaManager = Framework.getService(SchemaManager.class);
         Set<String> normPaths = new HashSet<>();
         for (String path : paths) {
             // remove "/data" suffix

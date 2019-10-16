@@ -55,8 +55,8 @@ import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.schema.types.Schema;
 
 /**
- * A DocumentModel that can have any schema and is not made persistent by itself. A mockup to keep arbitrary schema
- * data.
+ * A DocumentModel that can have any schema and is not made persistent by
+ * itself. A mockup to keep arbitrary schema data.
  */
 public class SimpleDocumentModel implements DocumentModel {
 
@@ -600,7 +600,7 @@ public class SimpleDocumentModel implements DocumentModel {
 
     @Override
     public PropertyObjectResolver getObjectResolver(String xpath) {
-        return DocumentPropertyObjectResolverImpl.create(this, xpath);
+        return DocumentPropertyObjectResolverImpl.create(this, xpath, schemaManager);
     }
 
 }

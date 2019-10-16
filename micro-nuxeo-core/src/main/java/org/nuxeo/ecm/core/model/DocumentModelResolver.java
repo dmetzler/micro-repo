@@ -215,31 +215,11 @@ public class DocumentModelResolver extends AbstractObjectResolver implements Obj
         }
         CloseableCoreSession closeableCoreSession = null;
         try {
-            CoreSession session;
-            try {
-                if (ref.repo != null) {
-                    // we have an explicit repository name
-                    if (context != null && ref.repo.equals(((CoreSession) context).getRepositoryName())) {
-                        // if it's the same repository as the context session, use it directly
-                        session = (CoreSession) context;
-                    } else {
-                        // otherwise open a new one
-                        closeableCoreSession = CoreInstance.openCoreSession(ref.repo);
-                        session = closeableCoreSession;
-                    }
-                } else {
-                    // use session from context
-                    session = (CoreSession) context;
-                    if (session == null) {
-                        // use the default repository if none is provided in the context
-                        closeableCoreSession = CoreInstance.openCoreSession(null);
-                        session = closeableCoreSession;
-                    }
-                }
-            } catch (LocalException e) {
-                // no such repository
+            if(!(context instanceof CoreSession)) {
                 return;
             }
+            CoreSession session = (CoreSession) context;
+
             DocumentRef docRef;
             switch (mode) {
             case ID_ONLY_REF:

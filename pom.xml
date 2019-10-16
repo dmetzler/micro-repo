@@ -13,6 +13,7 @@
   <modules>
     <module>micro-nuxeo-api</module>
     <module>micro-nuxeo-core</module>
+    <module>micro-nuxeo-todo</module>
     <module>micro-nuxeo-dsl</module>
     <module>micro-nuxeo-event</module>
   </modules>
@@ -229,6 +230,11 @@
         <artifactId>assertj-core</artifactId>
         <version>3.8.0</version>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>1.11</version>
       </dependency>
 
 

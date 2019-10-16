@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.nuxeo.ecm.core.api.UnrestrictedSessionRunner;
 import org.nuxeo.ecm.core.api.repository.RepositoryManager;
 import org.nuxeo.ecm.core.model.Repository;
 import org.nuxeo.runtime.transaction.TransactionHelper;
@@ -98,19 +97,19 @@ public class RepositoryService {
             return;
         }
         // invoke handlers
-        for (String name : getRepositoryNames()) {
-            initializeRepository(handler, name);
-        }
+//        for (String name : getRepositoryNames()) {
+//            initializeRepository(handler, name);
+//        }
     }
 
-    protected void initializeRepository(final RepositoryInitializationHandler handler, String name) {
-        new UnrestrictedSessionRunner(name) {
-            @Override
-            public void run() {
-                handler.initializeRepository(session);
-            }
-        }.runUnrestricted();
-    }
+//    protected void initializeRepository(final RepositoryInitializationHandler handler, String name) {
+//        new UnrestrictedSessionRunner(name) {
+//            @Override
+//            public void run() {
+//                handler.initializeRepository(session);
+//            }
+//        }.runUnrestricted();
+//    }
 
     /**
      * Gets a repository given its name.

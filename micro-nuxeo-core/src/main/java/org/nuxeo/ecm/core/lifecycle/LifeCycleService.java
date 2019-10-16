@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.nuxeo.ecm.core.api.LifeCycleException;
-import org.nuxeo.ecm.core.lifecycle.event.BulkLifeCycleChangeListener;
 import org.nuxeo.ecm.core.model.Document;
 
 /**

@@ -24,10 +24,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
-import org.nuxeo.ecm.core.event.Event;
-import org.nuxeo.ecm.core.event.EventContext;
-import org.nuxeo.ecm.core.event.EventListener;
-import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
+import org.nuxeo.micro.event.DocumentEventContext;
+import org.nuxeo.micro.event.Event;
+import org.nuxeo.micro.event.EventContext;
+import org.nuxeo.micro.event.EventListener;
 import org.nuxeo.runtime.api.Framework;
 
 public class DocUIDGeneratorListener implements EventListener {

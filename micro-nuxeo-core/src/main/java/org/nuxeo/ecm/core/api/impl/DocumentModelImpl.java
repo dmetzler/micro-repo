@@ -333,6 +333,10 @@ public class DocumentModelImpl implements DocumentModel, Cloneable {
         return parentRef;
     }
 
+    public SchemaManager getSchemaManager() {
+        return this.schemaManager;
+    }
+
     @Override
     public CoreSession getCoreSession() {
         if (sid == null) {
@@ -1465,7 +1469,7 @@ public class DocumentModelImpl implements DocumentModel, Cloneable {
 
     @Override
     public PropertyObjectResolver getObjectResolver(String xpath) {
-        return DocumentPropertyObjectResolverImpl.create(this, xpath);
+        return DocumentPropertyObjectResolverImpl.create(this, xpath, schemaManager);
     }
 
     /**
