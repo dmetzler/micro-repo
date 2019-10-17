@@ -1,0 +1,48 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.nuxeo</groupId>
+    <artifactId>micro-nuxeo-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>micro-nuxeo-el</artifactId>
+  <name>Micro Nuxeo :: parent</name>
+  <description></description>
+
+
+  <dependencies>
+    <dependency>
+      <groupId>org.nuxeo</groupId>
+      <artifactId>micro-nuxeo-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.el</groupId>
+      <artifactId>jboss-el</artifactId>
+    </dependency>
+    <dependency>
+      <!-- this implements a more recent version of the EL spec than javax.el:el-api:1.0 -->
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-el-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

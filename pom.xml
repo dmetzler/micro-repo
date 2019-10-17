@@ -12,6 +12,7 @@
 
   <modules>
     <module>micro-nuxeo-api</module>
+    <module>micro-nuxeo-el</module>
     <module>micro-nuxeo-core</module>
     <module>micro-nuxeo-todo</module>
     <module>micro-nuxeo-dsl</module>
@@ -67,6 +68,12 @@
       <dependency>
         <groupId>org.nuxeo</groupId>
         <artifactId>micro-nuxeo-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.nuxeo</groupId>
+        <artifactId>micro-nuxeo-el</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -211,6 +218,33 @@
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>26.0-jre</version>
+      </dependency>
+
+      <dependency>
+        <!-- this implements a more recent version of the EL spec than javax.el:el-api:1.0 -->
+        <groupId>org.apache.tomcat</groupId>
+        <artifactId>tomcat-el-api</artifactId>
+        <version>9.0.20</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.jboss.el</groupId>
+        <artifactId>jboss-el</artifactId>
+        <version>1.0_02.CR6</version>
+        <exclusions>
+          <!-- use org.apache.tomcat:tomcat-el-api instead -->
+          <exclusion>
+            <groupId>javax.el</groupId>
+            <artifactId>el-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <!-- this implements a more recent version of the EL spec than javax.el:el-api:1.0 -->
+        <groupId>org.apache.tomcat</groupId>
+        <artifactId>tomcat-el-api</artifactId>
+        <version>9.0.20</version>
+        <scope>provided</scope> <!-- provided by Tomcat as jasper.jar -->
       </dependency>
 
       <dependency>

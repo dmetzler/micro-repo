@@ -22,7 +22,6 @@ package org.nuxeo.ecm.core.versioning;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.facet.VersioningDocument;
 import org.nuxeo.ecm.core.api.versioning.VersioningService;
-import org.nuxeo.runtime.api.Framework;
 
 /**
  * Adapter showing the versioning aspects of documents.
@@ -33,8 +32,8 @@ public class VersioningDocumentAdapter implements VersioningDocument {
 
     public final VersioningService service;
 
-    public VersioningDocumentAdapter(DocumentModel doc) {
-        service = Framework.getService(VersioningService.class);
+    public VersioningDocumentAdapter(DocumentModel doc, VersioningService vs) {
+        service = vs;
         this.doc = doc;
     }
 

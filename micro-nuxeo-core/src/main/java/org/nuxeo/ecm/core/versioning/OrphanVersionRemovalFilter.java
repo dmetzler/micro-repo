@@ -21,7 +21,7 @@ package org.nuxeo.ecm.core.versioning;
 import java.util.List;
 
 import org.nuxeo.ecm.core.api.CoreSession;
-import org.nuxeo.ecm.core.event.impl.ShallowDocumentModel;
+import org.nuxeo.ecm.core.api.DocumentModel;
 
 /**
  * Interface to be implemented by contributions to the orphanVersionRemovalFilter extension point.
@@ -41,6 +41,6 @@ public interface OrphanVersionRemovalFilter {
      * @param versionUUIDs the UUIDs of the versions associated to the deleted document
      * @return the "filtred" list of versions that can be removed
      */
-    List<String> getRemovableVersionIds(CoreSession session, ShallowDocumentModel deletedLiveDoc,
+    List<String> getRemovableVersionIds(CoreSession session, DocumentModel deletedLiveDoc,
             List<String> versionUUIDs);
 }

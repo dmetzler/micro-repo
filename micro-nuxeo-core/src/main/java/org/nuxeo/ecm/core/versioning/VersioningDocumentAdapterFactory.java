@@ -21,15 +21,18 @@ package org.nuxeo.ecm.core.versioning;
 
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.adapter.DocumentAdapterFactory;
+import org.nuxeo.ecm.core.api.versioning.VersioningService;
 
 /**
  * Adapter class factory for Versioning Document interface.
  */
 public class VersioningDocumentAdapterFactory implements DocumentAdapterFactory {
 
+    VersioningService versioningService;
+
     @Override
     public Object getAdapter(DocumentModel doc, Class<?> itf) {
-        return new VersioningDocumentAdapter(doc);
+        return new VersioningDocumentAdapter(doc, versioningService);
     }
 
 }

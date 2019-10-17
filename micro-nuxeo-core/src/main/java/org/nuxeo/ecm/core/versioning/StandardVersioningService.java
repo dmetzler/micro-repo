@@ -31,19 +31,14 @@ import static org.nuxeo.ecm.core.api.event.CoreEventConstants.REPOSITORY_NAME;
 import static org.nuxeo.ecm.core.api.event.CoreEventConstants.SESSION_ID;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.nuxeo.ecm.core.api.CoreSession;
+import org.nuxeo.ecm.core.api.CoreSessionService;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelFactory;
 import org.nuxeo.ecm.core.api.LifeCycleException;
@@ -52,18 +47,20 @@ import org.nuxeo.ecm.core.api.VersioningOption;
 import org.nuxeo.ecm.core.api.event.DocumentEventCategories;
 import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
 import org.nuxeo.ecm.core.api.versioning.VersioningService;
-import org.nuxeo.ecm.core.event.EventService;
-import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 import org.nuxeo.ecm.core.model.Document;
 import org.nuxeo.ecm.core.schema.FacetNames;
-import org.nuxeo.runtime.api.Framework;
+import org.nuxeo.ecm.core.schema.SchemaManager;
+import org.nuxeo.micro.event.DocumentEventContext;
+import org.nuxeo.micro.event.EventService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of the versioning service that follows standard checkout / checkin semantics.
  */
 public class StandardVersioningService implements ExtendableVersioningService {
 
-    private static final Logger log = LogManager.getLogger(StandardVersioningService.class);
+    private static final Logger log = LoggerFactory.getLogger(StandardVersioningService.class);
 
     protected static final int DEFAULT_FORMER_RULE_ORDER = 10_000;
 
@@ -71,35 +68,11 @@ public class StandardVersioningService implements ExtendableVersioningService {
 
     protected static final String COMPAT_DEFAULT_ID = "compatibility-default";
 
-    /**
-     * @deprecated since 9.1 seems unused
-     */
-    @Deprecated
-    public static final String FILE_TYPE = "File";
-
-    /**
-     * @deprecated since 9.1 seems unused
-     */
-    @Deprecated
-    public static final String NOTE_TYPE = "Note";
-
-    /**
-     * @deprecated since 9.1 seems unused
-     */
-    @Deprecated
-    public static final String PROJECT_STATE = "project";
-
     public static final String APPROVED_STATE = "approved";
 
     public static final String OBSOLETE_STATE = "obsolete";
 
     public static final String BACK_TO_PROJECT_TRANSITION = "backToProject";
-
-    /**
-     * @deprecated since 9.1 seems unused
-     */
-    @Deprecated
-    protected static final String AUTO_CHECKED_OUT = "AUTO_CHECKED_OUT";
 
     /** Key for major version in Document API. */
     protected static final String MAJOR_VERSION = "ecm:majorVersion";
@@ -122,6 +95,19 @@ public class StandardVersioningService implements ExtendableVersioningService {
     private Map<String, VersioningFilterDescriptor> versioningFilters = new HashMap<>();
 
     private Map<String, VersioningRestrictionDescriptor> versioningRestrictions = new HashMap<>();
+
+    protected transient CoreSessionService css;
+
+    protected transient SchemaManager schemaManager;
+
+    protected transient EventService eventService;
+
+
+    public StandardVersioningService(SchemaManager schemaManager, CoreSessionService css, EventService eventService) {
+        this.schemaManager = schemaManager;
+        this.css = css;
+        this.eventService = eventService;
+    }
 
     @Override
     public String getVersionLabel(DocumentModel docModel) {
@@ -211,7 +197,7 @@ public class StandardVersioningService implements ExtendableVersioningService {
      */
     protected void setInitialVersion(Document doc) {
         // Create a document model for filters
-        DocumentModel docModel = DocumentModelFactory.createDocumentModel(doc, null, null);
+        DocumentModel docModel = DocumentModelFactory.createDocumentModel(doc, null, null, schemaManager, css);
         InitialStateDescriptor initialState = versioningPolicies.values()
                                                                 .stream()
                                                                 .sorted()
@@ -384,89 +370,6 @@ public class StandardVersioningService implements ExtendableVersioningService {
         }
     }
 
-    @Override
-    @Deprecated
-    public Map<String, VersioningRuleDescriptor> getVersioningRules() {
-        return Collections.emptyMap();
-    }
-
-    @Override
-    @Deprecated
-    public void setVersioningRules(Map<String, VersioningRuleDescriptor> versioningRules) {
-        // Convert former rules to new one - keep initial state and restriction
-        int order = DEFAULT_FORMER_RULE_ORDER - 1;
-        for (Entry<String, VersioningRuleDescriptor> rules : versioningRules.entrySet()) {
-            String documentType = rules.getKey();
-            VersioningRuleDescriptor versioningRule = rules.getValue();
-            // Compute policy and filter id
-            String compatId = COMPAT_ID_PREFIX + documentType;
-
-            // Convert the rule
-            if (versioningRule.isEnabled()) {
-                VersioningPolicyDescriptor policy = new VersioningPolicyDescriptor();
-                policy.id = compatId;
-                policy.order = order;
-                policy.initialState = versioningRule.initialState;
-                policy.filterIds = new ArrayList<>(Collections.singleton(compatId));
-
-                VersioningFilterDescriptor filter = new VersioningFilterDescriptor();
-                filter.id = compatId;
-                filter.types = Collections.singleton(documentType);
-
-                // Register rules
-                versioningPolicies.put(compatId, policy);
-                versioningFilters.put(compatId, filter);
-
-                // Convert save options
-                VersioningRestrictionDescriptor restriction = new VersioningRestrictionDescriptor();
-                restriction.type = documentType;
-                restriction.options = versioningRule.getOptions()
-                                                    .values()
-                                                    .stream()
-                                                    .map(SaveOptionsDescriptor::toRestrictionOptions)
-                                                    .collect(Collectors.toMap(
-                                                            VersioningRestrictionOptionsDescriptor::getLifeCycleState,
-                                                            Function.identity()));
-                versioningRestrictions.put(restriction.type, restriction);
-
-                order--;
-            } else {
-                versioningPolicies.remove(compatId);
-                versioningFilters.remove(compatId);
-            }
-        }
-    }
-
-    @Override
-    @Deprecated
-    public void setDefaultVersioningRule(DefaultVersioningRuleDescriptor defaultVersioningRule) {
-        if (defaultVersioningRule == null) {
-            return;
-        }
-        // Convert former rules to new one - keep initial state and restriction
-        VersioningPolicyDescriptor policy = new VersioningPolicyDescriptor();
-        policy.id = COMPAT_DEFAULT_ID;
-        policy.order = DEFAULT_FORMER_RULE_ORDER;
-        policy.initialState = defaultVersioningRule.initialState;
-
-        // Register rule
-        if (versioningPolicies == null) {
-            versioningPolicies = new HashMap<>();
-        }
-        versioningPolicies.put(policy.id, policy);
-
-        // Convert save options
-        VersioningRestrictionDescriptor restriction = new VersioningRestrictionDescriptor();
-        restriction.type = "*";
-        restriction.options = defaultVersioningRule.getOptions()
-                                                   .values()
-                                                   .stream()
-                                                   .map(SaveOptionsDescriptor::toRestrictionOptions)
-                                                   .collect(Collectors.toMap(
-                                                           VersioningRestrictionOptionsDescriptor::getLifeCycleState,
-                                                           Function.identity()));
-        versioningRestrictions.put(restriction.type, restriction);
-    }
 
     @Override
     public void setVersioningPolicies(Map<String, VersioningPolicyDescriptor> versioningPolicies) {
@@ -545,7 +448,7 @@ public class StandardVersioningService implements ExtendableVersioningService {
     protected void sendEvent(CoreSession session, Document doc, String previousLifecycleState,
             Map<String, Serializable> options) {
         String sid = session.getSessionId();
-        DocumentModel docModel = DocumentModelFactory.createDocumentModel(doc, sid, null);
+        DocumentModel docModel = DocumentModelFactory.createDocumentModel(doc, sid, null, schemaManager, css);
 
         DocumentEventContext ctx = new DocumentEventContext(session, session.getPrincipal(), docModel);
 
@@ -558,7 +461,7 @@ public class StandardVersioningService implements ExtendableVersioningService {
         ctx.setProperty(CATEGORY, DocumentEventCategories.EVENT_LIFE_CYCLE_CATEGORY);
         ctx.setProperty(COMMENT, options.get(COMMENT));
 
-        Framework.getService(EventService.class).fireEvent(ctx.newEvent(TRANSITION_EVENT));
+        eventService.fireEvent(ctx.newEvent(TRANSITION_EVENT));
     }
 
 }

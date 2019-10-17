@@ -40,8 +40,9 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.NuxeoPrincipal;
 import org.nuxeo.ecm.core.api.local.ClientLoginModule;
 import org.nuxeo.ecm.core.schema.DocumentType;
+import org.nuxeo.ecm.platform.el.DefaultELContextFactory;
 import org.nuxeo.ecm.platform.el.ELService;
-import org.nuxeo.runtime.api.Framework;
+
 
 /**
  * @since 9.1
@@ -80,7 +81,7 @@ public class StandardVersioningPolicyFilter implements VersioningPolicyFilter {
 
             String cond = evaluateCondition(condition);
 
-            ELContext context = Framework.getService(ELService.class).createELContext();
+            ELContext context = new DefaultELContextFactory().get();
             ExpressionFactory expressionFactory = new ExpressionFactoryImpl();
 
             VariableMapper vm = context.getVariableMapper();

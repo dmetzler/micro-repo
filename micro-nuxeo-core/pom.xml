@@ -24,6 +24,10 @@
       <artifactId>micro-nuxeo-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.nuxeo</groupId>
+      <artifactId>micro-nuxeo-el</artifactId>
+    </dependency>
+    <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
     </dependency>
@@ -122,22 +126,18 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.sun.xsom</groupId>
       <artifactId>xsom</artifactId>
-      <version>20140925</version>
     </dependency>
 
   </dependencies>

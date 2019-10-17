@@ -27,12 +27,10 @@ import org.nuxeo.ecm.core.CoreService;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.IdRef;
-import org.nuxeo.ecm.core.event.Event;
-import org.nuxeo.ecm.core.event.EventBundle;
-import org.nuxeo.ecm.core.event.EventContext;
-import org.nuxeo.ecm.core.event.PostCommitEventListener;
-import org.nuxeo.ecm.core.event.impl.ShallowDocumentModel;
-import org.nuxeo.runtime.api.Framework;
+import org.nuxeo.micro.event.Event;
+import org.nuxeo.micro.event.EventBundle;
+import org.nuxeo.micro.event.EventContext;
+import org.nuxeo.micro.event.PostCommitEventListener;
 
 /**
  * Async listener that is in charge to delete the versions. Before running the delete operation on the versions passed
@@ -44,6 +42,8 @@ import org.nuxeo.runtime.api.Framework;
 public class OrphanVersionRemoverListener implements PostCommitEventListener {
 
     protected static final Log log = LogFactory.getLog(OrphanVersionRemoverListener.class);
+
+    protected CoreService coreService;
 
     @Override
     public void handleEvent(EventBundle events) {
@@ -57,26 +57,18 @@ public class OrphanVersionRemoverListener implements PostCommitEventListener {
                 Object[] args = ctx.getArguments();
                 if (args.length == 2) {
                     DocumentModel doc = (DocumentModel) args[0];
-                    ShallowDocumentModel deletedLiveDoc = null;
-                    if (doc instanceof ShallowDocumentModel) {
-                        deletedLiveDoc = (ShallowDocumentModel) doc;
-                    } else {
-                        // cluster node has still no fetched invalidation
-                        // so ShallowDocumentModel has been reconnected via the cache !
-                        deletedLiveDoc = new ShallowDocumentModel(doc);
-                    }
                     List<String> versionUUIDs = (List<String>) args[1];
-                    removeIfPossible(session, deletedLiveDoc, versionUUIDs);
+                    removeIfPossible(session, doc, versionUUIDs);
                 }
             }
         }
     }
 
     protected Collection<OrphanVersionRemovalFilter> getFilters() {
-        return Framework.getService(CoreService.class).getOrphanVersionRemovalFilters();
+        return coreService.getOrphanVersionRemovalFilters();
     }
 
-    protected void removeIfPossible(CoreSession session, ShallowDocumentModel deletedLiveDoc, List<String> versionUUIDs)
+    protected void removeIfPossible(CoreSession session, DocumentModel deletedLiveDoc, List<String> versionUUIDs)
             {
         session.save(); // receive invalidations if no tx
 

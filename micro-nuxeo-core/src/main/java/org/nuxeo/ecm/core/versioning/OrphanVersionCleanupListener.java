@@ -20,11 +20,8 @@ package org.nuxeo.ecm.core.versioning;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.nuxeo.ecm.core.CoreService;
-import org.nuxeo.ecm.core.event.EventBundle;
-import org.nuxeo.ecm.core.event.PostCommitEventListener;
-import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.runtime.services.config.ConfigurationService;
+import org.nuxeo.micro.event.EventBundle;
+import org.nuxeo.micro.event.PostCommitEventListener;
 
 /**
  * Asynchronous listener that calls the orphan versions cleanup service. Designed to be called periodically by a
@@ -48,20 +45,22 @@ public class OrphanVersionCleanupListener implements PostCommitEventListener {
      * Gets the maximum number of orphan versions to delete in one transaction.
      */
     protected long getCommitSize() {
-        ConfigurationService configurationService = Framework.getService(ConfigurationService.class);
-        return configurationService.getLong(DEFAULT_COMMIT_SIZE_PROP, DEFAULT_COMMIT_SIZE);
+//        ConfigurationService configurationService = Framework.getService(ConfigurationService.class);
+//        return configurationService.getLong(DEFAULT_COMMIT_SIZE_PROP, DEFAULT_COMMIT_SIZE);
+
+        return DEFAULT_COMMIT_SIZE;
     }
 
     @Override
     public void handleEvent(EventBundle events) {
-        CoreService coreService = Framework.getService(CoreService.class);
-        if (coreService == null) {
-            // CoreService failed to start, no need to go further
-            return;
-        }
-        log.debug("Starting orphan versions cleanup");
-        long n = coreService.cleanupOrphanVersions(getCommitSize());
-        log.debug("Number of orphan versions deleted: " + n);
+        //CoreService coreService = Framework.getService(CoreService.class);
+//        if (coreService == null) {
+//            // CoreService failed to start, no need to go further
+//            return;
+//        }
+//        log.debug("Starting orphan versions cleanup");
+//        long n = coreService.cleanupOrphanVersions(getCommitSize());
+//        log.debug("Number of orphan versions deleted: " + n);
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2017 Nuxeo (http://nuxeo.com/) and others.
+ * (C) Copyright 2016 Nuxeo SA (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,20 @@
  * Contributors:
  *     Florent Guillaume
  */
-package org.nuxeo.ecm.core.versioning;
+package org.nuxeo.ecm.platform.el;
+
+import javax.el.ELContext;
 
 /**
- * The versioning service holds the versioning policy used to define what happens to a document's version when it is
- * created, saved, checked in, checked out or restored, and what version increment options (none, minor, major) are made
- * available to the user.
+ * Default implementation for an ELContext factory.
  *
- * @since 5.4
- * @deprecated since 10.2, use {@link org.nuxeo.ecm.core.api.versioning.VersioningService} instead.
+ * @since 8.3
  */
-@Deprecated
-public interface VersioningService extends org.nuxeo.ecm.core.api.versioning.VersioningService {
+public class DefaultELContextFactory implements ELContextFactory {
+
+    @Override
+    public ELContext get() {
+        return new ExpressionContext();
+    }
 
 }
