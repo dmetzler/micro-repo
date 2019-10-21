@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>micro-nuxeo-core</artifactId>
-  <name>Micro Nuxeo :: parent</name>
+  <name>Micro Nuxeo :: Core</name>
   <description></description>
 
 
@@ -26,6 +26,10 @@
     <dependency>
       <groupId>org.nuxeo</groupId>
       <artifactId>micro-nuxeo-el</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.nuxeo</groupId>
+      <artifactId>micro-nuxeo-kv</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>

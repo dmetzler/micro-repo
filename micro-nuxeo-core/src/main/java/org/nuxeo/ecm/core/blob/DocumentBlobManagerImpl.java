@@ -25,8 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.NuxeoException;
@@ -38,19 +36,18 @@ import org.nuxeo.ecm.core.model.Document;
 import org.nuxeo.ecm.core.model.Document.BlobAccessor;
 import org.nuxeo.ecm.core.model.Repository;
 import org.nuxeo.ecm.core.repository.RepositoryService;
-import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.runtime.model.ComponentContext;
-import org.nuxeo.runtime.model.ComponentInstance;
-import org.nuxeo.runtime.model.DefaultComponent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of the service managing {@link Blob}s associated to a {@link Document} or a repository.
+ * Implementation of the service managing {@link Blob}s associated to a
+ * {@link Document} or a repository.
  *
  * @since 9.2
  */
-public class DocumentBlobManagerComponent extends DefaultComponent implements DocumentBlobManager {
+public class DocumentBlobManagerImpl implements DocumentBlobManager {
 
-    private static final Log log = LogFactory.getLog(DocumentBlobManagerComponent.class);
+    private static final Logger log = LoggerFactory.getLogger(DocumentBlobManagerImpl.class);
 
     protected static final String XP = "configuration";
 
@@ -58,31 +55,17 @@ public class DocumentBlobManagerComponent extends DefaultComponent implements Do
 
     protected Deque<BlobDispatcherDescriptor> blobDispatcherDescriptorsRegistry = new LinkedList<>();
 
-    @Override
-    public void deactivate(ComponentContext context) {
+    private BlobManager blobManager;
+
+    private RepositoryService repositoryService;
+
+    public DocumentBlobManagerImpl(BlobManager blobManager, RepositoryService repositoryService) {
+        this.blobManager = blobManager;
+        this.repositoryService = repositoryService;
+    }
+
+    public void deactivate() {
         blobDispatcherDescriptorsRegistry.clear();
-    }
-
-    @Override
-    public void registerContribution(Object contribution, String extensionPoint, ComponentInstance contributor) {
-        if (XP.equals(extensionPoint)) {
-            if (contribution instanceof BlobDispatcherDescriptor) {
-                registerBlobDispatcher((BlobDispatcherDescriptor) contribution);
-            } else {
-                throw new NuxeoException("Invalid descriptor: " + contribution.getClass());
-            }
-        } else {
-            throw new NuxeoException("Invalid extension point: " + extensionPoint);
-        }
-    }
-
-    @Override
-    public void unregisterContribution(Object contribution, String extensionPoint, ComponentInstance contributor) {
-        if (XP.equals(extensionPoint)) {
-            if (contribution instanceof BlobDispatcherDescriptor) {
-                unregisterBlobDispatcher((BlobDispatcherDescriptor) contribution);
-            }
-        }
     }
 
     protected void registerBlobDispatcher(BlobDispatcherDescriptor descr) {
@@ -102,11 +85,11 @@ public class DocumentBlobManagerComponent extends DefaultComponent implements Do
     }
 
     protected BlobProvider getBlobProvider(String providerId) {
-        return Framework.getService(BlobManager.class).getBlobProvider(providerId);
+        return blobManager.getBlobProvider(providerId);
     }
 
     protected DocumentBlobProvider getDocumentBlobProvider(Blob blob) {
-        BlobProvider blobProvider = Framework.getService(BlobManager.class).getBlobProvider(blob);
+        BlobProvider blobProvider = blobManager.getBlobProvider(blob);
         if (blobProvider instanceof DocumentBlobProvider) {
             return (DocumentBlobProvider) blobProvider;
         }
@@ -116,8 +99,8 @@ public class DocumentBlobManagerComponent extends DefaultComponent implements Do
     /**
      * {@inheritDoc}
      * <p>
-     * The {@link BlobInfo} (coming from the database) contains the blob key, which may or may not be prefixed by a blob
-     * provider id.
+     * The {@link BlobInfo} (coming from the database) contains the blob key, which
+     * may or may not be prefixed by a blob provider id.
      */
     @Override
     public Blob readBlob(BlobInfo blobInfo, String repositoryName) throws IOException {
@@ -148,8 +131,9 @@ public class DocumentBlobManagerComponent extends DefaultComponent implements Do
     /**
      * {@inheritDoc}
      * <p>
-     * If the blob is managed and already uses the provider that's expected for this blob and document, there is no need
-     * to recompute a key. Otherwise, go through the blob provider.
+     * If the blob is managed and already uses the provider that's expected for this
+     * blob and document, there is no need to recompute a key. Otherwise, go through
+     * the blob provider.
      */
     @Override
     public String writeBlob(Blob blob, Document doc, String xpath) throws IOException {
@@ -213,7 +197,8 @@ public class DocumentBlobManagerComponent extends DefaultComponent implements Do
 
     @Override
     public void freezeVersion(Document doc) {
-        // finds all blobs, then ask their providers if there's anything to do on check in
+        // finds all blobs, then ask their providers if there's anything to do on check
+        // in
         doc.visitBlobs(accessor -> freezeVersion(accessor, doc));
     }
 
@@ -246,7 +231,6 @@ public class DocumentBlobManagerComponent extends DefaultComponent implements Do
         }
         // in all repositories, mark referenced binaries
         // the marking itself will call back into the appropriate gc's mark method
-        RepositoryService repositoryService = Framework.getService(RepositoryService.class);
         for (String repositoryName : repositoryService.getRepositoryNames()) {
             Repository repository = repositoryService.getRepository(repositoryName);
             repository.markReferencedBinaries();

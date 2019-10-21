@@ -66,11 +66,11 @@ public class Binary implements Serializable {
     public String getDigestAlgorithm() {
         // Cannot use current digest algorithm of the binary manager here since it might have changed after the binary
         // storage
-        String digest = getDigest();
-        if (digest == null) {
+        String currentDigest = getDigest();
+        if (currentDigest == null) {
             return null;
         }
-        return AbstractBinaryManager.DIGESTS_BY_LENGTH.get(digest.length());
+        return AbstractBinaryManager.DIGESTS_BY_LENGTH.get(currentDigest.length());
     }
 
     /**
@@ -119,20 +119,19 @@ public class Binary implements Serializable {
 
     private void readObject(java.io.ObjectInputStream ois) throws IOException, ClassNotFoundException {
         ois.defaultReadObject();
-        file = recomputeFile();
+//        file = recomputeFile();
     }
 
     /**
      * Recomputes the file attribute by getting it from a new Binary for the same digest.
      */
-    protected File recomputeFile(BlobManager bm) {
+    public void recomputeFile(BlobManager bm) {
         BlobProvider bp = bm.getBlobProvider(blobProviderId);
         Binary binary = bp.getBinaryManager().getBinary(digest);
         if (binary == null) {
             log.warn("Cannot fetch binary with digest " + digest);
-            return null;
         }
-        return binary.file;
+        this.file = binary.file;
     }
 
 }

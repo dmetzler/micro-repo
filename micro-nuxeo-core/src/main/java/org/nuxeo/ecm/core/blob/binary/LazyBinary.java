@@ -25,7 +25,6 @@ import java.io.InputStream;
 
 import org.nuxeo.ecm.core.blob.BlobManager;
 import org.nuxeo.ecm.core.blob.BlobProvider;
-import org.nuxeo.runtime.api.Framework;
 
 /**
  * Lazy Binary that fetches its remote stream on first access.
@@ -37,9 +36,12 @@ public class LazyBinary extends Binary {
     // transient to be Serializable
     protected transient CachingBinaryManager cbm;
 
-    public LazyBinary(String digest, String repoName, CachingBinaryManager cbm) {
+    private BlobManager bm;
+
+    public LazyBinary(String digest, String repoName, CachingBinaryManager cbm, BlobManager bm) {
         super(digest, repoName);
         this.cbm = cbm;
+        this.bm = bm;
     }
 
     // because the class is Serializable, re-acquire the CachingBinaryManager
@@ -48,7 +50,6 @@ public class LazyBinary extends Binary {
             if (blobProviderId == null) {
                 throw new UnsupportedOperationException("Cannot find binary manager, no blob provider id");
             }
-            BlobManager bm = Framework.getService(BlobManager.class);
             BlobProvider bp = bm.getBlobProvider(blobProviderId);
             cbm = (CachingBinaryManager) bp.getBinaryManager();
         }

@@ -34,7 +34,8 @@ import org.nuxeo.ecm.core.api.NuxeoException;
 /**
  * Blob provider that can reference files on the filesystem.
  * <p>
- * This blob provider MUST be configured with a "root" property that specifies the minimum root path for all files:
+ * This blob provider MUST be configured with a "root" property that specifies
+ * the minimum root path for all files:
  *
  * <pre>
  * <code>
@@ -47,8 +48,9 @@ import org.nuxeo.ecm.core.api.NuxeoException;
  * <p>
  * A root of {@code /} may be used to allow any path.
  * <p>
- * Blobs are constructed through {@link FilesystemBlobProvider#createBlob}. The constructed blob's key, which will be
- * stored in the document database, contains a path relative to the root.
+ * Blobs are constructed through {@link FilesystemBlobProvider#createBlob}. The
+ * constructed blob's key, which will be stored in the document database,
+ * contains a path relative to the root.
  *
  * @since 7.10
  */
@@ -58,6 +60,12 @@ public class FilesystemBlobProvider extends AbstractBlobProvider {
 
     /** The root ending with /, or an empty string. */
     protected String root;
+
+    private BlobManager blobManager;
+
+    public FilesystemBlobProvider(BlobManager blobManager) {
+        this.blobManager = blobManager;
+    }
 
     @Override
     public void initialize(String blobProviderId, Map<String, String> properties) throws IOException {
@@ -80,7 +88,7 @@ public class FilesystemBlobProvider extends AbstractBlobProvider {
 
     @Override
     public Blob readBlob(BlobInfo blobInfo) throws IOException {
-        return new SimpleManagedBlob(blobInfo);
+        return new SimpleManagedBlob(blobInfo, blobManager);
     }
 
     @Override
@@ -111,7 +119,8 @@ public class FilesystemBlobProvider extends AbstractBlobProvider {
     /**
      * Creates a filesystem blob with the given information.
      * <p>
-     * The passed {@link BlobInfo} contains information about the blob, and the key is a file path.
+     * The passed {@link BlobInfo} contains information about the blob, and the key
+     * is a file path.
      *
      * @param blobInfo the blob info where the key is a file path
      * @return the blob
@@ -149,7 +158,7 @@ public class FilesystemBlobProvider extends AbstractBlobProvider {
                 blobInfo.digest = DigestUtils.md5Hex(in);
             }
         }
-        return new SimpleManagedBlob(blobInfo);
+        return new SimpleManagedBlob(blobInfo, blobManager);
     }
 
 }

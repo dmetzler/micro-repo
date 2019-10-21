@@ -24,8 +24,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.model.PropertyException;
@@ -34,6 +32,8 @@ import org.nuxeo.ecm.core.api.model.PropertyVisitor;
 import org.nuxeo.ecm.core.schema.types.ComplexTypeImpl;
 import org.nuxeo.ecm.core.schema.types.Field;
 import org.nuxeo.ecm.core.schema.types.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Property used to declare property removed from schema.
@@ -44,7 +44,7 @@ public class RemovedProperty extends AbstractProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Log log = LogFactory.getLog(RemovedProperty.class);
+    private static final Logger log = LoggerFactory.getLogger(RemovedProperty.class);
 
     protected final String fieldName;
 
@@ -69,9 +69,9 @@ public class RemovedProperty extends AbstractProperty {
             msg.append("Set value to fallback property '").append(fallback.getXPath()).append("'");
         }
         if (log.isTraceEnabled()) {
-            log.error(msg, new NuxeoException("debug stack trace"));
+            log.error(msg.toString(), new NuxeoException("debug stack trace"));
         } else {
-            log.error(msg);
+            log.error(msg.toString());
         }
         if (fallback != null) {
             fallback.setValue(value);
@@ -87,9 +87,9 @@ public class RemovedProperty extends AbstractProperty {
             msg.append("Return value from '").append(fallback.getXPath()).append("'");
         }
         if (log.isTraceEnabled()) {
-            log.error(msg, new NuxeoException());
+            log.error(msg.toString(), new NuxeoException());
         } else {
-            log.error(msg);
+            log.error(msg.toString());
         }
         if (fallback == null) {
             return null;
@@ -98,11 +98,8 @@ public class RemovedProperty extends AbstractProperty {
     }
 
     protected StringBuilder newRemovedMessage() {
-        StringBuilder builder = new StringBuilder().append("Property '")
-                                                   .append(getXPath())
-                                                   .append("' is marked as removed from '")
-                                                   .append(getSchema().getName())
-                                                   .append("' schema");
+        StringBuilder builder = new StringBuilder().append("Property '").append(getXPath())
+                .append("' is marked as removed from '").append(getSchema().getName()).append("' schema");
         RemovedProperty removedParent = getRemovedParent();
         if (removedParent != this) {
             builder.append(" because property '").append(removedParent.getXPath()).append("' is marked as removed");
@@ -126,7 +123,8 @@ public class RemovedProperty extends AbstractProperty {
     @Override
     public Type getType() {
         if (fallback == null) {
-            // TODO try to do something better - currently RemovedProperty is always a container if there's no fallback
+            // TODO try to do something better - currently RemovedProperty is always a
+            // container if there's no fallback
             // Simulate a complex type
             return new ComplexTypeImpl(getSchema(), getSchema().getName(), fieldName);
         }
@@ -135,7 +133,8 @@ public class RemovedProperty extends AbstractProperty {
 
     @Override
     public boolean isContainer() {
-        // TODO try to do something better - currently RemovedProperty is always a container if there's no fallback
+        // TODO try to do something better - currently RemovedProperty is always a
+        // container if there's no fallback
         return fallback == null || fallback.isContainer();
     }
 
@@ -156,7 +155,8 @@ public class RemovedProperty extends AbstractProperty {
 
     @Override
     public Property get(int index) throws PropertyNotFoundException {
-        // TODO try to do something better - currently RemovedProperty is always a container if there's no fallback
+        // TODO try to do something better - currently RemovedProperty is always a
+        // container if there's no fallback
         return new RemovedProperty(this, fieldName);
     }
 

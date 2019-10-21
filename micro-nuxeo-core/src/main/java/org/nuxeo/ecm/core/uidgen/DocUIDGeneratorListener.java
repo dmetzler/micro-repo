@@ -28,11 +28,12 @@ import org.nuxeo.micro.event.DocumentEventContext;
 import org.nuxeo.micro.event.Event;
 import org.nuxeo.micro.event.EventContext;
 import org.nuxeo.micro.event.EventListener;
-import org.nuxeo.runtime.api.Framework;
 
 public class DocUIDGeneratorListener implements EventListener {
 
     private static final Log log = LogFactory.getLog(DocUIDGeneratorListener.class);
+
+    UIDGeneratorService uidGeneratorService;
 
     @Override
     public void handleEvent(Event event) {
@@ -60,14 +61,9 @@ public class DocUIDGeneratorListener implements EventListener {
         }
     }
 
-    private static void addUIDtoDoc(DocumentModel doc) throws PropertyNotFoundException {
-        UIDGeneratorService service = Framework.getService(UIDGeneratorService.class);
-        if (service == null) {
-            log.error("<addUIDtoDoc> UIDGeneratorService service not found ... !");
-            return;
-        }
+    private void addUIDtoDoc(DocumentModel doc) throws PropertyNotFoundException {
         // generate UID for our doc
-        service.setUID(doc);
+        uidGeneratorService.setUID(doc);
     }
 
 }

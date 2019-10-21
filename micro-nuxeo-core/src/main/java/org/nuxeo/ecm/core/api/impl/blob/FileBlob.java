@@ -35,7 +35,7 @@ import java.nio.file.Path;
 
 import org.apache.commons.io.IOUtils;
 import org.nuxeo.ecm.core.api.Blob;
-import org.nuxeo.runtime.api.Framework;
+import org.nuxeo.micro.FileTracker;
 
 /**
  * A {@link Blob} backed by a {@link File}.
@@ -130,7 +130,7 @@ public class FileBlob extends AbstractBlob implements Serializable {
         isTemporary = true;
         try {
             file = File.createTempFile("nxblob-", ".tmp", tmpDir);
-            Framework.trackFile(file, file);
+            FileTracker.track(file, file);
             filename = file.getName();
             try (OutputStream out = new FileOutputStream(file)) {
                 IOUtils.copy(in, out);
@@ -148,8 +148,8 @@ public class FileBlob extends AbstractBlob implements Serializable {
      */
     public FileBlob(String ext) throws IOException {
         isTemporary = true;
-        file = Framework.createTempFile("nxblob-", ext);
-        Framework.trackFile(file, file);
+        file = File.createTempFile("nxblob-", ext);
+        FileTracker.track(file, file);
         filename = file.getName();
     }
 

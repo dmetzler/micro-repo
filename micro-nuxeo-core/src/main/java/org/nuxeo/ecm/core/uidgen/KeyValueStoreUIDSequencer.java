@@ -18,25 +18,26 @@
  */
 package org.nuxeo.ecm.core.uidgen;
 
-import org.nuxeo.ecm.core.api.NuxeoException;
-import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.runtime.kv.KeyValueService;
-import org.nuxeo.runtime.kv.KeyValueStore;
-import org.nuxeo.runtime.services.config.ConfigurationService;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.nuxeo.ecm.core.api.NuxeoException;
+import org.nuxeo.runtime.kv.KeyValueService;
+import org.nuxeo.runtime.kv.KeyValueStore;
+
 /**
- * UID Sequencer based on a key/value store. The store is the same for all sequencers, but they are using different
- * keys, prefixed by the sequencer name.
+ * UID Sequencer based on a key/value store. The store is the same for all
+ * sequencers, but they are using different keys, prefixed by the sequencer
+ * name.
  *
  * @since 10.2
  */
 public class KeyValueStoreUIDSequencer extends AbstractUIDSequencer {
 
     /**
-     * Configuration property to specify the key/value store name. If none is specified, {@code sequence} is used.
+     * Configuration property to specify the key/value store name. If none is
+     * specified, {@code sequence} is used.
      */
     public static final String STORE_NAME_PROPERTY = "nuxeo.uidseq.keyvaluestore.name";
 
@@ -46,9 +47,15 @@ public class KeyValueStoreUIDSequencer extends AbstractUIDSequencer {
 
     protected String storeName;
 
+    private KeyValueService kvService;
+
+    public KeyValueStoreUIDSequencer(KeyValueService kvService, String storeName) {
+        this.kvService = kvService;
+        this.storeName = StringUtils.isNotBlank(storeName) ? storeName : DEFAULT_STORE_NAME;
+    }
+
     @Override
     public void init() {
-        storeName = Framework.getService(ConfigurationService.class).getString(STORE_NAME_PROPERTY, DEFAULT_STORE_NAME);
     }
 
     @Override
@@ -57,7 +64,7 @@ public class KeyValueStoreUIDSequencer extends AbstractUIDSequencer {
     }
 
     protected KeyValueStore getStore() {
-        KeyValueStore store = Framework.getService(KeyValueService.class).getKeyValueStore(storeName);
+        KeyValueStore store = kvService.getKeyValueStore(storeName);
         if (store == null) {
             throw new NuxeoException("Unknown key/value store: " + storeName);
         }

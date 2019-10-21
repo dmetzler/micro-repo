@@ -22,10 +22,10 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.nuxeo.ecm.core.api.impl.blob.AbstractBlob;
-import org.nuxeo.runtime.api.Framework;
 
 /**
- * Simple managed blob implementation holding just a key and delegating to its provider for implementation.
+ * Simple managed blob implementation holding just a key and delegating to its
+ * provider for implementation.
  *
  * @since 7.2
  */
@@ -37,7 +37,10 @@ public class SimpleManagedBlob extends AbstractBlob implements ManagedBlob {
 
     public Long length;
 
-    public SimpleManagedBlob(BlobInfo blobInfo) {
+    protected transient BlobManager blobManager;
+
+    public SimpleManagedBlob(BlobInfo blobInfo, BlobManager blobManager) {
+        this.blobManager = blobManager;
         this.key = blobInfo.key;
         setMimeType(blobInfo.mimeType);
         setEncoding(blobInfo.encoding);
@@ -63,7 +66,7 @@ public class SimpleManagedBlob extends AbstractBlob implements ManagedBlob {
 
     @Override
     public InputStream getStream() throws IOException {
-        return Framework.getService(BlobManager.class).getStream(this);
+        return blobManager.getStream(this);
     }
 
     @Override

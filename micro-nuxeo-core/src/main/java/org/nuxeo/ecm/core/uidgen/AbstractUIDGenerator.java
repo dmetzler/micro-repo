@@ -26,7 +26,6 @@ import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.schema.types.Schema;
-import org.nuxeo.runtime.api.Framework;
 
 /**
  * The abstract class adds some useful methods.
@@ -38,6 +37,12 @@ public abstract class AbstractUIDGenerator implements UIDGenerator {
     private UIDSequencer sequencer;
 
     private String[] propertyNames;
+
+    private SchemaManager schemaManager;
+
+    public AbstractUIDGenerator(SchemaManager schemaManager) {
+        this.schemaManager = schemaManager;
+    }
 
     @Override
     public final void setSequencer(UIDSequencer sequencer) {
@@ -121,11 +126,11 @@ public abstract class AbstractUIDGenerator implements UIDGenerator {
     }
 
     // helper method to deprecate
-    private static String getSchemaName(String propertyName) {
+    private String getSchemaName(String propertyName) {
         String[] s = propertyName.split(":");
         String prefix = s[0];
-        SchemaManager tm = Framework.getService(SchemaManager.class);
-        Schema schema = tm.getSchemaFromPrefix(prefix);
+
+        Schema schema = schemaManager.getSchemaFromPrefix(prefix);
         if (schema == null) {
             // fall back on prefix as it may be the schema name
             return prefix;

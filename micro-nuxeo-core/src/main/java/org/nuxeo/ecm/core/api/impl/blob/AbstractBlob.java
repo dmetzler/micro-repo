@@ -30,10 +30,12 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.util.Objects;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.CloseableFile;
+import org.nuxeo.micro.FileTracker;
 
 /**
  * Abstract implementation of a {@link Blob} storing the information other than the byte stream.
@@ -134,7 +136,7 @@ public abstract class AbstractBlob implements Blob, Serializable {
         if (file != null && (ext == null || file.getName().endsWith(ext))) {
             return new CloseableFile(file, false);
         }
-        File tmp = Framework.createTempFile("nxblob-", ext);
+        File tmp = File.createTempFile("nxblob-", ext, FileUtils.getTempDirectory());
         tmp.delete();
         if (file != null) {
             // attempt to create a symbolic link, which would be cheaper than a copy
@@ -149,7 +151,7 @@ public abstract class AbstractBlob implements Blob, Serializable {
                 Files.copy(in, tmp.toPath());
             }
         }
-        Framework.trackFile(tmp, tmp);
+        FileTracker.track(tmp, tmp);
         return new CloseableFile(tmp, true);
     }
 

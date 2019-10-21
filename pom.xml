@@ -12,11 +12,14 @@
 
   <modules>
     <module>micro-nuxeo-api</module>
-    <module>micro-nuxeo-el</module>
-    <module>micro-nuxeo-core</module>
-    <module>micro-nuxeo-todo</module>
-    <module>micro-nuxeo-dsl</module>
     <module>micro-nuxeo-event</module>
+    <module>micro-nuxeo-el</module>
+    <module>micro-nuxeo-kv</module>
+    <module>micro-nuxeo-core</module>
+    <!-- <module>micro-nuxeo-dublincore</module> -->
+    <!-- <module>micro-nuxeo-todo</module> -->
+    <!-- <module>micro-nuxeo-dsl</module> -->
+
   </modules>
 
 
@@ -86,6 +89,11 @@
       <dependency>
         <groupId>org.nuxeo</groupId>
         <artifactId>micro-nuxeo-event-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.nuxeo</groupId>
+        <artifactId>micro-nuxeo-kv</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -271,6 +279,11 @@
         <version>1.11</version>
       </dependency>
 
+      <dependency>
+        <groupId>net.jodah</groupId>
+        <artifactId>expiringmap</artifactId>
+        <version>0.5.9</version>
+      </dependency>
 
       <dependency>
         <groupId>com.sun.xsom</groupId>

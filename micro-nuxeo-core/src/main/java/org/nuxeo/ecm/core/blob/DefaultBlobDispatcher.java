@@ -35,10 +35,8 @@ import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.Blobs;
 import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
-import org.nuxeo.ecm.core.api.repository.RepositoryManager;
 import org.nuxeo.ecm.core.model.Document;
 import org.nuxeo.ecm.core.model.Document.BlobAccessor;
-import org.nuxeo.runtime.api.Framework;
 
 /**
  * Default blob dispatcher, that uses the repository name as the blob provider.
@@ -206,12 +204,6 @@ public class DefaultBlobDispatcher implements BlobDispatcher {
 
     @Override
     public Collection<String> getBlobProviderIds() {
-        if (useRepositoryName) {
-            if (repositoryNames == null) {
-                repositoryNames = Framework.getService(RepositoryManager.class).getRepositoryNames();
-            }
-            return repositoryNames;
-        }
         return providerIds;
     }
 

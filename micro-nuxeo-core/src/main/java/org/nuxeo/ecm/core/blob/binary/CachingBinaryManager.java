@@ -31,15 +31,16 @@ import org.nuxeo.common.file.FileCache;
 import org.nuxeo.common.file.LRUFileCache;
 import org.nuxeo.common.utils.SizeUtils;
 import org.nuxeo.ecm.core.api.NuxeoException;
-import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.runtime.trackers.files.FileEventTracker;
+import org.nuxeo.ecm.core.blob.BlobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Abstract class for a {@link BinaryManager} that uses a cache for its files because fetching them is expensive.
+ * Abstract class for a {@link BinaryManager} that uses a cache for its files
+ * because fetching them is expensive.
  * <p>
- * Initialization of the {@link BinaryManager} must call {@link #initializeCache} from the {@link #initialize} method.
+ * Initialization of the {@link BinaryManager} must call
+ * {@link #initializeCache} from the {@link #initialize} method.
  *
  * @since 5.7
  */
@@ -53,6 +54,12 @@ public abstract class CachingBinaryManager extends AbstractBinaryManager {
 
     protected FileStorage fileStorage;
 
+    private BlobManager blobManager;
+
+    public CachingBinaryManager(BlobManager blobManager) {
+        this.blobManager = blobManager;
+    }
+
     @Override
     public void initialize(String blobProviderId, Map<String, String> properties) throws IOException {
         super.initialize(blobProviderId, properties);
@@ -64,10 +71,11 @@ public abstract class CachingBinaryManager extends AbstractBinaryManager {
     /**
      * Initialize the cache.
      *
-     * @param dir the directory to use to store cached files
-     * @param maxSize the maximum size of the cache (in bytes)
-     * @param maxCount the maximum number of files in the cache
-     * @param minAge the minimum age of a file in the cache to be eligible for removal (in seconds)
+     * @param dir         the directory to use to store cached files
+     * @param maxSize     the maximum size of the cache (in bytes)
+     * @param maxCount    the maximum number of files in the cache
+     * @param minAge      the minimum age of a file in the cache to be eligible for
+     *                    removal (in seconds)
      * @param fileStorage the file storage mechanism to use to store and fetch files
      * @since 5.9.2
      */
@@ -79,7 +87,7 @@ public abstract class CachingBinaryManager extends AbstractBinaryManager {
     /**
      * Initialize the cache.
      *
-     * @param maxSizeStr the maximum size of the cache (as a String)
+     * @param maxSizeStr  the maximum size of the cache (as a String)
      * @param fileStorage the file storage mechanism to use to store and fetch files
      * @see #initializeCache(String, String, String, FileStorage)
      * @since 6.0
@@ -93,16 +101,18 @@ public abstract class CachingBinaryManager extends AbstractBinaryManager {
     /**
      * Initializes the cache.
      *
-     * @param maxSizeStr the maximum size of the cache (as a String)
+     * @param maxSizeStr  the maximum size of the cache (as a String)
      * @param maxCountStr the maximum number of files in the cache
-     * @param minAgeStr the minimum age of a file in the cache to be eligible for removal (in seconds)
+     * @param minAgeStr   the minimum age of a file in the cache to be eligible for
+     *                    removal (in seconds)
      * @param fileStorage the file storage mechanism to use to store and fetch files
      * @see SizeUtils#parseSizeInBytes(String)
      * @since 7.10-HF03, 8.1
      */
     public void initializeCache(String maxSizeStr, String maxCountStr, String minAgeStr, FileStorage fileStorage)
             throws IOException {
-        cachedir = Framework.createTempFile("nxbincache.", "");
+
+        cachedir = File.createTempFile("nxbincache.", "");
         cachedir.delete();
         cachedir.mkdir();
         long maxSize = SizeUtils.parseSizeInBytes(maxSizeStr);
@@ -113,7 +123,7 @@ public abstract class CachingBinaryManager extends AbstractBinaryManager {
                 + maxCount + " minAge: " + minAge);
 
         // be sure FileTracker won't steal our files !
-        //FileEventTracker.registerProtectedPath(cachedir.getAbsolutePath());
+        // FileEventTracker.registerProtectedPath(cachedir.getAbsolutePath());
     }
 
     @Override
@@ -157,7 +167,7 @@ public abstract class CachingBinaryManager extends AbstractBinaryManager {
 
     @Override
     public Binary getBinary(String digest) {
-        return new LazyBinary(digest, blobProviderId, this);
+        return new LazyBinary(digest, blobProviderId, this, blobManager);
     }
 
     /* =============== Methods used by LazyBinary =============== */

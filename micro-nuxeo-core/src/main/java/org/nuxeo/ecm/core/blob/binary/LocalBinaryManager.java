@@ -37,8 +37,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.nuxeo.common.Environment;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.blob.BlobProviderDescriptor;
-import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.runtime.trackers.files.FileEventTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +81,7 @@ public class LocalBinaryManager extends AbstractBinaryManager {
         if (StringUtils.isBlank(path)) {
             path = DEFAULT_PATH;
         }
-        path = Framework.expandVars(path);
+        //path = Framework.expandVars(path);
         path = path.trim();
         File base;
         if (path.startsWith("/") || path.startsWith("\\") || path.contains("://") || path.contains(":\\")
@@ -95,12 +93,6 @@ public class LocalBinaryManager extends AbstractBinaryManager {
             File home = Environment.getDefault().getData();
             base = new File(home, path);
 
-            // Backward compliance with versions before 5.4 (NXP-5370)
-            File oldBase = new File(Framework.getRuntime().getHome().getPath(), path);
-            if (oldBase.exists()) {
-                log.warn("Old binaries path used (NXP-5370). Please move " + oldBase + " to " + base);
-                base = oldBase;
-            }
         }
         // take namespace into account
         String namespace = properties.get(BlobProviderDescriptor.NAMESPACE);
@@ -119,7 +111,7 @@ public class LocalBinaryManager extends AbstractBinaryManager {
         createGarbageCollector();
 
         // be sure FileTracker won't steal our files !
-        FileEventTracker.registerProtectedPath(storageDir.getAbsolutePath());
+        //FileEventTracker.registerProtectedPath(storageDir.getAbsolutePath());
     }
 
     @Override
