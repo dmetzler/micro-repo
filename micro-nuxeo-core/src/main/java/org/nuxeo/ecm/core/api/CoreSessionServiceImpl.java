@@ -40,7 +40,8 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 /**
- * Implementation for the service managing the acquisition/release of {@link CoreSession} instances.
+ * Implementation for the service managing the acquisition/release of
+ * {@link CoreSession} instances.
  *
  * @since 8.4
  */
@@ -52,6 +53,8 @@ public class CoreSessionServiceImpl implements CoreSessionService {
      * All open {@link CoreSessionRegistrationInfo}, keyed by session id.
      */
     private final Map<String, CoreSessionRegistrationInfo> sessions = new ConcurrentHashMap<>();
+
+    protected final Repository repository;
 
     protected final SecurityService securityService;
 
@@ -72,14 +75,13 @@ public class CoreSessionServiceImpl implements CoreSessionService {
     private CoreSessionServiceImpl(SecurityService securityService, VersioningService versioningService,
             DocumentValidationService documentValidationService, EventService eventService,
             CharacterFilteringService charFilteringService, TrashService trashService,
-            LifeCycleService lifeCycleService, CoreService coreService) {
+            LifeCycleService lifeCycleService, CoreService coreService, Repository repository) {
 
         this.securityService = securityService;
 
         this.versioningService = versioningService;
 
         this.documentValidationService = documentValidationService;
-
 
         this.eventService = eventService;
 
@@ -90,6 +92,8 @@ public class CoreSessionServiceImpl implements CoreSessionService {
         this.lifeCycleService = lifeCycleService;
 
         this.coreService = coreService;
+
+        this.repository = repository;
 
     }
 
@@ -114,12 +118,19 @@ public class CoreSessionServiceImpl implements CoreSessionService {
 
         protected CoreService coreService;
 
+        protected Repository repository;
+
         protected Builder() {
 
         }
 
         public Builder securityService(SecurityService securityService) {
             this.securityService = securityService;
+            return this;
+        }
+
+        public Builder repository(Repository repository) {
+            this.repository = repository;
             return this;
         }
 
@@ -160,7 +171,7 @@ public class CoreSessionServiceImpl implements CoreSessionService {
 
         public CoreSessionServiceImpl build() {
             return new CoreSessionServiceImpl(securityService, versioningService, documentValidationService,
-                    eventService, charFilteringService, trashService, lifeCycleService, coreService);
+                    eventService, charFilteringService, trashService, lifeCycleService, coreService, repository);
         }
 
     }
@@ -172,7 +183,7 @@ public class CoreSessionServiceImpl implements CoreSessionService {
             CacheBuilder.newBuilder().maximumSize(100).build();
 
     @Override
-    public CloseableCoreSession createCoreSession(Repository repository, NuxeoPrincipal principal) {
+    public CloseableCoreSession createCoreSession(NuxeoPrincipal principal) {
         LocalSession session = new LocalSession(repository, principal, this);
         sessions.put(session.getSessionId(), new CoreSessionRegistrationInfo(session));
         return session;
@@ -191,7 +202,8 @@ public class CoreSessionServiceImpl implements CoreSessionService {
                 log.warn("Closing unknown CoreSession", e);
             } else {
                 // this sessionId was recently closed and we kept info about it
-                // log the current stacktrace with the original opening and closing as suppressed exceptions
+                // log the current stacktrace with the original opening and closing as
+                // suppressed exceptions
                 Exception e = new Exception("DEBUG: spurious " + debug);
                 e.addSuppressed(closed);
                 log.warn("Closing already closed CoreSession", e);

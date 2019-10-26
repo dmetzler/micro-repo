@@ -29,6 +29,9 @@ import static org.nuxeo.ecm.core.api.event.DocumentEventTypes.BEFORE_DOC_UPDATE;
 import static org.nuxeo.ecm.core.api.event.DocumentEventTypes.DOCUMENT_CREATED_BY_COPY;
 import static org.nuxeo.ecm.core.api.event.DocumentEventTypes.DOCUMENT_PUBLISHED;
 import static org.nuxeo.ecm.core.schema.FacetNames.SYSTEM_DOCUMENT;
+import static org.nuxeo.ecm.platform.dublincore.constants.DublinCoreConstants.DUBLINCORE_CONTRIBUTORS_PROPERTY;
+import static org.nuxeo.ecm.platform.dublincore.constants.DublinCoreConstants.DUBLINCORE_CREATOR_PROPERTY;
+import static org.nuxeo.ecm.platform.dublincore.constants.DublinCoreConstants.DUBLINCORE_LAST_CONTRIBUTOR_PROPERTY;
 
 import java.io.Serializable;
 import java.util.Calendar;
@@ -42,12 +45,11 @@ import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.UnrestrictedSessionRunner;
 import org.nuxeo.ecm.core.api.event.CoreEventConstants;
 import org.nuxeo.ecm.platform.dublincore.service.DublinCoreStorageService;
+import org.nuxeo.ecm.platform.dublincore.service.DublinCoreStorageServiceImpl;
 import org.nuxeo.micro.event.DocumentEventContext;
 import org.nuxeo.micro.event.Event;
 import org.nuxeo.micro.event.EventContext;
 import org.nuxeo.micro.event.EventListener;
-import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.runtime.services.config.ConfigurationService;
 
 /**
  * Core Event Listener for updating DublinCore.
@@ -59,6 +61,12 @@ public class DublinCoreListener implements EventListener {
     public static final String DISABLE_DUBLINCORE_LISTENER = "disableDublinCoreListener";
 
     private static final String RESET_CREATOR_PROPERTY = "nuxeo.dclistener.reset-creator-on-copy";
+
+
+
+    boolean resetCreatorProperty = false;
+
+    protected DublinCoreStorageService dublincoreStorageService = new DublinCoreStorageServiceImpl();
 
     /**
      * Core event notification.
@@ -119,30 +127,27 @@ public class DublinCoreListener implements EventListener {
             }
         }
 
-        DublinCoreStorageService service = Framework.getService(DublinCoreStorageService.class);
 
         Boolean resetCreator = (Boolean) event.getContext().getProperty(CoreEventConstants.RESET_CREATOR);
-        boolean resetCreatorProperty = Framework.getService(ConfigurationService.class)
-                                                .isBooleanTrue(RESET_CREATOR_PROPERTY);
         Boolean dirty = (Boolean) event.getContext().getProperty(CoreEventConstants.DOCUMENT_DIRTY);
         if ((eventId.equals(BEFORE_DOC_UPDATE) && Boolean.TRUE.equals(dirty))
                 || (eventId.equals(TRANSITION_EVENT) && !doc.isImmutable())) {
-            service.setModificationDate(doc, cEventDate);
-            service.addContributor(doc, event);
+            dublincoreStorageService.setModificationDate(doc, cEventDate);
+            dublincoreStorageService.addContributor(doc, event);
         } else if (eventId.equals(ABOUT_TO_CREATE)) {
-            service.setCreationDate(doc, cEventDate);
-            service.setModificationDate(doc, cEventDate);
-            service.addContributor(doc, event);
+            dublincoreStorageService.setCreationDate(doc, cEventDate);
+            dublincoreStorageService.setModificationDate(doc, cEventDate);
+            dublincoreStorageService.addContributor(doc, event);
         } else if (eventId.equals(DOCUMENT_CREATED_BY_COPY)
                 && (resetCreatorProperty || Boolean.TRUE.equals(resetCreator))) {
-            Framework.doPrivileged(() -> {
+//            Framework.doPrivileged(() -> {
                 doc.setPropertyValue(DUBLINCORE_CREATOR_PROPERTY, null);
                 doc.setPropertyValue(DUBLINCORE_CONTRIBUTORS_PROPERTY, null);
                 doc.setPropertyValue(DUBLINCORE_LAST_CONTRIBUTOR_PROPERTY, null);
-            });
-            service.setCreationDate(doc, cEventDate);
-            service.setModificationDate(doc, cEventDate);
-            service.addContributor(doc, event);
+//            });
+            dublincoreStorageService.setCreationDate(doc, cEventDate);
+            dublincoreStorageService.setModificationDate(doc, cEventDate);
+            dublincoreStorageService.addContributor(doc, event);
         }
     }
 

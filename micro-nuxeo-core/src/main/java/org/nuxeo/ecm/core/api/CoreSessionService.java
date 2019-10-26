@@ -20,8 +20,6 @@ package org.nuxeo.ecm.core.api;
 
 import java.util.List;
 
-import org.nuxeo.ecm.core.model.Repository;
-
 
 /**
  * Service managing the acquisition/release of {@link CoreSession} instances.
@@ -59,7 +57,7 @@ public interface CoreSessionService {
      * @param principal the principal
      * @return a {@link CloseableCoreSession}
      */
-    CloseableCoreSession createCoreSession(Repository repository, NuxeoPrincipal principal);
+    CloseableCoreSession createCoreSession(NuxeoPrincipal principal);
 
     /**
      * Releases (closes) a {@link CloseableCoreSession} acquired by {@link #createCoreSession}.

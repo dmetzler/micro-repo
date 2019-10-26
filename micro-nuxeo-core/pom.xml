@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>micro-nuxeo-core</artifactId>
-  <name>Micro Nuxeo :: Core</name>
+  <name>Micro Nuxeo :: Session Core</name>
   <description></description>
 
 
@@ -22,6 +22,10 @@
     <dependency>
       <groupId>org.nuxeo</groupId>
       <artifactId>micro-nuxeo-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.nuxeo</groupId>
+      <artifactId>micro-nuxeo-jta</artifactId>
     </dependency>
     <dependency>
       <groupId>org.nuxeo</groupId>
@@ -51,10 +55,7 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>io.dropwizard.metrics</groupId>
-      <artifactId>metrics-core</artifactId>
-    </dependency>
+
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
@@ -63,14 +64,7 @@
       <groupId>org.mongodb</groupId>
       <artifactId>mongo-java-driver</artifactId>
     </dependency>
-    <dependency>
-      <groupId>javax.resource</groupId>
-      <artifactId>connector-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.transaction</groupId>
-      <artifactId>jta</artifactId>
-    </dependency>
+
     <dependency>
       <groupId>cup</groupId>
       <artifactId>java-cup</artifactId>
@@ -82,43 +76,6 @@
     </dependency>
 
 
-    <dependency>
-      <groupId>commons-beanutils</groupId>
-      <artifactId>commons-beanutils</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.resource</groupId>
-      <artifactId>connector-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.geronimo.components</groupId>
-      <artifactId>geronimo-connector</artifactId>
-      <!--exclusions> <exclusion> <groupId>org.apache.geronimo.specs</groupId>
-        <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId> </exclusion> </exclusions -->
-    </dependency>
-    <dependency>
-      <groupId>org.tranql</groupId>
-      <artifactId>tranql-connector</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.geronimo.components</groupId>
-      <artifactId>geronimo-transaction</artifactId>
-      <!--exclusions> <exclusion> <groupId>org.apache.geronimo.specs</groupId>
-        <artifactId>geronimo-jta_1.1_spec</artifactId> </exclusion> <exclusion> <groupId>org.apache.geronimo.specs</groupId>
-        <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId> </exclusion> </exclusions -->
-    </dependency>
-    <dependency>
-      <groupId>javax.transaction</groupId>
-      <artifactId>javax.transaction-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.xbean</groupId>
-      <artifactId>xbean-naming</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.nuxeo.common</groupId>
       <artifactId>nuxeo-common</artifactId>

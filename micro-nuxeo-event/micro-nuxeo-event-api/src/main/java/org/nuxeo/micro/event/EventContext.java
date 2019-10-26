@@ -154,4 +154,8 @@ public interface EventContext extends Serializable {
      */
     void setRepositoryName(String repositoryName);
 
+
+
+    <T> T getService(Class<T> serviceClass);
+
 }

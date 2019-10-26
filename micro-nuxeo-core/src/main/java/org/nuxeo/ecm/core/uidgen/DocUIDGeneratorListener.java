@@ -33,8 +33,6 @@ public class DocUIDGeneratorListener implements EventListener {
 
     private static final Log log = LogFactory.getLog(DocUIDGeneratorListener.class);
 
-    UIDGeneratorService uidGeneratorService;
-
     @Override
     public void handleEvent(Event event) {
 
@@ -42,6 +40,9 @@ public class DocUIDGeneratorListener implements EventListener {
             return;
         }
         EventContext ctx = event.getContext();
+
+        UIDGeneratorService uidGeneratorService = ctx.getService(UIDGeneratorService.class);
+
         if (ctx instanceof DocumentEventContext) {
             DocumentEventContext docCtx = (DocumentEventContext) ctx;
             DocumentModel doc = docCtx.getSourceDocument();
@@ -54,16 +55,11 @@ public class DocUIDGeneratorListener implements EventListener {
             String eventId = event.getName();
             log.debug("eventId : " + eventId);
             try {
-                addUIDtoDoc(doc);
+                uidGeneratorService.setUID(doc);
             } catch (PropertyNotFoundException e) {
                 log.error("Error occurred while generating UID for doc: " + doc, e);
             }
         }
-    }
-
-    private void addUIDtoDoc(DocumentModel doc) throws PropertyNotFoundException {
-        // generate UID for our doc
-        uidGeneratorService.setUID(doc);
     }
 
 }

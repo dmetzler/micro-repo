@@ -34,8 +34,6 @@ import org.nuxeo.ecm.core.blob.binary.BinaryManager;
 import org.nuxeo.ecm.core.blob.binary.BinaryManagerStatus;
 import org.nuxeo.ecm.core.model.Document;
 import org.nuxeo.ecm.core.model.Document.BlobAccessor;
-import org.nuxeo.ecm.core.model.Repository;
-import org.nuxeo.ecm.core.repository.RepositoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,11 +55,9 @@ public class DocumentBlobManagerImpl implements DocumentBlobManager {
 
     private BlobManager blobManager;
 
-    private RepositoryService repositoryService;
 
-    public DocumentBlobManagerImpl(BlobManager blobManager, RepositoryService repositoryService) {
+    public DocumentBlobManagerImpl(BlobManager blobManager) {
         this.blobManager = blobManager;
-        this.repositoryService = repositoryService;
     }
 
     public void deactivate() {
@@ -231,10 +227,10 @@ public class DocumentBlobManagerImpl implements DocumentBlobManager {
         }
         // in all repositories, mark referenced binaries
         // the marking itself will call back into the appropriate gc's mark method
-        for (String repositoryName : repositoryService.getRepositoryNames()) {
-            Repository repository = repositoryService.getRepository(repositoryName);
-            repository.markReferencedBinaries();
-        }
+//        for (String repositoryName : repositoryService.getRepositoryNames()) {
+//            Repository repository = repositoryService.getRepository(repositoryName);
+//            repository.markReferencedBinaries();
+//        }
         // stop gc
         BinaryManagerStatus globalStatus = new BinaryManagerStatus();
         for (BinaryGarbageCollector gc : gcs) {

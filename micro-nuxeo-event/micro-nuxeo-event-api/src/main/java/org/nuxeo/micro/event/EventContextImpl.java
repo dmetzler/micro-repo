@@ -89,4 +89,12 @@ public class EventContextImpl extends AbstractEventContext {
         this.principal = principal;
     }
 
+    @Override
+    public <T> T getService(Class<T> serviceClass) {
+        if (session != null) {
+            return session.getRepository().getService(serviceClass);
+        }
+        return null;
+    }
+
 }

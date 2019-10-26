@@ -12,13 +12,16 @@
 
   <modules>
     <module>micro-nuxeo-api</module>
+    <module>micro-nuxeo-metrics</module>
+    <module>micro-nuxeo-jta</module>
     <module>micro-nuxeo-event</module>
     <module>micro-nuxeo-el</module>
     <module>micro-nuxeo-kv</module>
     <module>micro-nuxeo-core</module>
-    <!-- <module>micro-nuxeo-dublincore</module> -->
+    <module>micro-nuxeo-dublincore</module>
+    <module>micro-nuxeo-repo</module>
     <!-- <module>micro-nuxeo-todo</module> -->
-    <!-- <module>micro-nuxeo-dsl</module> -->
+    <module>micro-nuxeo-dsl</module>
 
   </modules>
 
@@ -88,12 +91,40 @@
 
       <dependency>
         <groupId>org.nuxeo</groupId>
+        <artifactId>micro-nuxeo-jta</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.nuxeo</groupId>
+        <artifactId>micro-nuxeo-metrics</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.nuxeo</groupId>
         <artifactId>micro-nuxeo-event-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.nuxeo</groupId>
+        <artifactId>micro-nuxeo-event-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.nuxeo</groupId>
+        <artifactId>micro-nuxeo-dublincore</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.nuxeo</groupId>
         <artifactId>micro-nuxeo-kv</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.nuxeo</groupId>
+        <artifactId>micro-nuxeo-dsl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -121,8 +152,6 @@
         <artifactId>metrics-core</artifactId>
         <version>4.0.3</version>
       </dependency>
-      <!-- <dependency> <groupId>com.google.guava</groupId> <artifactId>guava</artifactId>
-        <version>27.1-jre</version> </dependency> -->
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
@@ -265,7 +294,7 @@
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
         <version>2.25.1</version>
-        <scope>test</scope>
+        <!-- <scope>test</scope> -->
       </dependency>
       <dependency>
         <groupId>org.assertj</groupId>

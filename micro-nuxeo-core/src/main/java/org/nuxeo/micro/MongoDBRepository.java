@@ -67,9 +67,9 @@ import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.PartialList;
 import org.nuxeo.ecm.core.api.ScrollResult;
 import org.nuxeo.ecm.core.api.repository.FulltextConfiguration;
-import org.nuxeo.ecm.core.api.repository.Repository;
 import org.nuxeo.ecm.core.blob.BlobManager;
 import org.nuxeo.ecm.core.blob.DocumentBlobManager;
+import org.nuxeo.ecm.core.model.Repository;
 import org.nuxeo.ecm.core.query.QueryParseException;
 import org.nuxeo.ecm.core.query.sql.model.OrderByClause;
 import org.nuxeo.ecm.core.schema.SchemaManager;
@@ -80,6 +80,7 @@ import org.nuxeo.ecm.core.storage.dbs.DBSExpressionEvaluator;
 import org.nuxeo.ecm.core.storage.dbs.DBSRepositoryBase;
 import org.nuxeo.ecm.core.storage.dbs.DBSStateFlattener;
 import org.nuxeo.ecm.core.storage.dbs.DBSTransactionState.ChangeTokenUpdater;
+import org.nuxeo.ecm.core.uidgen.UIDGeneratorService;
 import org.nuxeo.runtime.mongodb.MongoDBConnectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,8 +172,8 @@ public class MongoDBRepository extends DBSRepositoryBase {
     protected final CursorService<MongoCursor<Document>, Document, String> cursorService;
 
     public MongoDBRepository(MongoDatabase database, ConnectionManager cm, MongoDBRepositoryDescriptor descriptor,
-            BlobManager bm, TransactionManager tm, SchemaManager sm, DocumentBlobManager dbm) {
-        super(cm, descriptor.name, descriptor, bm, tm, sm, dbm);
+            BlobManager bm, TransactionManager tm, SchemaManager sm, DocumentBlobManager dbm, UIDGeneratorService uidGeneratorService) {
+        super(cm, descriptor.name, descriptor, bm, tm, sm, dbm, uidGeneratorService);
         coll = database.getCollection(descriptor.name);
         countersColl = database.getCollection(descriptor.name + ".counters");
         if (Boolean.TRUE.equals(descriptor.nativeId)) {

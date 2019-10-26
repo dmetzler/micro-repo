@@ -161,12 +161,10 @@ public class UserPrincipal implements NuxeoPrincipal, Serializable {
     public void setPrincipalId(String principalId) {
     }
 
-    @Override
     public DocumentModel getModel() {
         return model;
     }
 
-    @Override
     public void setModel(DocumentModel model) {
         this.model = model;
     }
@@ -235,7 +233,6 @@ public class UserPrincipal implements NuxeoPrincipal, Serializable {
         return null;
     }
 
-    @Override
     public boolean isAnonymous() {
         return anonymous;
     }

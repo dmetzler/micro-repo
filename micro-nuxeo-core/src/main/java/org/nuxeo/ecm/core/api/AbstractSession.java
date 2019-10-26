@@ -40,7 +40,6 @@ import static org.nuxeo.ecm.core.api.security.SecurityConstants.WRITE_LIFE_CYCLE
 import static org.nuxeo.ecm.core.api.security.SecurityConstants.WRITE_PROPERTIES;
 import static org.nuxeo.ecm.core.api.security.SecurityConstants.WRITE_SECURITY;
 import static org.nuxeo.ecm.core.api.security.SecurityConstants.WRITE_VERSION;
-import static org.nuxeo.ecm.core.api.trash.TrashService.Feature.TRASHED_STATE_IS_DEDUCED_FROM_LIFECYCLE;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -95,10 +94,10 @@ import org.nuxeo.ecm.core.schema.types.CompositeType;
 import org.nuxeo.ecm.core.schema.types.Schema;
 import org.nuxeo.ecm.core.security.LockSecurityPolicy;
 import org.nuxeo.ecm.core.security.SecurityService;
-import org.nuxeo.micro.MetricsService;
 import org.nuxeo.micro.event.DocumentEventContext;
 import org.nuxeo.micro.event.Event;
 import org.nuxeo.micro.event.EventService;
+import org.nuxeo.micro.metrics.MetricsRegistry;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
@@ -107,10 +106,11 @@ import com.codahale.metrics.SharedMetricRegistries;
 /**
  * Abstract implementation of the client interface.
  * <p>
- * This handles all the aspects that are independent on the final implementation (like running inside a J2EE platform or
- * not).
+ * This handles all the aspects that are independent on the final implementation
+ * (like running inside a J2EE platform or not).
  * <p>
- * The only aspect not implemented is the session management that should be handled by subclasses.
+ * The only aspect not implemented is the session management that should be
+ * handled by subclasses.
  *
  * @author Bogdan Stefanescu
  * @author Florent Guillaume
@@ -135,7 +135,8 @@ public abstract class AbstractSession implements CoreSession, Serializable {
     @Deprecated
     public static final String TRASH_KEEP_CHECKED_IN_PROPERTY = "org.nuxeo.trash.keepCheckedIn";
 
-    // @since 9.1 disable ecm:isLatestVersion and ecm:isLatestMajorVersion updates for performance purpose
+    // @since 9.1 disable ecm:isLatestVersion and ecm:isLatestMajorVersion updates
+    // for performance purpose
     public static final String DISABLED_ISLATESTVERSION_PROPERTY = "org.nuxeo.core.isLatestVersion.disabled";
 
     public static final String BINARY_TEXT_SYS_PROP = "fulltextBinary";
@@ -145,7 +146,7 @@ public abstract class AbstractSession implements CoreSession, Serializable {
     private Long maxResults;
 
     // @since 5.7.2
-    protected final MetricRegistry registry = SharedMetricRegistries.getOrCreate(MetricsService.class.getName());
+    protected final MetricRegistry registry = MetricsRegistry.get();
 
     protected Counter createDocumentCount;
 
@@ -154,12 +155,12 @@ public abstract class AbstractSession implements CoreSession, Serializable {
     protected Counter updateDocumentCount;
 
     protected void createMetrics() {
-        createDocumentCount = registry.counter(
-                MetricRegistry.name("nuxeo.repositories", getRepositoryName(), "documents", "create"));
-        deleteDocumentCount = registry.counter(
-                MetricRegistry.name("nuxeo.repositories", getRepositoryName(), "documents", "delete"));
-        updateDocumentCount = registry.counter(
-                MetricRegistry.name("nuxeo.repositories", getRepositoryName(), "documents", "update"));
+        createDocumentCount = registry
+                .counter(MetricRegistry.name("nuxeo.repositories", getRepositoryName(), "documents", "create"));
+        deleteDocumentCount = registry
+                .counter(MetricRegistry.name("nuxeo.repositories", getRepositoryName(), "documents", "delete"));
+        updateDocumentCount = registry
+                .counter(MetricRegistry.name("nuxeo.repositories", getRepositoryName(), "documents", "update"));
     }
 
     protected final SecurityService securityService;
@@ -182,7 +183,6 @@ public abstract class AbstractSession implements CoreSession, Serializable {
 
     protected CoreSessionServiceImpl css;
 
-
     public AbstractSession(CoreSessionServiceImpl coreSessionService, Repository repository) {
         this.css = coreSessionService;
         this.repository = repository;
@@ -202,6 +202,10 @@ public abstract class AbstractSession implements CoreSession, Serializable {
 
         this.coreService = coreSessionService.getCoreService();
 
+    }
+
+    public CloseableCoreSession upgradeAsSystem() {
+        return css.createCoreSession(new SystemPrincipal(getPrincipal().getName()));
     }
 
     /**
@@ -278,8 +282,8 @@ public abstract class AbstractSession implements CoreSession, Serializable {
     /**
      * Copied from obsolete VersionChangeNotifier.
      * <p>
-     * Sends change notifications to core event listeners. The event contains info with older document (before version
-     * change) and newer doc (current document).
+     * Sends change notifications to core event listeners. The event contains info
+     * with older document (before version change) and newer doc (current document).
      *
      * @param options additional info to pass to the event
      */
@@ -360,7 +364,8 @@ public abstract class AbstractSession implements CoreSession, Serializable {
     }
 
     /**
-     * Gets the document model for the given core document, preserving the contextData.
+     * Gets the document model for the given core document, preserving the
+     * contextData.
      *
      * @param doc the document
      * @return the document model
@@ -673,7 +678,8 @@ public abstract class AbstractSession implements CoreSession, Serializable {
         charFilteringService.filter(docModel);
 
         if (docModel.getSessionId() == null) {
-            // docModel was created using constructor instead of CoreSession.createDocumentModel
+            // docModel was created using constructor instead of
+            // CoreSession.createDocumentModel
             docModel.attach(getSessionId());
         }
         String typeName = docModel.getType();
@@ -730,8 +736,10 @@ public abstract class AbstractSession implements CoreSession, Serializable {
         docModel = readModel(doc, docModel);
         // compute auto versioning
         // no need to fire event, as we use DocumentModel API it's already done
-        // we don't rely on SKIP_VERSIONING because automatic versioning in saveDocument as the same behavior - and it
-        // doesn't erase initial version as it's the case to avoid when setting Skip_VERSIONING
+        // we don't rely on SKIP_VERSIONING because automatic versioning in saveDocument
+        // as the same behavior - and it
+        // doesn't erase initial version as it's the case to avoid when setting
+        // Skip_VERSIONING
         versioningService.doAutomaticVersioning(null, docModel, false);
         notifyEvent(DocumentEventTypes.DOCUMENT_CREATED, docModel, options, null, null, true, false);
         docModel = writeModel(doc, docModel);
@@ -1110,7 +1118,8 @@ public abstract class AbstractSession implements CoreSession, Serializable {
     }
 
     /**
-     * @return the appropriate countUpTo value depending on input {@code countTotal} and configuration.
+     * @return the appropriate countUpTo value depending on input {@code countTotal}
+     *         and configuration.
      */
     protected long computeCountUpTo(boolean countTotal) {
         long countUpTo;
@@ -1444,8 +1453,8 @@ public abstract class AbstractSession implements CoreSession, Serializable {
     }
 
     /**
-     * Implementation uses the fact that the lexicographic ordering of paths is a refinement of the "contains" partial
-     * ordering.
+     * Implementation uses the fact that the lexicographic ordering of paths is a
+     * refinement of the "contains" partial ordering.
      */
     @Override
     public void removeDocuments(DocumentRef[] docRefs) {
@@ -1508,7 +1517,8 @@ public abstract class AbstractSession implements CoreSession, Serializable {
         }
 
         DocumentModel previousDocModel = readModel(doc);
-        // load previous data for versioning purpose, we want previous document filled with previous value which could
+        // load previous data for versioning purpose, we want previous document filled
+        // with previous value which could
         // not be the case if access to property value is done after the update
         Arrays.asList(previousDocModel.getSchemas()).forEach(previousDocModel::getProperties);
         options.put(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL, previousDocModel);
@@ -1537,8 +1547,8 @@ public abstract class AbstractSession implements CoreSession, Serializable {
         }
 
         // recompute versioning option as it can be set by listeners
-        VersioningOption versioningOption = (VersioningOption) docModel.getContextData(
-                VersioningService.VERSIONING_OPTION);
+        VersioningOption versioningOption = (VersioningOption) docModel
+                .getContextData(VersioningService.VERSIONING_OPTION);
         docModel.putContextData(VersioningService.VERSIONING_OPTION, null);
         String checkinComment = (String) docModel.getContextData(VersioningService.CHECKIN_COMMENT);
         docModel.putContextData(VersioningService.CHECKIN_COMMENT, null);
@@ -1548,11 +1558,14 @@ public abstract class AbstractSession implements CoreSession, Serializable {
 
         boolean manualVersioning = versioningOption != null;
         if (!docModel.isImmutable()) {
-            // compute auto versioning before update - here we create a version of document in order to save previous
-            // state it's useful if we want to implement rules like create a version if last contributor is not the
+            // compute auto versioning before update - here we create a version of document
+            // in order to save previous
+            // state it's useful if we want to implement rules like create a version if last
+            // contributor is not the
             // same previous one. So we want to trigger this mechanism if and only if:
             // - previous document is checkouted
-            // - we don't ask for a version without updating the document (manual versioning only)
+            // - we don't ask for a version without updating the document (manual versioning
+            // only)
             // no need to fire event, as we use DocumentModel API it's already done
             if (previousDocModel.isCheckedOut() && (!manualVersioning || dirty)) {
                 versioningService.doAutomaticVersioning(previousDocModel, docModel, true);
@@ -1805,12 +1818,14 @@ public abstract class AbstractSession implements CoreSession, Serializable {
     }
 
     /**
-     * Send a core event for the creation of a new check in version. The source document is the live document model used
-     * as the source for the checkin, not the archived version it-self.
+     * Send a core event for the creation of a new check in version. The source
+     * document is the live document model used as the source for the checkin, not
+     * the archived version it-self.
      *
-     * @param docModel work document that has been checked-in as a version
+     * @param docModel            work document that has been checked-in as a
+     *                            version
      * @param checkedInVersionRef document ref of the new checked-in version
-     * @param options initial option map, or null
+     * @param options             initial option map, or null
      */
     protected void notifyCheckedInVersion(DocumentModel docModel, DocumentRef checkedInVersionRef,
             Map<String, Serializable> options, String checkinComment) {
@@ -1943,7 +1958,8 @@ public abstract class AbstractSession implements CoreSession, Serializable {
     }
 
     /**
-     * Remove proxies for the same base document in the folder. doc may be a normal document or a proxy.
+     * Remove proxies for the same base document in the folder. doc may be a normal
+     * document or a proxy.
      */
     protected List<String> removeExistingProxies(Document doc, Document folder) {
         Collection<Document> otherProxies = getSession().getProxies(doc, folder);
@@ -1956,10 +1972,11 @@ public abstract class AbstractSession implements CoreSession, Serializable {
     }
 
     /**
-     * Update the proxy for doc in the given section to point to the new target. Do nothing if there are several
-     * proxies.
+     * Update the proxy for doc in the given section to point to the new target. Do
+     * nothing if there are several proxies.
      *
-     * @return the proxy if it was updated, or {@code null} if none or several were found
+     * @return the proxy if it was updated, or {@code null} if none or several were
+     *         found
      */
     protected DocumentModel updateExistingProxies(Document doc, Document folder, Document target) {
         Collection<Document> proxies = getSession().getProxies(doc, folder);
@@ -2073,9 +2090,10 @@ public abstract class AbstractSession implements CoreSession, Serializable {
     /**
      * Make a document follow a transition.
      *
-     * @param docRef a {@link DocumentRef}
+     * @param docRef     a {@link DocumentRef}
      * @param transition the transition to follow
-     * @param options an option map than can be used by callers to pass additional params
+     * @param options    an option map than can be used by callers to pass
+     *                   additional params
      * @since 5.9.3
      */
     private boolean followTransition(DocumentRef docRef, String transition, Map<String, Serializable> options)
@@ -2083,7 +2101,8 @@ public abstract class AbstractSession implements CoreSession, Serializable {
         Document doc = resolveReference(docRef);
         checkPermission(doc, WRITE_LIFE_CYCLE);
 
-        // backward compat - used to forward deprecated call followTransition("deleted") to trash service
+        // backward compat - used to forward deprecated call followTransition("deleted")
+        // to trash service
         boolean deleteTransitions = LifeCycleConstants.DELETE_TRANSITION.equals(transition)
                 || LifeCycleConstants.UNDELETE_TRANSITION.equals(transition);
 
@@ -2183,7 +2202,8 @@ public abstract class AbstractSession implements CoreSession, Serializable {
         // TODO: add a new permission named LOCK and use it instead of
         // WRITE_PROPERTIES
 
-        // ignore the lock policy that would always deny a write on a locked document, because we want to have a
+        // ignore the lock policy that would always deny a write on a locked document,
+        // because we want to have a
         // specific LockException when the document is already locked by another user
         try {
             LockSecurityPolicy.setIgnorePolicy(true);
@@ -2399,7 +2419,8 @@ public abstract class AbstractSession implements CoreSession, Serializable {
             options.put(systemProperty, value != null); // deprecated, not very useful
             options.put(DocumentEventTypes.SYSTEM_PROPERTY, systemProperty);
             options.put(DocumentEventTypes.SYSTEM_PROPERTY_VALUE, value);
-            // note: event is sent "inline", so never available to async processing (because it's big)
+            // note: event is sent "inline", so never available to async processing (because
+            // it's big)
             notifyEvent(DocumentEventTypes.BINARYTEXT_UPDATED, docModel, options, null, null, false, true);
         }
         doc.setSystemProp(systemProperty, value);
@@ -2487,8 +2508,9 @@ public abstract class AbstractSession implements CoreSession, Serializable {
     }
 
     /**
-     * Returns the first {@code Document} with the given {@code facet}, recursively going up the parent hierarchy.
-     * Returns {@code null} if there is no more parent.
+     * Returns the first {@code Document} with the given {@code facet}, recursively
+     * going up the parent hierarchy. Returns {@code null} if there is no more
+     * parent.
      * <p>
      * This method does not check security rights.
      */
@@ -2504,7 +2526,8 @@ public abstract class AbstractSession implements CoreSession, Serializable {
     public Map<String, String> getBinaryFulltext(DocumentRef ref) {
         Document doc = resolveReference(ref);
         checkPermission(doc, READ);
-        // Use an id whether than system properties to avoid to store fulltext properties in cache
+        // Use an id whether than system properties to avoid to store fulltext
+        // properties in cache
         String id = doc.getUUID();
         if (doc.isProxy()) {
             id = doc.getTargetDocument().getUUID();
@@ -2530,12 +2553,12 @@ public abstract class AbstractSession implements CoreSession, Serializable {
             return postCreate.apply(createDocument(docModel));
         }
         String key = computeKeyForAtomicCreation(docModel);
-        //return LockHelper.doAtomically(key, () -> {
-            if (exists(ref)) {
-                return getDocument(ref);
-            }
-            return postCreate.apply(createDocument(docModel));
-        //});
+        // return LockHelper.doAtomically(key, () -> {
+        if (exists(ref)) {
+            return getDocument(ref);
+        }
+        return postCreate.apply(createDocument(docModel));
+        // });
     }
 
     protected String computeKeyForAtomicCreation(DocumentModel docModel) {

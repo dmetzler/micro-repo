@@ -63,6 +63,7 @@ import org.nuxeo.ecm.core.schema.types.Field;
 import org.nuxeo.ecm.core.schema.types.ListType;
 import org.nuxeo.ecm.core.schema.types.Schema;
 import org.nuxeo.ecm.core.schema.types.Type;
+import org.nuxeo.ecm.core.uidgen.UIDGeneratorService;
 import org.nuxeo.runtime.transaction.TransactionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,13 +117,17 @@ public abstract class DBSRepositoryBase implements DBSRepository {
 
     private DocumentBlobManager dbm;
 
+    private UIDGeneratorService uidGeneratorService;
+
     public DBSRepositoryBase(ConnectionManager cm, String repositoryName, DBSRepositoryDescriptor descriptor,
-            BlobManager bm, TransactionManager tm, SchemaManager schemaManager, DocumentBlobManager dbm) {
+            BlobManager bm, TransactionManager tm, SchemaManager schemaManager, DocumentBlobManager dbm,
+            UIDGeneratorService uidGeneratorService) {
         this.cm = cm;
         this.repositoryName = repositoryName;
         this.tm = tm;
         this.schemaManager = schemaManager;
         this.dbm = dbm;
+        this.uidGeneratorService = uidGeneratorService;
         String idt = descriptor.idType;
         List<IdType> allowed = getAllowedIdTypes();
         if (StringUtils.isBlank(idt)) {
@@ -141,7 +146,8 @@ public abstract class DBSRepositoryBase implements DBSRepository {
         // if (fulltextDescriptor.getFulltextDisabled()) {
         // fulltextConfiguration = null;
         // } else {
-        // fulltextConfiguration = FulltextConfigurationFactory.make(fulltextDescriptor);
+        // fulltextConfiguration =
+        // FulltextConfigurationFactory.make(fulltextDescriptor);
         // }
         // this.cm = cm;
 
@@ -150,7 +156,10 @@ public abstract class DBSRepositoryBase implements DBSRepository {
         initBlobsPaths();
     }
 
-    /** Gets the allowed id types for this DBS repository. The first one is the default. */
+    /**
+     * Gets the allowed id types for this DBS repository. The first one is the
+     * default.
+     */
     public abstract List<IdType> getAllowedIdTypes();
 
     // @Override
@@ -325,7 +334,6 @@ public abstract class DBSRepositoryBase implements DBSRepository {
         return context.newSession();
     }
 
-
     protected DBSSession newSession(DBSRepository repository) {
         return new DBSSession(repository);
     }
@@ -333,8 +341,8 @@ public abstract class DBSRepositoryBase implements DBSRepository {
     public Map<Transaction, TransactionContext> transactionContexts = new ConcurrentHashMap<>();
 
     /**
-     * Context maintained during a transaction, holding the base session used, and all session proxy handles that have
-     * been returned to callers.
+     * Context maintained during a transaction, holding the base session used, and
+     * all session proxy handles that have been returned to callers.
      */
     public class TransactionContext implements Synchronization {
 
@@ -407,8 +415,8 @@ public abstract class DBSRepositoryBase implements DBSRepository {
     }
 
     /**
-     * An indirection to a base {@link DBSSession} intercepting {@code close()} to not close the base session until the
-     * transaction itself is closed.
+     * An indirection to a base {@link DBSSession} intercepting {@code close()} to
+     * not close the base session until the transaction itself is closed.
      */
     public static class DBSSessionInvoker implements InvocationHandler {
 
@@ -499,6 +507,16 @@ public abstract class DBSRepositoryBase implements DBSRepository {
     @Override
     public DocumentBlobManager getDocumentBlobManager() {
         return dbm;
+    }
+
+    @Override
+    public <T> T getService(Class<T> serviceClass) {
+        if (SchemaManager.class.equals(serviceClass)) {
+            return (T) schemaManager;
+        } else if (UIDGeneratorService.class.equals(serviceClass)) {
+            return (T) uidGeneratorService;
+        }
+        return null;
     }
 
 }

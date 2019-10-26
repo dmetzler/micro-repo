@@ -42,20 +42,19 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.NuxeoPrincipal;
 import org.nuxeo.ecm.core.api.SystemPrincipal;
-import org.nuxeo.ecm.core.event.Event;
-import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.runtime.model.DefaultComponent;
-
+import org.nuxeo.micro.event.Event;
 /**
  * DublinCore Storage Service Implementation.
  *
  * @since 10.2
  */
-public class DublinCoreStorageServiceImpl extends DefaultComponent implements DublinCoreStorageService {
+public class DublinCoreStorageServiceImpl implements DublinCoreStorageService {
 
     @Override
     public void setCreationDate(DocumentModel doc, Calendar creationDate) {
-        Framework.doPrivileged(() -> doc.setPropertyValue(DUBLINCORE_CREATED_DATE_PROPERTY, creationDate));
+//        Framework.doPrivileged(() ->
+        doc.setPropertyValue(DUBLINCORE_CREATED_DATE_PROPERTY, creationDate);
+//        );
     }
 
     @Override
@@ -65,12 +64,12 @@ public class DublinCoreStorageServiceImpl extends DefaultComponent implements Du
 
     @Override
     public void setModificationDate(DocumentModel doc, Calendar modificationDate) {
-        Framework.doPrivileged(() -> {
+//        Framework.doPRDrivileged(() -> {
             doc.setPropertyValue(DUBLINCORE_MODIFIED_DATE_PROPERTY, modificationDate);
             if (doc.getPropertyValue(DUBLINCORE_CREATED_DATE_PROPERTY) == null) {
                 setCreationDate(doc, modificationDate);
             }
-        });
+//        });
     }
 
     @Override
@@ -88,13 +87,13 @@ public class DublinCoreStorageServiceImpl extends DefaultComponent implements Du
             contributorsList.add(principalName);
         }
 
-        Framework.doPrivileged(() -> {
+//        Framework.doPrivileged(() -> {
             if (doc.getPropertyValue(DUBLINCORE_CREATOR_PROPERTY) == null) {
                 doc.setPropertyValue(DUBLINCORE_CREATOR_PROPERTY, principalName);
             }
             doc.setPropertyValue(DUBLINCORE_CONTRIBUTORS_PROPERTY, (Serializable) contributorsList);
             doc.setPropertyValue(DUBLINCORE_LAST_CONTRIBUTOR_PROPERTY, principalName);
-        });
+//        });
     }
 
     /**

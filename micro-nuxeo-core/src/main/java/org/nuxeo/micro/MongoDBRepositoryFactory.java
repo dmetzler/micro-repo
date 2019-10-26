@@ -22,6 +22,7 @@ import org.nuxeo.ecm.core.blob.DocumentBlobManager;
 import org.nuxeo.ecm.core.repository.RepositoryFactory;
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.storage.dbs.DBSRepositoryFactory;
+import org.nuxeo.ecm.core.uidgen.UIDGeneratorService;
 
 import com.mongodb.client.MongoDatabase;
 
@@ -38,18 +39,21 @@ public class MongoDBRepositoryFactory extends DBSRepositoryFactory {
 
     private DocumentBlobManager dbm;
 
+    private UIDGeneratorService uidGeneratorService;
+
     public MongoDBRepositoryFactory(String repositoryName, MongoDatabase db, SchemaManager sm,
-            DocumentBlobManager dbm) {
+            DocumentBlobManager dbm, UIDGeneratorService uidGeneratorService) {
         super(repositoryName);
         this.db = db;
         this.sm = sm;
         this.dbm = dbm;
+        this.uidGeneratorService = uidGeneratorService;
     }
 
     @Override
     public Object call() {
         return new MongoDBRepository(db, installPool(), (MongoDBRepositoryDescriptor) getRepositoryDescriptor(), null,
-                null, sm, dbm);
+                null, sm, dbm, uidGeneratorService);
 
     }
 

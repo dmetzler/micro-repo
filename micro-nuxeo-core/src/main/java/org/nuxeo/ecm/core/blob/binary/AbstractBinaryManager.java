@@ -55,7 +55,7 @@ public abstract class AbstractBinaryManager implements BinaryManager {
     /**
      * @since 7.4
      */
-    public static final HashMap<Integer, String> DIGESTS_BY_LENGTH = new HashMap<>();
+    protected static final HashMap<Integer, String> DIGESTS_BY_LENGTH = new HashMap<>();
 
     public static final String DEFAULT_DIGEST = MD5_DIGEST; // SHA256_DIGEST
 
@@ -74,6 +74,7 @@ public abstract class AbstractBinaryManager implements BinaryManager {
         DIGESTS_BY_LENGTH.put(SHA1_DIGEST_LENGTH, SHA1_DIGEST);
         DIGESTS_BY_LENGTH.put(SHA256_DIGEST_LENGTH, SHA256_DIGEST);
     }
+
 
     /**
      * Creates a binary value from the given input stream.

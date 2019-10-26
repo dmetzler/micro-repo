@@ -22,7 +22,7 @@ package org.nuxeo.ecm.platform.dublincore.service;
 import java.util.Calendar;
 
 import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.event.Event;
+import org.nuxeo.micro.event.Event;
 
 /**
  * Former implementation for DublinCore schema storage.
@@ -39,16 +39,6 @@ public interface DublinCoreStorageService {
     void setCreationDate(DocumentModel doc, Calendar creationDate);
 
     /**
-     * Sets the document's creation date.
-     *
-     * @deprecated since 10.2, use directly {@link DublinCoreStorageService#setCreationDate(DocumentModel, Calendar)}
-     */
-    @Deprecated(since = "10.2")
-    default void setCreationDate(DocumentModel doc, Calendar creationDate, @SuppressWarnings("unused") Event event) {
-        setCreationDate(doc, creationDate);
-    }
-
-    /**
      * Sets the document's issued date.
      */
     void setIssuedDate(DocumentModel doc, Calendar issuedDate);
@@ -57,18 +47,6 @@ public interface DublinCoreStorageService {
      * Sets the document's modified date.
      */
     void setModificationDate(DocumentModel doc, Calendar modificationDate);
-
-    /**
-     * Sets the document's modified date.
-     *
-     * @deprecated since 10.2, use directly
-     *             {@link DublinCoreStorageService#setModificationDate(DocumentModel, Calendar)}
-     */
-    @Deprecated(since = "10.2")
-    default void setModificationDate(DocumentModel doc, Calendar modificationDate,
-            @SuppressWarnings("unused") Event event) {
-        setModificationDate(doc, modificationDate);
-    }
 
     /**
      * Adds a contributor to the document.

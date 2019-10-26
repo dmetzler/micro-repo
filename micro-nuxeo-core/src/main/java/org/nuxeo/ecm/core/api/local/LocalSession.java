@@ -203,4 +203,9 @@ public class LocalSession extends AbstractSession implements CloseableCoreSessio
         return true;
     }
 
+    @Override
+    public Repository getRepository() {
+        return repository;
+    }
+
 }

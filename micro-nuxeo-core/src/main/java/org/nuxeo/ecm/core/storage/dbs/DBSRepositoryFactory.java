@@ -40,14 +40,8 @@ public abstract class DBSRepositoryFactory implements RepositoryFactory {
 
     public DBSRepositoryDescriptor getRepositoryDescriptor() {
         MongoDBRepositoryDescriptor desc = new MongoDBRepositoryDescriptor();
-        desc.name = "default";
+        desc.name = repositoryName;
         return desc;
-        // DBSRepositoryService repositoryService = Framework.getService(DBSRepositoryService.class);
-        // DBSRepositoryDescriptor descriptor = repositoryService.getRepositoryDescriptor(repositoryName);
-        // if (descriptor == null) {
-        // throw new IllegalStateException("No descriptor registered for: " + repositoryName);
-        // }
-        // return descriptor;
     }
 
     /**

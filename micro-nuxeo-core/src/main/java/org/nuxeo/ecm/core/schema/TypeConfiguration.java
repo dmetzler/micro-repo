@@ -31,10 +31,10 @@ import org.nuxeo.common.xmap.annotation.XObject;
 public class TypeConfiguration {
 
     @XNode("prefetch")
-    String prefetchInfo;
+    protected String prefetchInfo;
 
     @XNode("clearComplexPropertyBeforeSet")
-    Boolean clearComplexPropertyBeforeSet;
+    protected Boolean clearComplexPropertyBeforeSet;
 
     /**
      * @since 10.3

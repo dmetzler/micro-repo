@@ -29,6 +29,7 @@ import java.util.function.Function;
 import org.nuxeo.ecm.core.api.DocumentModel.DocumentModelRefresh;
 import org.nuxeo.ecm.core.api.security.ACE;
 import org.nuxeo.ecm.core.api.security.ACP;
+import org.nuxeo.ecm.core.model.Repository;
 import org.nuxeo.ecm.core.schema.DocumentType;
 import org.nuxeo.ecm.core.schema.types.Schema;
 
@@ -1499,5 +1500,7 @@ public interface CoreSession {
      * @since 9.3
      */
     DocumentModel getOrCreateDocument(DocumentModel docModel, Function<DocumentModel, DocumentModel> postCreate);
+
+    Repository getRepository();
 
 }
