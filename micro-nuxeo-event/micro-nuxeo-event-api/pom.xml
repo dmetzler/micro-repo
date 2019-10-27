@@ -52,16 +52,9 @@
       <artifactId>jta</artifactId>
     </dependency>
     <dependency>
-      <groupId>cup</groupId>
-      <artifactId>java-cup</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore</artifactId>
     </dependency>
-
-
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
@@ -100,8 +93,8 @@
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.nuxeo.common</groupId>
-      <artifactId>nuxeo-common</artifactId>
+      <groupId>org.nuxeo</groupId>
+      <artifactId>micro-nuxeo-common</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>

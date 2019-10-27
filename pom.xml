@@ -11,6 +11,7 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>micro-nuxeo-common</module>
     <module>micro-nuxeo-api</module>
     <module>micro-nuxeo-metrics</module>
     <module>micro-nuxeo-jta</module>
@@ -70,6 +71,11 @@
         <scope>import</scope>
       </dependency>
 
+      <dependency>
+        <groupId>org.nuxeo</groupId>
+        <artifactId>micro-nuxeo-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>org.nuxeo</groupId>
@@ -121,7 +127,11 @@
         <artifactId>micro-nuxeo-kv</artifactId>
         <version>${project.version}</version>
       </dependency>
-
+    <dependency>
+        <groupId>commons-collections</groupId>
+        <artifactId>commons-collections</artifactId>
+        <version>3.2.2</version>
+      </dependency>
       <dependency>
         <groupId>org.nuxeo</groupId>
         <artifactId>micro-nuxeo-dsl</artifactId>
@@ -174,33 +184,35 @@
         <artifactId>jta</artifactId>
         <version>1.1</version>
       </dependency>
-      <dependency>
+      <!-- <dependency>
         <groupId>cup</groupId>
         <artifactId>java-cup</artifactId>
         <version>0.11a</version>
+      </dependency> -->
+      <dependency>
+        <groupId>com.github.vbmacher</groupId>
+        <artifactId>java-cup</artifactId>
+        <version>11b-20160615</version>
       </dependency>
-
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpcore</artifactId>
         <version>4.4.10</version>
       </dependency>
-
-
       <dependency>
         <groupId>commons-beanutils</groupId>
         <artifactId>commons-beanutils</artifactId>
         <version>1.9.3</version>
       </dependency>
       <dependency>
-        <groupId>javax.resource</groupId>
-        <artifactId>connector-api</artifactId>
-        <version>1.5</version>
+        <groupId>xerces</groupId>
+        <artifactId>xercesImpl</artifactId>
+        <version>2.12.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.geronimo.components</groupId>
         <artifactId>geronimo-connector</artifactId>
-        <version>2.2.1-NX1</version>
+        <version>2.2.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.apache.geronimo.specs</groupId>
@@ -245,11 +257,6 @@
         <artifactId>javax.servlet-api</artifactId>
         <version>4.0.1</version>
       </dependency>
-      <dependency>
-        <groupId>org.nuxeo.common</groupId>
-        <artifactId>nuxeo-common</artifactId>
-        <version>10.10</version>
-      </dependency>
 
       <dependency>
         <groupId>com.google.guava</groupId>
@@ -275,13 +282,6 @@
             <artifactId>el-api</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <dependency>
-        <!-- this implements a more recent version of the EL spec than javax.el:el-api:1.0 -->
-        <groupId>org.apache.tomcat</groupId>
-        <artifactId>tomcat-el-api</artifactId>
-        <version>9.0.20</version>
-        <scope>provided</scope> <!-- provided by Tomcat as jasper.jar -->
       </dependency>
 
       <dependency>
@@ -322,4 +322,18 @@
 
     </dependencies>
   </dependencyManagement>
+
+   <repositories>
+    <repository>
+      <id>jboss-public</id>
+      <url>https://repository.jboss.org/nexus/content/groups/public</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
 </project>

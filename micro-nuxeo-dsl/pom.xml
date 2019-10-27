@@ -104,7 +104,7 @@
       <artifactId>jta</artifactId>
     </dependency>
     <dependency>
-      <groupId>cup</groupId>
+      <groupId>com.github.vbmacher</groupId>
       <artifactId>java-cup</artifactId>
     </dependency>
 
@@ -117,10 +117,6 @@
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.resource</groupId>
-      <artifactId>connector-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.geronimo.components</groupId>
@@ -152,8 +148,8 @@
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.nuxeo.common</groupId>
-      <artifactId>nuxeo-common</artifactId>
+      <groupId>org.nuxeo</groupId>
+      <artifactId>micro-nuxeo-common</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>

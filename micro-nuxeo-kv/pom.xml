@@ -16,8 +16,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.nuxeo.common</groupId>
-      <artifactId>nuxeo-common</artifactId>
+      <groupId>org.nuxeo</groupId>
+      <artifactId>micro-nuxeo-common</artifactId>
     </dependency>
     <dependency>
       <groupId>net.jodah</groupId>
