@@ -60,10 +60,6 @@
       <artifactId>commons-beanutils</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.resource</groupId>
-      <artifactId>connector-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.apache.geronimo.components</groupId>
       <artifactId>geronimo-connector</artifactId>
       <!--exclusions> <exclusion> <groupId>org.apache.geronimo.specs</groupId>

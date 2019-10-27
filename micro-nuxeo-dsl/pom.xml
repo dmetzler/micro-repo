@@ -17,40 +17,40 @@
   <build>
     <plugins>
       <plugin>
-         <groupId>com.github.eirslett</groupId>
-         <artifactId>frontend-maven-plugin</artifactId>
-         <version>0.0.20</version>
-         <executions>
-             <execution>
-                 <id>install node and npm</id>
-                 <goals>
-                     <goal>install-node-and-npm</goal>
-                 </goals>
-                 <phase>generate-resources</phase>
-                 <configuration>
-                     <nodeVersion>v10.13.0</nodeVersion>
-                     <npmVersion>6.11.3</npmVersion>
-                 </configuration>
-            </execution>
-            <execution>
-                 <id>npm install</id>
-                 <goals>
-                    <goal>npm</goal>
-                 </goals>
-                 <phase>generate-resources</phase>
-            </execution>
-            <execution>
-                 <id>gulp build</id>
-                 <goals>
-                     <goal>gulp</goal>
-                 </goals>
-                 <configuration>
-                  <arguments>build</arguments>
-                </configuration>
-                 <phase>generate-resources</phase>
-            </execution>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <version>0.0.20</version>
+        <executions>
+          <execution>
+            <id>install node and npm</id>
+            <goals>
+              <goal>install-node-and-npm</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <nodeVersion>v10.13.0</nodeVersion>
+              <npmVersion>6.11.3</npmVersion>
+            </configuration>
+          </execution>
+          <execution>
+            <id>npm install</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>generate-resources</phase>
+          </execution>
+          <execution>
+            <id>gulp build</id>
+            <goals>
+              <goal>gulp</goal>
+            </goals>
+            <configuration>
+              <arguments>build</arguments>
+            </configuration>
+            <phase>generate-resources</phase>
+          </execution>
         </executions>
-     </plugin>
+      </plugin>
 
     </plugins>
 
