@@ -51,6 +51,7 @@ public class MultiTenantRepoTest {
     @After
     public void doAfter() {
         TransactionHelper.commitOrRollbackTransaction();
+        jta.deactivate();
     }
 
     @Test

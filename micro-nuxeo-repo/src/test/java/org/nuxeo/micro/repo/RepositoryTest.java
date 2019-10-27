@@ -52,6 +52,7 @@ public class RepositoryTest {
     @After
     public void doAfter() {
         TransactionHelper.commitOrRollbackTransaction();
+        jta.deactivate();
     }
 
     @Test
