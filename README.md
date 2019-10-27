@@ -1,6 +1,8 @@
 Micro Repo
 ==========
 
+[![Build Status](https://travis-ci.org/dmetzler/micro-repo.svg?branch=master)](https://travis-ci.org/dmetzler/micro-repo)
+
 DISCLAIMER
 ----------
 
