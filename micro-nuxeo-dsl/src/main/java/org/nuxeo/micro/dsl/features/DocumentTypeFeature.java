@@ -11,6 +11,7 @@ public class DocumentTypeFeature implements DslFeature {
 
     private List<DocumentTypeDescriptor> doctypes = new ArrayList<>();
 
+    @SuppressWarnings("unchecked")
     @Override
     public void visit(DslModel model, Map<String, Object> ast) {
         if(ast.get("doctypes")!=null){

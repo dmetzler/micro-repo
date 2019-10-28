@@ -88,6 +88,7 @@ public class MultiTenantRepoTest {
             // When I create a Book
             DocumentModel doc = session.createDocumentModel("/", "test", "Book");
             doc.setPropertyValue("dc:title", "Test");
+            doc.setPropertyValue("bk:isbn", "isbn");
             doc = session.createDocument(doc);
             session.save();
 
@@ -95,6 +96,7 @@ public class MultiTenantRepoTest {
             doc = session.getDocument(new PathRef("/test"));
             assertThat(doc).isNotNull();
             assertThat(doc.getPropertyValue("dc:title")).isEqualTo("Test");
+            assertThat(doc.getPropertyValue("bk:isbn")).isEqualTo("isbn");
 
             DocumentModelList docs = session.query("SELECT * FROM Book");
             docs.forEach(System.out::println);

@@ -45,13 +45,11 @@ import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
  * <p>
  * Data structure are usually part of a composite model as the {@link DocumentModel}.
  *
- * @deprecated since 8.4 for public use, this is an internal implementation class subject to change
  * @see DocumentModel#getSchemas
  * @see DocumentModel#getProperties
  * @see DocumentModel#getPropertyObject
  * @see DocumentModel#getPropertyObjects
  */
-@Deprecated
 public interface DataModel extends Serializable {
 
     /**

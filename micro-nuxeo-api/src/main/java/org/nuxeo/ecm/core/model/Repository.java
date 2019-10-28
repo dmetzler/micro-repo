@@ -23,7 +23,6 @@ package org.nuxeo.ecm.core.model;
 
 import org.nuxeo.ecm.core.api.repository.FulltextConfiguration;
 import org.nuxeo.ecm.core.schema.SchemaManager;
-import org.nuxeo.ecm.core.schema.TypeProvider;
 
 /**
  * Interface to manage a low-level repository.
@@ -32,7 +31,7 @@ public interface Repository {
 
     String getName();
 
-    Session getSession();
+    Session<?> getSession();
 
     void shutdown();
 

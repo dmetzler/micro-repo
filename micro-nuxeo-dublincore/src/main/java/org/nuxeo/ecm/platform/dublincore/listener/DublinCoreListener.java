@@ -60,7 +60,7 @@ public class DublinCoreListener implements EventListener {
 
     public static final String DISABLE_DUBLINCORE_LISTENER = "disableDublinCoreListener";
 
-    private static final String RESET_CREATOR_PROPERTY = "nuxeo.dclistener.reset-creator-on-copy";
+    //private static final String RESET_CREATOR_PROPERTY = "nuxeo.dclistener.reset-creator-on-copy";
 
 
 

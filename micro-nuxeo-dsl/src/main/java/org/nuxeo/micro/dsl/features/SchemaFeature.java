@@ -14,6 +14,7 @@ public class SchemaFeature implements DslFeature {
 
     Map<String, FieldsDef> fieldsDefs = new HashMap<>();
 
+    @SuppressWarnings("unchecked")
     @Override
     public void visit(DslModel model, Map<String, Object> ast) {
         if (ast.get("schemas") != null) {

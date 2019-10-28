@@ -38,14 +38,14 @@ public class DocumentAdapterDescriptor {
     private String facet;
 
     @XNode("@class")
-    private Class itf;
+    private Class<?> itf;
 
     private DocumentAdapterFactory factory;
 
     public DocumentAdapterDescriptor() {
     }
 
-    public DocumentAdapterDescriptor(String facet, Class itf, DocumentAdapterFactory factory) {
+    public DocumentAdapterDescriptor(String facet, Class<?> itf, DocumentAdapterFactory factory) {
         this.facet = facet;
         this.itf = itf;
         this.factory = factory;

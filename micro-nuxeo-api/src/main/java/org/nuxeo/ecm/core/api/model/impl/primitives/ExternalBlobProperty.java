@@ -93,6 +93,7 @@ public class ExternalBlobProperty extends MapProperty {
     public Serializable internalGetValue() throws PropertyException {
         Object mapValue = super.internalGetValue();
         if (mapValue instanceof Map) {
+            @SuppressWarnings("rawtypes")
             Blob blob = getBlobFromMap((Map) mapValue);
             if (blob != null && !(blob instanceof Serializable)) {
                 throw new PropertyException("Blob is not serializable: " + blob);
@@ -105,7 +106,7 @@ public class ExternalBlobProperty extends MapProperty {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public <T> T getValue(Class<T> type) throws PropertyException {
         Object value = super.internalGetValue();
         if (value == null) {
@@ -190,10 +191,10 @@ public class ExternalBlobProperty extends MapProperty {
         if (uri == null || "".equals(uri)) {
             return null;
         }
-        String filename = (String) mapValue.get(FILE_NAME);
-        String mimeType = (String) mapValue.get(MIME_TYPE);
-        String encoding = (String) mapValue.get(ENCODING);
-        String digest = (String) mapValue.get(DIGEST);
+//        String filename = (String) mapValue.get(FILE_NAME);
+//        String mimeType = (String) mapValue.get(MIME_TYPE);
+//        String encoding = (String) mapValue.get(ENCODING);
+//        String digest = (String) mapValue.get(DIGEST);
         return null;
 //        try {
 //            BlobHolderAdapterService service = Framework.getService(BlobHolderAdapterService.class);

@@ -52,6 +52,7 @@ import org.nuxeo.micro.event.EventBundle;
  *
  * @author Thierry Delprat
  */
+@SuppressWarnings("deprecation")
 public class ShallowDocumentModel implements DocumentModel {
 
     private static final long serialVersionUID = 1L;

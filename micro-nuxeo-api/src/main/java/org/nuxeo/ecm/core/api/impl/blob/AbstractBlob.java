@@ -38,7 +38,8 @@ import org.nuxeo.ecm.core.api.CloseableFile;
 import org.nuxeo.micro.FileTracker;
 
 /**
- * Abstract implementation of a {@link Blob} storing the information other than the byte stream.
+ * Abstract implementation of a {@link Blob} storing the information other than
+ * the byte stream.
  */
 public abstract class AbstractBlob implements Blob, Serializable {
 
@@ -200,17 +201,10 @@ public abstract class AbstractBlob implements Blob, Serializable {
 
     // overridden by StorageBlob for improved performance
     protected boolean equalsStream(Blob other) {
-        InputStream is = null;
-        InputStream ois = null;
-        try {
-            is = getStream();
-            ois = other.getStream();
+        try (InputStream is = getStream(); InputStream ois = other.getStream()) {
             return IOUtils.contentEquals(is, ois);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } finally {
-            IOUtils.closeQuietly(is);
-            IOUtils.closeQuietly(ois);
         }
     }
 
@@ -219,10 +213,10 @@ public abstract class AbstractBlob implements Blob, Serializable {
     @Override
     public int hashCode() {
         return new HashCodeBuilder() //
-                                     .append(getFilename()) //
-                                     .append(getMimeType()) //
-                                     .append(getEncoding()) //
-                                     .toHashCode();
+                .append(getFilename()) //
+                .append(getMimeType()) //
+                .append(getEncoding()) //
+                .toHashCode();
     }
 
 }

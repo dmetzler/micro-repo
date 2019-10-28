@@ -590,16 +590,16 @@ public abstract class AbstractProperty implements Property {
      * @since 9.2
      */
     protected Property computeRemovedProperty(String name) {
-        String schema = getSchema().getName();
+        //String schema = getSchema().getName();
         // name is only the property name we try to get, build its path in order to check it against configuration
-        String originalPath = collectPath(new Path("/")).append(name).toString().substring(1);
-        String path;
+//        String originalPath = collectPath(new Path("/")).append(name).toString().substring(1);
+//        String path;
         // replace all something[..] in a path by *, for example files/item[2]/filename -> files/*/filename
-        if (originalPath.indexOf('[') != -1) {
-            path = NON_CANON_INDEX.matcher(originalPath).replaceAll("*");
-        } else {
-            path = originalPath;
-        }
+//        if (originalPath.indexOf('[') != -1) {
+//            path = NON_CANON_INDEX.matcher(originalPath).replaceAll("*");
+//        } else {
+//            path = originalPath;
+//        }
         return null;
 
         // PropertyCharacteristicHandler propertyHandler = Framework.getService(PropertyCharacteristicHandler.class);

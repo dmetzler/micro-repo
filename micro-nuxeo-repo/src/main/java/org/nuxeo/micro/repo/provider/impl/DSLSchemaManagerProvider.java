@@ -1,18 +1,27 @@
 package org.nuxeo.micro.repo.provider.impl;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.QName;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.schema.SchemaManagerImpl;
 import org.nuxeo.micro.dsl.DslModel;
 import org.nuxeo.micro.dsl.features.DocumentTypeFeature;
 import org.nuxeo.micro.dsl.features.SchemaFeature;
+import org.nuxeo.micro.dsl.features.SchemaFeature.FieldsDef;
 import org.nuxeo.micro.dsl.parser.DslParser;
 import org.nuxeo.micro.dsl.parser.DslParserImpl;
 import org.slf4j.Logger;
@@ -41,6 +50,18 @@ public class DSLSchemaManagerProvider extends CoreSchemaManagerProvider {
                 DslModel model = dslparser.parse(dsl);
 
                 SchemaFeature schemaFeature = model.getFeature(SchemaFeature.class);
+
+                schemaFeature.getShemaBindings().forEach(sb -> {
+                    String schemaName = sb.name;
+                    try {
+                        File schemaFile = buildXsdForShema(tenantId, sm.getSchemasDir(), schemaName,
+                                schemaFeature.getFieldDefs().get(schemaName));
+                        sb.src = schemaFile.getAbsolutePath();
+                    } catch (IOException e) {
+                        log.warn("Unable to read XSD for schema {}", schemaName);
+                    }
+                });
+
                 schemaFeature.getShemaBindings().stream().forEach(sm::registerSchema);
 
                 DocumentTypeFeature feature = model.getFeature(DocumentTypeFeature.class);
@@ -48,9 +69,73 @@ public class DSLSchemaManagerProvider extends CoreSchemaManagerProvider {
                 sm.flushPendingsRegistration();
             }
         } catch (IOException e) {
-            log.warn("Unable to read configuration file for tenant [{}]", tenantId);
+            log.warn("Unable to read configuration file for tenant [{}]", tenantId, e);
         }
 
         return sm;
+    }
+
+    private File buildXsdForShema(String tenantId, File schemaDir, String schemaName, FieldsDef fields)
+            throws IOException {
+
+        try {
+            Document doc = loadXsdTemplate();
+
+            String schemaUri = String.format("http://www.nuxeo.org/ecm/project/schemas/%s/%s", tenantId, schemaName);
+            Element root = doc.getRootElement();
+            // local namespace
+            root.addAttribute("targetNamespace", schemaUri);
+            root.addNamespace("nxs", schemaUri);
+
+            for (SchemaFeature.Field field : fields.getFields()) {
+                Element elem = root.addElement(QName.get("xs:element"));
+                String name = field.getName();
+                elem.addAttribute("name", name);
+                String type = field.getType();
+                elem.addAttribute("type", toXSDType(type));
+            }
+            File file = new File(FileUtils.getTempDirectory(),String.format("%s_%s.xsd", tenantId, schemaName));
+
+            FileWriter fw = new FileWriter(file);
+            try {
+                XMLWriter writer = new XMLWriter(fw, OutputFormat.createPrettyPrint());
+                writer.write(doc);
+            } finally {
+                fw.close();
+            }
+            return file;
+
+        } catch (DocumentException e) {
+            throw new IOException("Unable to read XSD schema file");
+        }
+    }
+
+    private String toXSDType(String type) {
+        if ("String".equalsIgnoreCase(type)) {
+            return "xs:string";
+        } else if ("Integer".equalsIgnoreCase(type)) {
+            return "xs:integer";
+        } else if ("Double".equalsIgnoreCase(type)) {
+            return "xs:double";
+        } else if ("Date".equalsIgnoreCase(type)) {
+            return "xs:date";
+        } else if ("Boolean".equalsIgnoreCase(type)) {
+            return "xs:boolean";
+        } else {
+            throw new IllegalArgumentException("Unknown type : " + type);
+        }
+    }
+
+    private Document loadXsdTemplate() throws DocumentException, IOException {
+        URL resource = getClass().getClassLoader().getResource("templates/schema-templates.xsd");
+
+        File file = new File(resource.getFile());
+
+        InputStream in = new FileInputStream(file);
+        try {
+            return new SAXReader().read(in);
+        } finally {
+            in.close();
+        }
     }
 }

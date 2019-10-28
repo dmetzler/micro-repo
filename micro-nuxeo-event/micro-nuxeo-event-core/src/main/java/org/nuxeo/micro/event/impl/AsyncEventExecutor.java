@@ -23,18 +23,16 @@ package org.nuxeo.micro.event.impl;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.nuxeo.micro.event.EventBundle;
 import org.nuxeo.micro.event.EventListenerDescriptor;
 
 /**
  * Executor of async listeners passing them to the WorkManager.
  */
-@SuppressWarnings("PackageAccessibility")
+//@SuppressWarnings("PackageAccessibility")
 public class AsyncEventExecutor {
 
-    private static final Log log = LogFactory.getLog(AsyncEventExecutor.class);
+ //   private static final Log log = LogFactory.getLog(AsyncEventExecutor.class);
 
     public AsyncEventExecutor() {
     }
@@ -96,21 +94,21 @@ public class AsyncEventExecutor {
 //        }
     }
 
-    private void scheduleListeners(final List<EventListenerDescriptor> listeners, EventBundle bundle) {
-        for (EventListenerDescriptor listener : listeners) {
-            EventBundle filtered = listener.filterBundle(bundle);
-            if (filtered.isEmpty()) {
-                continue;
-            }
-            // This may be called in a transaction if event.isCommitEvent() is true or at
-            // transaction commit
-            // in other cases. If the transaction has been marked rollback-only, then
-            // scheduling must discard
-            // so we schedule "after commit"
-
-            //getWorkManager().schedule(new ListenerWork(listener, filtered), true);
-        }
-    }
+//    private void scheduleListeners(final List<EventListenerDescriptor> listeners, EventBundle bundle) {
+//        for (EventListenerDescriptor listener : listeners) {
+//            EventBundle filtered = listener.filterBundle(bundle);
+//            if (filtered.isEmpty()) {
+//                continue;
+//            }
+//            // This may be called in a transaction if event.isCommitEvent() is true or at
+//            // transaction commit
+//            // in other cases. If the transaction has been marked rollback-only, then
+//            // scheduling must discard
+//            // so we schedule "after commit"
+//
+//            //getWorkManager().schedule(new ListenerWork(listener, filtered), true);
+//        }
+//    }
 
     public int getUnfinishedCount() {
 //        WorkManager workManager = getWorkManager();

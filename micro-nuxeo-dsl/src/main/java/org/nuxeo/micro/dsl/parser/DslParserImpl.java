@@ -22,8 +22,6 @@ import org.nuxeo.micro.dsl.features.DslFeature;
 import org.nuxeo.micro.dsl.features.DslSourceFeature;
 import org.nuxeo.micro.dsl.features.SchemaFeature;
 
-import com.sun.xml.xsom.impl.SchemaSetImpl;
-
 public class DslParserImpl implements DslParser {
 
     private static final Log log = LogFactory.getLog(DslParserImpl.class);

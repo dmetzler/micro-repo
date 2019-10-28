@@ -49,7 +49,7 @@ public class NamingContextFacade extends NamingContext {
         }
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public Hashtable getEnvironment() {
         Hashtable env = super.getEnvironment();

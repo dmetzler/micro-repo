@@ -407,7 +407,16 @@ public class SchemaManagerImpl implements SchemaManager, Serializable {
             // log.error("INLINE Schemas ARE NOT YET IMPLEMENTED!");
             return;
         }
-        URL url = this.getClass().getClassLoader().getResource(sd.src);
+        URL url = null;
+
+        File srcFile = new File(sd.src);
+        if(srcFile.exists()) {
+            url = srcFile.toURI().toURL();
+        }
+
+        if( url == null) {
+            url = this.getClass().getClassLoader().getResource(sd.src);
+        }
         // URL url = sd.context.getLocalResource(sd.src);
         // if (url == null) {
         // // try asking the class loader

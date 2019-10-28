@@ -121,6 +121,7 @@ public class FileBlob extends AbstractBlob implements Serializable {
      * @param encoding the encoding
      * @param tmpDir the temporary directory for file creation
      */
+    @SuppressWarnings("deprecation")
     public FileBlob(InputStream in, String mimeType, String encoding, File tmpDir) throws IOException {
         if (in == null) {
             throw new NullPointerException("null inputstream");

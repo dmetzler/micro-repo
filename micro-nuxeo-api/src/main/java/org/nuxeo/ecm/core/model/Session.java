@@ -37,7 +37,7 @@ import org.nuxeo.ecm.core.api.query.QueryFilter;
 /**
  * Internal Session accessing the low-level storage.
  */
-public interface Session<T extends QueryFilter> {
+public interface Session<T extends QueryFilter<?>> {
 
     // parameters for the session contexts
     String USER_NAME = "username";

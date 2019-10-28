@@ -284,55 +284,6 @@ public final class ZipUtils {
         return entry -> filter.accept(new org.nuxeo.common.utils.Path(entry.getName()));
     }
 
-    // ________________ Entries ________________
-    /**
-     * Unzip directly the entry. The returned InputStream has to be closed.
-     *
-     * @return the input stream of the desired entry - has to be closed by the caller, or null if not found
-     * @param file the source file
-     * @param entryName the entry name that has to be extracted
-     * @deprecated since 10.1 (unused and fails to close a ZipFile)
-     */
-    @Deprecated
-    public static InputStream getEntryContentAsStream(File file, String entryName) throws IOException {
-        InputStream result = null;
-        ZipFile zip = new ZipFile(file);
-        ZipEntry entry = zip.getEntry(entryName);
-        if (entry != null) {
-            result = zip.getInputStream(entry);
-        }
-        return result;
-    }
-
-    /**
-     * Unzip directly the entry.
-     *
-     * @return the String content of the entry with name entryName
-     * @param file the source file
-     * @param entryName the entry name that has to be extracted
-     * @deprecated since 10.1 (unused and fails to close a ZipFile)
-     */
-    @Deprecated
-    public static String getEntryContentAsString(File file, String entryName) throws IOException {
-        try (InputStream resultStream = getEntryContentAsStream(file, entryName)) {
-            return IOUtils.toString(resultStream, UTF_8);
-        }
-    }
-
-    /**
-     * Unzips directly the entry.
-     *
-     * @return The byte array content of the entry with name entryName
-     * @param file the source file
-     * @param entryName the entry name that has to be extracted
-     * @deprecated since 10.1 (unused and fails to close a ZipFile)
-     */
-    @Deprecated
-    public static byte[] getEntryContentAsBytes(File file, String entryName) throws IOException {
-        try (InputStream resultStream = getEntryContentAsStream(file, entryName)) {
-            return IOUtils.toByteArray(resultStream);
-        }
-    }
 
     /**
      * Lists the entries on the zip file.

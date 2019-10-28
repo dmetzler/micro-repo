@@ -48,7 +48,7 @@ public interface Document {
      *
      * @return the session
      */
-    Session getSession();
+    Session<?> getSession();
 
     /**
      * Gets the name of this document.
