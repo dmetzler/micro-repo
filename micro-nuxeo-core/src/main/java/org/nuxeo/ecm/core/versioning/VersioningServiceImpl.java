@@ -113,7 +113,9 @@ public class VersioningServiceImpl implements VersioningService {
 
     public VersioningServiceImpl(SchemaManager schemaManager, CoreSessionService css, EventService eventService) {
         this.standardService = new StandardVersioningService(schemaManager, css, eventService);
+        recompute();
     }
+
 
     protected void registerVersioningService(VersioningServiceDescriptor contrib) {
         String klass = contrib.className;

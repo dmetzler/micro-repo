@@ -42,9 +42,9 @@ import org.nuxeo.ecm.core.blob.binary.BinaryManager;
  *
  * @since 7.2
  */
-public class BlobManagerComponent implements BlobManager {
+public class BlobManagerImpl implements BlobManager {
 
-    private static final Log log = LogFactory.getLog(BlobManagerComponent.class);
+    private static final Log log = LogFactory.getLog(BlobManagerImpl.class);
 
     protected static final String XP = "configuration";
 

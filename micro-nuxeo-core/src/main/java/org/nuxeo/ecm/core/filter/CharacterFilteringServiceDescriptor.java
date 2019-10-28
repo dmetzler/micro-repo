@@ -34,6 +34,13 @@ import java.util.List;
 @XObject("filtering")
 public class CharacterFilteringServiceDescriptor {
 
+    public CharacterFilteringServiceDescriptor() {
+    }
+
+    public CharacterFilteringServiceDescriptor(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     @XNode("@enabled")
     public boolean enabled;
 

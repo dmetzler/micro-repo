@@ -21,7 +21,10 @@
 package org.nuxeo.ecm.core.filter;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.nuxeo.ecm.core.api.DataModel;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.impl.DataModelImpl;
@@ -45,27 +48,21 @@ public class CharacterFilteringServiceImpl implements CharacterFilteringService 
 
     protected CharMatcher charsToRemove;
 
-//    @Override
-//    public void registerContribution(Object contrib, String point, ComponentInstance contributor) {
-//        if (FILTERING_XP.equals(point)) {
-//
-//            desc = (CharacterFilteringServiceDescriptor) contrib;
-//
-//            CharMatcher charsToPreserve = CharMatcher.anyOf("\r\n\t");
-//            CharMatcher allButPreserved = charsToPreserve.negate();
-//            charsToRemove = CharMatcher.javaIsoControl().and(allButPreserved);
-//            charsToRemove = charsToRemove.or(CharMatcher.invisible().and(CharMatcher.whitespace().negate()));
-//
-//            List<String> additionalChars = desc.getDisallowedChars();
-//            if (additionalChars != null && !additionalChars.isEmpty()) {
-//                String otherCharsToRemove = additionalChars.stream().map(StringEscapeUtils::unescapeJava).collect(
-//                        Collectors.joining());
-//                charsToRemove = charsToRemove.or(CharMatcher.anyOf(otherCharsToRemove));
-//            }
-//        } else {
-//            throw new RuntimeException("Unknown extension point: " + point);
-//        }
-//    }
+    public CharacterFilteringServiceImpl() {
+        desc = new CharacterFilteringServiceDescriptor(true);
+
+        CharMatcher charsToPreserve = CharMatcher.anyOf("\r\n\t");
+        CharMatcher allButPreserved = charsToPreserve.negate();
+        charsToRemove = CharMatcher.javaIsoControl().and(allButPreserved);
+        charsToRemove = charsToRemove.or(CharMatcher.invisible().and(CharMatcher.whitespace().negate()));
+
+        List<String> additionalChars = desc.getDisallowedChars();
+        if (additionalChars != null && !additionalChars.isEmpty()) {
+            String otherCharsToRemove = additionalChars.stream().map(StringEscapeUtils::unescapeJava)
+                    .collect(Collectors.joining());
+            charsToRemove = charsToRemove.or(CharMatcher.anyOf(otherCharsToRemove));
+        }
+    }
 
     @Override
     public String filter(String value) {
@@ -74,16 +71,14 @@ public class CharacterFilteringServiceImpl implements CharacterFilteringService 
 
     @Override
     public void filter(DocumentModel docModel) {
-        if (desc.isEnabled()) {
-            // check only loaded datamodels to find the dirty ones
-            for (DataModel dm : docModel.getDataModelsCollection()) { // only loaded
-                if (!dm.isDirty()) {
-                    continue;
-                }
-                DocumentPart part = ((DataModelImpl) dm).getDocumentPart();
-                for (Property prop : part.getChildren()) {
-                    filterProperty(prop, docModel);
-                }
+        // check only loaded datamodels to find the dirty ones
+        for (DataModel dm : docModel.getDataModelsCollection()) { // only loaded
+            if (!dm.isDirty()) {
+                continue;
+            }
+            DocumentPart part = ((DataModelImpl) dm).getDocumentPart();
+            for (Property prop : part.getChildren()) {
+                filterProperty(prop, docModel);
             }
         }
     }
