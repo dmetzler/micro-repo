@@ -18,7 +18,7 @@ import org.nuxeo.ecm.core.schema.SchemaDescriptor;
 import org.nuxeo.ecm.core.schema.SchemaManagerImpl;
 
 public class SerializableSchemaManagerTest {
-    private List<String> schemas = Arrays.asList(new String[] { "user", "common", "uid", "dublincore" });
+    private List<String> schemas = Arrays.asList(new String[] {  "common", "uid", "dublincore" });
 
     @Test
     public void schema_manager_can_be_serialized() throws Exception {
@@ -37,7 +37,7 @@ public class SerializableSchemaManagerTest {
             ObjectInputStream in = new ObjectInputStream(bais) ) {
             sm = (SchemaManagerImpl)in.readObject();
         }
-
+        System.out.println(serializedSm.length);
         assertTrue(sm.getDocumentTypes().length > 0);
     }
 

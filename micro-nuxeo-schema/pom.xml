@@ -9,35 +9,60 @@
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>micro-nuxeo-api</artifactId>
-  <name>Micro Nuxeo :: Repository API</name>
+  <artifactId>micro-nuxeo-schema</artifactId>
+  <name>Micro Nuxeo :: Schema Manager</name>
   <description></description>
 
 
   <dependencies>
     <dependency>
       <groupId>org.nuxeo</groupId>
-      <artifactId>micro-nuxeo-schema</artifactId>
+      <artifactId>micro-nuxeo-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
+
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>mongo-java-driver</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.vbmacher</groupId>
+      <artifactId>java-cup</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+    </dependency>
+
+
+    <dependency>
       <groupId>org.nuxeo</groupId>
       <artifactId>micro-nuxeo-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -46,17 +71,18 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.xsom</groupId>
+      <artifactId>xsom</artifactId>
     </dependency>
 
   </dependencies>

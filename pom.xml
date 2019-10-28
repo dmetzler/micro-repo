@@ -13,6 +13,7 @@
   <modules>
     <module>micro-nuxeo-common</module>
     <module>micro-nuxeo-api</module>
+    <module>micro-nuxeo-schema</module>
     <module>micro-nuxeo-metrics</module>
     <module>micro-nuxeo-jta</module>
     <module>micro-nuxeo-event</module>
@@ -125,6 +126,11 @@
       <dependency>
         <groupId>org.nuxeo</groupId>
         <artifactId>micro-nuxeo-kv</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.nuxeo</groupId>
+        <artifactId>micro-nuxeo-schema</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

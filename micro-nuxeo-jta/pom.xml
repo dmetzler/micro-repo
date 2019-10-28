@@ -13,7 +13,6 @@
   <name>Micro Nuxeo :: Transaction Manager</name>
   <description></description>
 
-
   <dependencies>
     <dependency>
       <groupId>org.apache.commons</groupId>
