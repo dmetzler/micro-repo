@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @since 8.4
  */
-public interface CoreSessionService {
+public interface CoreSessionService extends CoreSessionProvider {
 
     /**
      * Debug information about a {@link CoreSession} acquisition.
@@ -65,16 +65,6 @@ public interface CoreSessionService {
      * @param session the session to close
      */
     void releaseCoreSession(CloseableCoreSession session);
-
-    /**
-     * Gets an existing open session for the given session id.
-     * <p>
-     * The returned {@link CoreSession} must not be closed, as it is owned by someone else.
-     *
-     * @param sessionId the session id
-     * @return the session, which must not be closed
-     */
-    CoreSession getCoreSession(String sessionId);
 
     /**
      * Gets the number of open sessions.

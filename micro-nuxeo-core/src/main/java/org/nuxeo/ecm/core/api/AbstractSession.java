@@ -101,7 +101,6 @@ import org.nuxeo.micro.metrics.MetricsRegistry;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.SharedMetricRegistries;
 
 /**
  * Abstract implementation of the client interface.

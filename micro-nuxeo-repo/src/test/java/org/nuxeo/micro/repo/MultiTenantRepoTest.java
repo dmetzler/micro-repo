@@ -11,6 +11,7 @@ import org.nuxeo.ecm.core.api.CoreSessionService;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.PathRef;
+import org.nuxeo.ecm.core.api.VersioningOption;
 import org.nuxeo.micro.NuxeoPrincipalImpl;
 import org.nuxeo.micro.repo.provider.DocumentBlobManagerProvider;
 import org.nuxeo.micro.repo.provider.SchemaManagerProvider;
@@ -97,6 +98,10 @@ public class MultiTenantRepoTest {
             assertThat(doc).isNotNull();
             assertThat(doc.getPropertyValue("dc:title")).isEqualTo("Test");
             assertThat(doc.getPropertyValue("bk:isbn")).isEqualTo("isbn");
+
+            doc.setPropertyValue("dc:title","A book");
+            session.saveDocument(doc);
+            session.checkIn(doc.getRef(), VersioningOption.MAJOR, "Bla");
 
             DocumentModelList docs = session.query("SELECT * FROM Book");
             docs.forEach(System.out::println);

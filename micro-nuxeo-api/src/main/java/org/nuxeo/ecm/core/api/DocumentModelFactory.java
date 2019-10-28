@@ -63,7 +63,7 @@ public class DocumentModelFactory {
      * @return the new document model
      */
     public static DocumentModelImpl createDocumentModel(Document doc, String sid, String[] schemas, SchemaManager sm,
-            CoreSessionService css) {
+            CoreSessionProvider css) {
 
         DocumentType type = doc.getType();
         if (type == null) {
@@ -149,7 +149,7 @@ public class DocumentModelFactory {
      *
      * @since 5.4.2
      */
-    public static DocumentModelImpl createDocumentModel(String docType, SchemaManager sm, CoreSessionService css) {
+    public static DocumentModelImpl createDocumentModel(String docType, SchemaManager sm, CoreSessionProvider css) {
         DocumentType type = sm.getDocumentType(docType);
         return createDocumentModel(null, type, sm, css);
     }
@@ -163,7 +163,7 @@ public class DocumentModelFactory {
      * @param docType the document type
      * @return the document model
      */
-    public static DocumentModelImpl createDocumentModel(String sessionId, DocumentType docType, SchemaManager sm, CoreSessionService css) {
+    public static DocumentModelImpl createDocumentModel(String sessionId, DocumentType docType, SchemaManager sm, CoreSessionProvider css) {
         DocumentModelImpl docModel = new DocumentModelImpl(sessionId, docType.getName(), null, null, null, null, null,
                 null, null, null, false, sm, css);
         for (Schema schema : docType.getSchemas()) {
@@ -195,7 +195,7 @@ public class DocumentModelFactory {
      */
     @SuppressWarnings("deprecation")
     public static DocumentModel writeDocumentModel(DocumentModel docModel, Document doc, SchemaManager sm,
-            CoreSessionService css) {
+            CoreSessionProvider css) {
         if (!(docModel instanceof DocumentModelImpl)) {
             throw new NuxeoException("Must be a DocumentModelImpl: " + docModel);
         }
@@ -304,7 +304,7 @@ public class DocumentModelFactory {
      *
      * @since 5.7.2
      */
-    public static DocumentModel createDocumentModel(String type, String id, SchemaManager sm, CoreSessionService css) {
+    public static DocumentModel createDocumentModel(String type, String id, SchemaManager sm, CoreSessionProvider css) {
         DocumentType docType = sm.getDocumentType(type);
         DocumentModelImpl doc = new DocumentModelImpl(null, docType.getName(), id, null, null, new IdRef(id), null,
                 null, null, null, (Boolean) null, sm, css);

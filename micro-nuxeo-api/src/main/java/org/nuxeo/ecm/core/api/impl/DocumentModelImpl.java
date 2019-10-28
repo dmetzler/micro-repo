@@ -23,7 +23,6 @@ import static org.nuxeo.ecm.core.schema.types.ComplexTypeImpl.canonicalXPath;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -37,17 +36,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.transaction.Transaction;
-
 import org.nuxeo.common.collections.PrimitiveArrays;
 import org.nuxeo.common.utils.Path;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.CoreSession;
-import org.nuxeo.ecm.core.api.CoreSessionService;
+import org.nuxeo.ecm.core.api.CoreSessionProvider;
 import org.nuxeo.ecm.core.api.DataModel;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentRef;
-import org.nuxeo.ecm.core.api.InstanceRef;
 import org.nuxeo.ecm.core.api.Lock;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.PathRef;
@@ -74,7 +70,6 @@ import org.nuxeo.ecm.core.schema.types.JavaTypes;
 import org.nuxeo.ecm.core.schema.types.ListType;
 import org.nuxeo.ecm.core.schema.types.Schema;
 import org.nuxeo.ecm.core.schema.types.Type;
-import org.nuxeo.runtime.transaction.TransactionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -193,7 +188,7 @@ public class DocumentModelImpl implements DocumentModel, Cloneable {
 
     private transient SchemaManager schemaManager;
 
-    private transient CoreSessionService css;
+    private transient CoreSessionProvider css;
 
     protected DocumentModelImpl() {
     }
@@ -204,7 +199,7 @@ public class DocumentModelImpl implements DocumentModel, Cloneable {
      * <p>
      * It must at least contain the type.
      */
-    public DocumentModelImpl(String typeName, SchemaManager schemaManager, CoreSessionService css) {
+    public DocumentModelImpl(String typeName, SchemaManager schemaManager, CoreSessionProvider css) {
         this.schemaManager = schemaManager;
         this.css = css;
         this.type = schemaManager.getDocumentType(typeName);
@@ -223,7 +218,7 @@ public class DocumentModelImpl implements DocumentModel, Cloneable {
      * A client constructed data model must contain at least the path and the type.
      */
     public DocumentModelImpl(String parentPath, String name, String type, SchemaManager schemaManager,
-            CoreSessionService css) {
+            CoreSessionProvider css) {
         this(type, schemaManager, css);
         String fullPath = parentPath == null ? name : parentPath + (parentPath.endsWith("/") ? "" : "/") + name;
         path = new Path(fullPath);
@@ -237,7 +232,7 @@ public class DocumentModelImpl implements DocumentModel, Cloneable {
 
     public DocumentModelImpl(String sid, String type, String id, Path path, DocumentRef docRef, DocumentRef parentRef,
             String[] schemas, Set<String> facets, String sourceId, String repositoryName, boolean isProxy,
-            SchemaManager schemaManager, CoreSessionService css) {
+            SchemaManager schemaManager, CoreSessionProvider css) {
         this(type, schemaManager, css);
         this.sid = sid;
         this.id = id;
@@ -284,7 +279,7 @@ public class DocumentModelImpl implements DocumentModel, Cloneable {
     }
 
     public DocumentModelImpl(DocumentModel parent, String name, String type, SchemaManager schemaManager,
-            CoreSessionService css) {
+            CoreSessionProvider css) {
         this(parent.getPathAsString(), name, type, schemaManager, css);
     }
 
@@ -339,7 +334,7 @@ public class DocumentModelImpl implements DocumentModel, Cloneable {
 
     @Override
     public CoreSession getCoreSession() {
-        if (sid == null) {
+        if (sid == null || css == null) {
             return null;
         }
         return css.getCoreSession(sid);
@@ -1472,41 +1467,44 @@ public class DocumentModelImpl implements DocumentModel, Cloneable {
         return DocumentPropertyObjectResolverImpl.create(this, xpath, schemaManager);
     }
 
-    /**
-     * Replace the content by it's the reference if the document is live and not
-     * dirty.
-     *
-     * @see org.nuxeo.ecm.core.event.EventContext
-     * @since 7.10
-     */
-    private Object writeReplace() throws ObjectStreamException {
-        if (!TransactionHelper.isTransactionActive()) { // protect from no transaction
-            Transaction tx = TransactionHelper.suspendTransaction();
-            try {
-                TransactionHelper.startTransaction();
-                try {
-                    return writeReplace();
-                } finally {
-                    TransactionHelper.commitOrRollbackTransaction();
-                }
-            } finally {
-                if (tx != null) {
-                    TransactionHelper.resumeTransaction(tx);
-                }
-            }
-        }
-        if (isDirty()) {
-            return this;
-        }
-        if (!hasSession()) {
-            return this;
-        }
-        CoreSession session = getSession();
-        if (!session.exists(ref)) {
-            return this;
-        }
-        return new InstanceRef(this, session.getPrincipal());
-    }
+
+    // Removed because probably not used anymore and a bad practice
+    // It also brings a dependency to TransactionManager that we don't want
+//    /**
+//     * Replace the content by it's the reference if the document is live and not
+//     * dirty.
+//     *
+//     * @see org.nuxeo.ecm.core.event.EventContext
+//     * @since 7.10
+//     */
+//    private Object writeReplace() throws ObjectStreamException {
+//        if (!TransactionHelper.isTransactionActive()) { // protect from no transaction
+//            Transaction tx = TransactionHelper.suspendTransaction();
+//            try {
+//                TransactionHelper.startTransaction();
+//                try {
+//                    return writeReplace();
+//                } finally {
+//                    TransactionHelper.commitOrRollbackTransaction();
+//                }
+//            } finally {
+//                if (tx != null) {
+//                    TransactionHelper.resumeTransaction(tx);
+//                }
+//            }
+//        }
+//        if (isDirty()) {
+//            return this;
+//        }
+//        if (!hasSession()) {
+//            return this;
+//        }
+//        CoreSession session = getSession();
+//        if (!session.exists(ref)) {
+//            return this;
+//        }
+//        return new InstanceRef(this, session.getPrincipal());
+//    }
 
     /**
      * Legacy code: Explicitly detach the document to send the document as an event
