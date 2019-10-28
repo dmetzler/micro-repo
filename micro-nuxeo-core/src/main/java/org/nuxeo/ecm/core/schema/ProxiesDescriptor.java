@@ -18,6 +18,7 @@
  */
 package org.nuxeo.ecm.core.schema;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,7 +30,9 @@ import org.nuxeo.common.xmap.annotation.XObject;
  * Repository proxies configuration descriptor.
  */
 @XObject("proxies")
-public class ProxiesDescriptor {
+public class ProxiesDescriptor implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @XNode("@type")
     private String type;

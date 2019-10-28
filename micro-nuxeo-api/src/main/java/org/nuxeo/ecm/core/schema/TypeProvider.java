@@ -20,6 +20,7 @@
 
 package org.nuxeo.ecm.core.schema;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
@@ -29,7 +30,7 @@ import org.nuxeo.ecm.core.schema.types.Schema;
 /**
  * A provider of types (schemas, document types, facets).
  */
-public interface TypeProvider {
+public interface TypeProvider extends Serializable {
 
     /** Gets a schema. */
     Schema getSchema(String schema);

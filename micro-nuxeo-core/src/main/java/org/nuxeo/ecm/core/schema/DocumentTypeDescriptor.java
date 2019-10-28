@@ -19,6 +19,7 @@
 
 package org.nuxeo.ecm.core.schema;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,7 +41,9 @@ import org.nuxeo.common.xmap.annotation.XObject;
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  */
 @XObject("doctype")
-public class DocumentTypeDescriptor {
+public class DocumentTypeDescriptor implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @XNode("@name")
     public String name;

@@ -22,6 +22,7 @@
 package org.nuxeo.ecm.core.schema;
 
 import java.io.File;
+import java.io.Serializable;
 
 import org.nuxeo.common.xmap.annotation.XNode;
 import org.nuxeo.common.xmap.annotation.XObject;
@@ -30,7 +31,9 @@ import org.nuxeo.common.xmap.annotation.XObject;
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  */
 @XObject("schema")
-public class SchemaBindingDescriptor {
+public class SchemaBindingDescriptor implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @XNode("@name")
     public String name;

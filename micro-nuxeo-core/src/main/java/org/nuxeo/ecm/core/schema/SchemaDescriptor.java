@@ -20,6 +20,7 @@
 
 package org.nuxeo.ecm.core.schema;
 
+import java.io.Serializable;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -30,7 +31,9 @@ import org.nuxeo.common.xmap.annotation.XObject;
  * Descriptor for a reference to a schema from a document type or a facet.
  */
 @XObject("schema")
-public class SchemaDescriptor {
+public class SchemaDescriptor implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @XNode("@name")
     public String name;
