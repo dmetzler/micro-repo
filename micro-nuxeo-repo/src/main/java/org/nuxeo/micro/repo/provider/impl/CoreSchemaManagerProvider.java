@@ -32,6 +32,8 @@ public class CoreSchemaManagerProvider implements SchemaManagerProvider {
             .add("relatedtext") //
             .add("publishing") //
             .add("webcontainer") //
+            .add("collection") //
+            .add("collectionMember") //
             .build();
 
     private static final List<String> facets = new ImmutableList.Builder<String>()//
@@ -50,6 +52,7 @@ public class CoreSchemaManagerProvider implements SchemaManagerProvider {
             .add("NotFulltextIndexable") //
             .add("BigFolder") //
             .add("HiddenInCreation") //
+            .add("NotCollectionMember") //
             .build();
 
     private static final Map<String, String> facetsWithSchema = new ImmutableMap.Builder<String, String>()

@@ -12,8 +12,6 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.micro.dsl.DslModel;
 import org.nuxeo.micro.dsl.DslModel.DslModelBuilder;
@@ -21,10 +19,12 @@ import org.nuxeo.micro.dsl.features.DocumentTypeFeature;
 import org.nuxeo.micro.dsl.features.DslFeature;
 import org.nuxeo.micro.dsl.features.DslSourceFeature;
 import org.nuxeo.micro.dsl.features.SchemaFeature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DslParserImpl implements DslParser {
 
-    private static final Log log = LogFactory.getLog(DslParserImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(DslParserImpl.class);
 
     private ScriptEngine engine;
 

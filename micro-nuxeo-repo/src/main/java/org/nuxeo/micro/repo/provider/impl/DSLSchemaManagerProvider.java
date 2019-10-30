@@ -9,6 +9,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -24,6 +25,7 @@ import org.nuxeo.micro.dsl.features.SchemaFeature;
 import org.nuxeo.micro.dsl.features.SchemaFeature.FieldsDef;
 import org.nuxeo.micro.dsl.parser.DslParser;
 import org.nuxeo.micro.dsl.parser.DslParserImpl;
+import org.nuxeo.micro.repo.provider.TenantSchemaUrlResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +33,10 @@ public class DSLSchemaManagerProvider extends CoreSchemaManagerProvider {
 
     public static final Logger log = LoggerFactory.getLogger(DSLSchemaManagerProvider.class);
     protected DslParser dslparser;
+    private TenantSchemaUrlResolver urlResolver;
 
-    public DSLSchemaManagerProvider() {
+    public DSLSchemaManagerProvider(TenantSchemaUrlResolver urlResolver) {
+        this.urlResolver = urlResolver;
         dslparser = new DslParserImpl();
         ((DslParserImpl) dslparser).init();
     }
@@ -42,11 +46,10 @@ public class DSLSchemaManagerProvider extends CoreSchemaManagerProvider {
         SchemaManagerImpl sm = (SchemaManagerImpl) super.getForTenant(tenantId);
 
         try {
-            URL resource = getClass().getClassLoader().getResource(tenantId + ".nxl");
+            URL resource = urlResolver.getForTenant(tenantId);
 
             if (resource != null) {
-                File file = new File(resource.getFile());
-                String dsl = FileUtils.readFileToString(file, Charset.defaultCharset());
+                String dsl = IOUtils.toString(resource.openStream(), Charset.defaultCharset());
                 DslModel model = dslparser.parse(dsl);
 
                 SchemaFeature schemaFeature = model.getFeature(SchemaFeature.class);
@@ -94,7 +97,7 @@ public class DSLSchemaManagerProvider extends CoreSchemaManagerProvider {
                 String type = field.getType();
                 elem.addAttribute("type", toXSDType(type));
             }
-            File file = new File(FileUtils.getTempDirectory(),String.format("%s_%s.xsd", tenantId, schemaName));
+            File file = new File(FileUtils.getTempDirectory(), String.format("%s_%s.xsd", tenantId, schemaName));
 
             FileWriter fw = new FileWriter(file);
             try {
@@ -129,13 +132,10 @@ public class DSLSchemaManagerProvider extends CoreSchemaManagerProvider {
     private Document loadXsdTemplate() throws DocumentException, IOException {
         URL resource = getClass().getClassLoader().getResource("templates/schema-templates.xsd");
 
-        File file = new File(resource.getFile());
-
-        InputStream in = new FileInputStream(file);
-        try {
+        try (InputStream in = resource.openStream()) {
             return new SAXReader().read(in);
-        } finally {
-            in.close();
         }
+
+
     }
 }

@@ -24,6 +24,7 @@
     <module>micro-nuxeo-repo</module>
     <!-- <module>micro-nuxeo-todo</module> -->
     <module>micro-nuxeo-dsl</module>
+    <module>cloud-tenant-manager</module>
 
   </modules>
 

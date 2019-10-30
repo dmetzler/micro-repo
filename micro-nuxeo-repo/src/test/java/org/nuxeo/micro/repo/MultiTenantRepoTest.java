@@ -10,12 +10,14 @@ import org.nuxeo.ecm.core.api.CloseableCoreSession;
 import org.nuxeo.ecm.core.api.CoreSessionService;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.PathRef;
+import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.VersioningOption;
 import org.nuxeo.micro.NuxeoPrincipalImpl;
 import org.nuxeo.micro.repo.provider.DocumentBlobManagerProvider;
 import org.nuxeo.micro.repo.provider.SchemaManagerProvider;
+import org.nuxeo.micro.repo.provider.TenantSchemaUrlResolver;
 import org.nuxeo.micro.repo.provider.UIDGeneratorServiceProvider;
+import org.nuxeo.micro.repo.provider.impl.ClassPathSchemaUrlResolver;
 import org.nuxeo.micro.repo.provider.impl.DSLSchemaManagerProvider;
 import org.nuxeo.micro.repo.provider.impl.DefaultUIDGeneratorServiceProvider;
 import org.nuxeo.micro.repo.provider.impl.MockDocumentBloblManagerProvider;
@@ -37,7 +39,8 @@ public class MultiTenantRepoTest {
         principal.setAdministrator(true);
 
         // Should be built by an Injection Manager (HK2, Guice....)
-        SchemaManagerProvider schemaManagerProvider = new DSLSchemaManagerProvider();
+        TenantSchemaUrlResolver urlProvider = new ClassPathSchemaUrlResolver(getClass().getClassLoader());
+        SchemaManagerProvider schemaManagerProvider = new DSLSchemaManagerProvider(urlProvider);
         DocumentBlobManagerProvider documentBlobManagerProvider = new MockDocumentBloblManagerProvider();
         UIDGeneratorServiceProvider uidGenProvider = new DefaultUIDGeneratorServiceProvider();
         factory = new RepoConfigurationFactory(
@@ -94,7 +97,7 @@ public class MultiTenantRepoTest {
             session.save();
 
             // Then the book is created
-            doc = session.getDocument(new PathRef("/test"));
+            doc = session.getDocument(new IdRef(doc.getId()));
             assertThat(doc).isNotNull();
             assertThat(doc.getPropertyValue("dc:title")).isEqualTo("Test");
             assertThat(doc.getPropertyValue("bk:isbn")).isEqualTo("isbn");
