@@ -74,35 +74,46 @@ public class CoreSessionClientImpl implements CoreSessionClient, Closeable {
     public CoreSessionClient query(String query, NuxeoPrincipal principal, JsonObject options,
             Handler<AsyncResult<List<DocumentModel>>> resultHandler) {
 
-        try (CloseableCoreSession session = css.createCoreSession(principal)) {
-            DocumentModelList docs = session.query(query);
-            resultHandler.handle(Future.succeededFuture(docs));
-        } catch (Exception e) {
-            resultHandler.handle(Future.failedFuture(e));
-        }
+        session(principal, sessionHandler -> {
+            try (CloseableCoreSession session = sessionHandler.result()) {
+                DocumentModelList docs = session.query(query);
+                resultHandler.handle(Future.succeededFuture(docs));
+
+            } catch (Exception e) {
+                resultHandler.handle(Future.failedFuture(e));
+            }
+        });
+
         return this;
     }
 
     @Override
     public CoreSessionClient getDocument(DocumentRef docRef, NuxeoPrincipal principal, JsonObject jsonObject,
             Handler<AsyncResult<@Nullable DocumentModel>> resultHandler) {
-        try (CloseableCoreSession session = css.createCoreSession(principal)) {
-            if (session.exists(docRef)) {
-                resultHandler.handle(Future.succeededFuture(session.getDocument(docRef)));
-            } else {
-                resultHandler
-                        .handle(Future.failedFuture(new DocumentNotFoundException(String.format("Ref(%s)", docRef))));
+
+        session(principal, sessionHandler -> {
+            try (CloseableCoreSession session = sessionHandler.result()) {
+                if (session.exists(docRef)) {
+                    resultHandler.handle(Future.succeededFuture(session.getDocument(docRef)));
+                } else {
+                    resultHandler.handle(
+                            Future.failedFuture(new DocumentNotFoundException(String.format("Ref(%s)", docRef))));
+                }
+
             }
-        } catch (Exception e) {
-            resultHandler.handle(Future.failedFuture(e));
-        }
+        });
+
         return this;
     }
 
     @Override
     public CoreSessionClient session(NuxeoPrincipal principal,
             Handler<AsyncResult<CloseableCoreSession>> resultHandler) {
-        resultHandler.handle(Future.succeededFuture(css.createCoreSession(principal)));
+
+        TransactionHelper.runInTransaction(() -> {
+            CloseableCoreSession coreSession = css.createCoreSession(principal);
+            resultHandler.handle(Future.succeededFuture(coreSession));
+        });
         return this;
     }
 
@@ -146,7 +157,6 @@ public class CoreSessionClientImpl implements CoreSessionClient, Closeable {
 
         synchronized CoreSessionService sessionService() {
             if (css == null) {
-
                 // Should be built by an Injection Manager (HK2, Guice....)
 
                 TenantSchemaUrlResolver urlProvider = new ClassPathSchemaUrlResolver(getClass().getClassLoader());
@@ -176,6 +186,7 @@ public class CoreSessionClientImpl implements CoreSessionClient, Closeable {
                     for (CoreSessionRegistrationInfo ri : css.getCoreSessionRegistrationInfos()) {
                         ri.getCoreSession().close();
                     }
+
                 }
                 if (closeRunner != null) {
                     closeRunner.run();

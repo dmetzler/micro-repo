@@ -8,10 +8,8 @@ import java.util.Optional;
 
 import org.nuxeo.ecm.core.api.CloseableCoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.NuxeoPrincipal;
 import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.runtime.jtajca.JtaActivator;
-import org.nuxeo.runtime.transaction.TransactionHelper;
 
 import com.nuxeo.cloud.tenants.model.Tenant;
 import com.nuxeo.cloud.tenants.nuxeo.CoreSessionClient;
@@ -27,14 +25,14 @@ import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.AuthHandler;
 import io.vertx.ext.web.handler.BasicAuthHandler;
 import io.vertx.ext.web.handler.graphql.GraphQLHandler;
@@ -44,8 +42,9 @@ import io.vertx.ext.web.handler.graphql.VertxDataFetcher;
 
 public class APIVerticle extends AbstractVerticle {
 
+    private static final Logger log = LoggerFactory.getLogger(APIVerticle.class);
+
     private JtaActivator jta;
-    private CoreSessionClient client;
 
     public static void main(String[] args) {
         Vertx.vertx().deployVerticle(new APIVerticle());
@@ -53,10 +52,13 @@ public class APIVerticle extends AbstractVerticle {
 
     @Override
     public void start(Promise<Void> fut) throws Exception {
+        log.info(String.format("Starting [%s]", APIVerticle.class.getCanonicalName()));
+        long start = System.currentTimeMillis();
 
         // Activate JTA
         jta = new JtaActivator();
         jta.activate();
+
 
         ConfigRetriever retriever = ConfigRetriever.create(vertx, //
                 new ConfigRetrieverOptions().addStore(//
@@ -66,76 +68,64 @@ public class APIVerticle extends AbstractVerticle {
                                 .setConfig(new JsonObject()//
                                         .put("path", "config/application.yaml"))));
 
-        client = CoreSessionClient.create(vertx, "tenants");
 
         retriever.getConfig(config -> {
             if (config.failed()) {
                 fut.fail(config.cause());
             } else {
 
-                startServer(fut, config.result().getInteger("port", 8080));
+                CoreSessionClient.create(vertx, "tenants", cs -> {
+
+                    if (cs.succeeded()) {
+
+                        Router router = Router.router(vertx);
+
+                        // AuthHandler authHandler = getOAuthHandler(router);
+
+                        AuthHandler authHandler = BasicAuthHandler.create(new BasicAuthProvider());
+
+                        GraphQL graphQL = setupGraphQLJava();
+                        GraphiQLHandlerOptions options = new GraphiQLHandlerOptions().setEnabled(true);
+
+                        GraphiQLHandler graphiQLHandler = GraphiQLHandler.create(options);
+                        graphiQLHandler.graphiQLRequestHeaders(rc -> {
+                            String token = rc.get("token");
+                            return MultiMap.caseInsensitiveMultiMap().add(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+                        });
+
+                        router.route("/").handler(authHandler);
+                        router.route("/graphiql/*").handler(graphiQLHandler);
+                        router.route("/graphql")//
+                                .handler(GraphQLHandler.create(graphQL)
+                                        .queryContext(rc -> new NuxeoContext(rc, cs.result())));
+                        Integer port = config.result().getInteger("port", 8080);
+                        vertx.createHttpServer()//
+                                .requestHandler(router)//
+                                .listen(port, http -> {
+                                    if (http.succeeded()) {
+                                        fut.complete();
+                                        log.info(String.format("HTTP server started on port %d", port));
+                                        log.info(String.format("Started [%s] in %dms",
+                                                APIVerticle.class.getCanonicalName(),
+                                                System.currentTimeMillis() - start));
+                                    } else {
+                                        fut.fail(http.cause());
+                                    }
+                                });
+                    } else {
+                        fut.fail(cs.cause());
+                    }
+
+                });
+
             }
         });
     }
 
     public void stop(Promise<Void> fut) {
-        TransactionHelper.commitOrRollbackTransaction();
+
         jta.deactivate();
         fut.complete();
-    }
-
-    void startServer(Promise<Void> fut, Integer port) {
-
-        Router router = Router.router(vertx);
-
-        // AuthHandler authHandler = getOAuthHandler(router);
-
-        AuthHandler authHandler = BasicAuthHandler.create(new BasicAuthProvider());
-
-        GraphQL graphQL = setupGraphQLJava();
-        GraphiQLHandlerOptions options = new GraphiQLHandlerOptions().setEnabled(true);
-
-        GraphiQLHandler graphiQLHandler = GraphiQLHandler.create(options);
-        graphiQLHandler.graphiQLRequestHeaders(rc -> {
-            String token = rc.get("token");
-            return MultiMap.caseInsensitiveMultiMap().add(HttpHeaders.AUTHORIZATION, "Bearer " + token);
-        });
-
-        router.route("/").handler(authHandler);
-        router.route("/graphiql/*").handler(graphiQLHandler);
-        router.route("/graphql").handler(new Handler<RoutingContext>() {
-            @Override
-            public void handle(RoutingContext event) {
-                if (!TransactionHelper.isTransactionActive()) {
-                    TransactionHelper.startTransaction();
-                }
-                event.next();
-
-            }
-
-        });
-        router.route("/graphql")//
-                .handler(GraphQLHandler.create(graphQL).queryContext(rc -> new NuxeoContext(rc)));
-        router.route("/graphql").handler(new Handler<RoutingContext>() {
-
-            @Override
-            public void handle(RoutingContext event) {
-                TransactionHelper.commitOrRollbackTransaction();
-                event.next();
-            }
-
-        });
-        vertx.createHttpServer()//
-                .requestHandler(router)//
-                .listen(port, http -> {
-                    if (http.succeeded()) {
-                        fut.complete();
-                        System.out.println("HTTP server started on port " + port);
-                    } else {
-                        fut.fail(http.cause());
-                    }
-                });
-
     }
 
     private GraphQL setupGraphQLJava() {
@@ -174,23 +164,22 @@ public class APIVerticle extends AbstractVerticle {
         String customerId = env.getArgument("customerId");
 
         String query = String.format("SELECT * FROM Tenant WHERE tn:customerId = '%s'", customerId);
-        client.query(query, nc.getPrincipal(), new JsonObject(), ar -> {
+        nc.query(query, new JsonObject(), ar -> {
             if (ar.succeeded()) {
                 fut.complete(ar.result().stream().map(Tenant::fromDoc).collect(toList()));
             } else {
                 fut.fail(ar.cause());
             }
         });
-        client.close();
 
     }
 
     private void tenantById(DataFetchingEnvironment env, Promise<Tenant> fut) {
         NuxeoContext nc = env.getContext();
-
         String tenantId = env.getArgument("tenantId");
-        String query = String.format("SELECT * FROM Tenant WHERE tn:id = '%s'", tenantId);
-        client.query(query, nc.getPrincipal(), new JsonObject(), ar -> {
+
+        String query = String.format("SELECT * FROM Tenant WHERE ecm:uuid = '%s'", tenantId);
+        nc.query(query, new JsonObject(), ar -> {
 
             if (ar.succeeded()) {
                 Optional<Tenant> tenant = ar.result().stream().map(Tenant::fromDoc).findFirst();
@@ -204,16 +193,15 @@ public class APIVerticle extends AbstractVerticle {
             }
         });
 
+
     }
 
     private void newTenant(DataFetchingEnvironment env, Promise<Tenant> fut) {
-        NuxeoContext nc = env.getContext();
+        NuxeoContext nuxeo = env.getContext();
         String tenantId = env.getArgument("tenantId");
         String customerId = env.getArgument("customerId");
 
-        NuxeoPrincipal principal = nc.getPrincipal();
-
-        client.session(principal, cs -> {
+        nuxeo.session(cs -> {
             if (cs.succeeded()) {
                 try (CloseableCoreSession session = cs.result()) {
                     PathRef docRef = new PathRef("/" + customerId);
@@ -223,16 +211,14 @@ public class APIVerticle extends AbstractVerticle {
                     }
 
                     Tenant tenant = new Tenant(customerId, tenantId);
-                    session.createDocument(tenant.toDoc(session));
-                    session.save();
-                    fut.complete(tenant);
+                    DocumentModel tenantDoc =  session.createDocument(tenant.toDoc(session));
+                    fut.complete(Tenant.fromDoc(tenantDoc));
                 }
             } else {
                 fut.fail(cs.cause());
             }
 
         });
-
     }
 
 }

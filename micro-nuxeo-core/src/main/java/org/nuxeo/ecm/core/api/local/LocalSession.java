@@ -104,7 +104,7 @@ public class LocalSession extends AbstractSession implements CloseableCoreSessio
     }
 
     @Override
-    public Session getSession() {
+    public Session<?> getSession() {
         if (!TransactionHelper.isTransactionActiveOrMarkedRollback()) {
             throw new NuxeoException("Cannot use a CoreSession outside a transaction");
         }
@@ -129,7 +129,7 @@ public class LocalSession extends AbstractSession implements CloseableCoreSessio
      */
     protected SessionInfo createSession() {
 
-        Session session = repository.getSession();
+        Session<?> session = repository.getSession();
         TransactionHelper.registerSynchronization(this);
         SessionInfo si = new SessionInfo(session);
         sessionHolder.set(si);

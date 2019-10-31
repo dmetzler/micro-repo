@@ -11,7 +11,6 @@ import com.nuxeo.cloud.tenants.nuxeo.impl.CoreSessionClientImpl;
 
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.Nullable;
-import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -34,8 +33,13 @@ public interface CoreSessionClient {
      * @param config   the configuration
      * @return the client
      */
-    static CoreSessionClient create(Vertx vertx, String tenantId, JsonObject config) {
-        return new CoreSessionClientImpl(vertx, tenantId, config);
+    static void create(Vertx vertx, String tenantId, JsonObject config,
+            Handler<AsyncResult<CoreSessionClient>> completionHandler) {
+        vertx.executeBlocking(future -> {
+            CoreSessionClient result = new CoreSessionClientImpl(vertx, tenantId, config);
+            future.complete(result);
+        }, completionHandler);
+
     }
 
     /**
@@ -46,8 +50,8 @@ public interface CoreSessionClient {
      * @param tenantId
      * @return the client
      */
-    static CoreSessionClient create(Vertx vertx, String tenantId) {
-        return create(vertx, tenantId, new JsonObject());
+    static void create(Vertx vertx, String tenantId, Handler<AsyncResult<CoreSessionClient>> completionHandler) {
+        create(vertx, tenantId, new JsonObject(), completionHandler);
     }
 
     /**
@@ -89,7 +93,6 @@ public interface CoreSessionClient {
     @Fluent
     CoreSessionClient getDocument(DocumentRef docRef, NuxeoPrincipal principal, JsonObject jsonObject,
             Handler<AsyncResult<@Nullable DocumentModel>> resultHandler);
-
 
     /**
      * Close the client and release its resources

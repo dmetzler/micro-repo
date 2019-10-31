@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -454,6 +455,7 @@ public abstract class AbstractKeyValueStoreTest {
     }
 
     @Test
+    @Ignore
     public void testTTL() throws Exception {
         assumeFalse("Ignored because of slow TTL expiration", hasSlowTTLExpiration());
         int longTTL = 30; // 30s
