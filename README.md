@@ -8,7 +8,8 @@ DISCLAIMER
 
 Read this before anything else:
 
-This repository holds a toy project that is not intended to be used and you can NOT expect that it will work for real one day. It's basically a research project to test new ideas. It currently doesn't even compile.
+This repository holds a toy project that is not intended to be used and you can NOT expect that it will work for real one day. It's basically a research project to test new ideas. ~~It currently doesn't even compile~~
+
 
 
 What is this? Why did I commit that?
@@ -25,13 +26,43 @@ So I started by removing the Nuxeo Runtime and tried to replace every call to `F
 And it appeared that it was possible minus lots of tradeoff that I will describe in my [blog](https://dmetzler.github.io). It also emphasized some very cool opportunities and help me identify the dependencies between a lot of components in Nuxeo.
 
 
-How to have a look at it?
--------------------------
+Can I test it?
+--------------
 
-Did I tell you that it doesn't compile?
+As of November 2nd 2019, the project features a sample application that exposes documents of type `Library`. You can run it with `docker-compose` which will build the project and deploy it alongside a MongoDB instance.
 
-The only way to currently see a few stuffs running is by importing the project into an IDE, start a local MongoDB and run the test(s).
+First create a `config/application.yaml` file by using the provided template and update the OAuth properties (by [creating a OAuth app on Github](https://github.com/settings/developers)).
 
+Then simply launch `docker-compose up` and once started, access [http://localhost:8080/graphiql/](http://localhost:8080/graphiql/).
+
+Here are some sample requests that you can do:
+
+```graphql
+query all {
+  allLibraries {
+    id
+    path
+    creator
+    city
+    country
+  }
+}
+
+
+mutation Library {
+  newLibrary(name: "UCLA library", city: "Los Angeles", country: "USA") {
+    id
+  }
+}
+
+mutation deleteLibrary {
+  deleteLibrary(id:"35cb3d0b-0160-4e8f-a8aa-258700c1826c") {
+    id
+  }
+}
+```
+
+To hack the domain model, you can have a look at the `micro-library` module which is basically a [Vert.X](https://vertx.io/) application
 
 Licensing
 ---------

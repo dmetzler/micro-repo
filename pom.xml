@@ -24,7 +24,8 @@
     <module>micro-nuxeo-repo</module>
     <!-- <module>micro-nuxeo-todo</module> -->
     <module>micro-nuxeo-dsl</module>
-    <module>cloud-tenant-manager</module>
+    <module>micro-nuxeo-vertx</module>
+    <module>micro-library</module>
 
   </modules>
 
@@ -60,6 +61,14 @@
     <grpc.version>1.24.0</grpc.version><!-- CURRENT_GRPC_VERSION -->
     <protobuf.version>3.9.0</protobuf.version>
     <protoc.version>3.9.0</protoc.version>
+
+
+    <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
+    <maven-shade-plugin.version>2.4.3</maven-shade-plugin.version>
+    <maven-surefire-plugin.version>2.22.1</maven-surefire-plugin.version>
+    <exec-maven-plugin.version>1.5.0</exec-maven-plugin.version>
+    <vertx.version>3.8.3</vertx.version>
+    <junit-jupiter.version>5.4.0</junit-jupiter.version>
 
   </properties>
 

@@ -1,5 +1,6 @@
 package org.nuxeo.micro.repo.provider.impl;
 
+import org.nuxeo.common.xmap.annotation.XNode;
 import org.nuxeo.ecm.core.model.Repository;
 import org.nuxeo.ecm.core.repository.RepositoryFactory;
 import org.nuxeo.micro.MongoDBRepositoryFactory;
@@ -18,11 +19,13 @@ public class MongoDBRepositoryProviderImpl implements RepositoryProvider{
     private DocumentBlobManagerProvider dbmProvider;
     private SchemaManagerProvider schemaProvider;
     private UIDGeneratorServiceProvider uidGeneratorServiceProvider;
+    private MongoDBConnectionConfig mongoconfig;
 
-    public MongoDBRepositoryProviderImpl(SchemaManagerProvider schemaProvider, DocumentBlobManagerProvider dbmProvider, UIDGeneratorServiceProvider uidGeneratorServiceProvider) {
+    public MongoDBRepositoryProviderImpl(SchemaManagerProvider schemaProvider, DocumentBlobManagerProvider dbmProvider, UIDGeneratorServiceProvider uidGeneratorServiceProvider, MongoDBConnectionConfig mongoconfig) {
         this.schemaProvider = schemaProvider;
         this.dbmProvider = dbmProvider;
         this.uidGeneratorServiceProvider = uidGeneratorServiceProvider ;
+        this.mongoconfig = mongoconfig;
     }
 
 
@@ -39,19 +42,11 @@ public class MongoDBRepositoryProviderImpl implements RepositoryProvider{
     private MongoDatabase getMongoDB() {
         MongoDBComponent mongoComponent = new MongoDBComponent();
         // Init component to hold MongoDB config
-        mongoComponent.addDescriptor(getLocalMongoConfig());
+        mongoComponent.addDescriptor(mongoconfig);
         mongoComponent.init();
         MongoDatabase db = mongoComponent.getDatabase("default");
         return db;
     }
 
-    protected MongoDBConnectionConfig getLocalMongoConfig() {
-        MongoDBConnectionConfig result = new MongoDBConnectionConfig();
-        result.server = "localhost:27017";
-        result.dbname = "nuxeo";
-        result.id = "default";
-        return result;
-
-    }
 
 }

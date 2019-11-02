@@ -1,0 +1,18 @@
+type Library {
+  id: String!
+  path: String
+  name: String!
+  city: String
+  country: String
+  creator: String
+}
+
+type Query {
+  allLibraries(country: String, city: String): [Library]
+  libraryById(id: String!): Library
+}
+
+type Mutation {
+  newLibrary(name: String!, city: String, country: String): Library
+  deleteLibrary(id: String!): Library
+}

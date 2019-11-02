@@ -1,6 +1,0 @@
-doctype Tenant {
-  schemas {
-    common dublincore
-    tn:tenant { customerId, envType, ready boolean}
-  }
-}

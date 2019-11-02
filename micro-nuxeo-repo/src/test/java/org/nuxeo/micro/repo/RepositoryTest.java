@@ -19,6 +19,7 @@ import org.nuxeo.micro.repo.provider.impl.MockDocumentBloblManagerProvider;
 import org.nuxeo.micro.repo.provider.impl.MongoDBRepositoryProviderImpl;
 import org.nuxeo.micro.repo.provider.impl.CoreSchemaManagerProvider;
 import org.nuxeo.runtime.jtajca.JtaActivator;
+import org.nuxeo.runtime.mongodb.MongoDBConnectionConfig;
 import org.nuxeo.runtime.transaction.TransactionHelper;
 
 public class RepositoryTest {
@@ -40,8 +41,8 @@ public class RepositoryTest {
         SchemaManagerProvider schemaManagerProvider = new CoreSchemaManagerProvider();
         DocumentBlobManagerProvider documentBlobManagerProvider = new MockDocumentBloblManagerProvider();
         UIDGeneratorServiceProvider uidGenProvider = new DefaultUIDGeneratorServiceProvider();
-        factory = new RepoConfigurationFactory(
-                new MongoDBRepositoryProviderImpl(schemaManagerProvider, documentBlobManagerProvider, uidGenProvider));
+        factory = new RepoConfigurationFactory(new MongoDBRepositoryProviderImpl(schemaManagerProvider,
+                documentBlobManagerProvider, uidGenProvider, getLocalMongoConfig()));
 
         // Activate JTA
         jta = new JtaActivator();
@@ -70,12 +71,22 @@ public class RepositoryTest {
             doc = session.getDocument(new PathRef("/test"));
             assertThat(doc).isNotNull();
             assertThat(doc.getPropertyValue("dc:title")).isEqualTo("Test");
-            //session.removeDocument(new PathRef("/test"));
+            // session.removeDocument(new PathRef("/test"));
 
             DocumentModelList docs = session.query("SELECT * FROM Folder");
             docs.forEach(System.out::println);
 
         }
+
+    }
+
+    protected MongoDBConnectionConfig getLocalMongoConfig() {
+        MongoDBConnectionConfig result = new MongoDBConnectionConfig();
+        result.server = "localhost:27017";
+        result.dbname = "nuxeo";
+        result.id = "default";
+
+        return result;
 
     }
 }

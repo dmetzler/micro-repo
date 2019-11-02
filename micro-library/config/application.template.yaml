@@ -1,0 +1,19 @@
+db:
+  type: mongodb
+  server: localhost:27017
+  dbname: nuxeo
+
+
+oauth:
+  # Create your app on Github at https://github.com/settings/developers
+  clientId: xxxxxxxxxxxxxxxxxx
+  clientSecret: xxxxxxxxxxxxxxxxxx
+  basePath: https://github.com/login
+  tokenPath: /oauth/access_token
+  authorizationPath: /oauth/authorize
+  userInfoPath: https://api.github.com/user
+
+port: 8080
+
+nuxeo:
+  tenantId: library
