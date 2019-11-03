@@ -1,5 +1,8 @@
 package org.nuxeo.vertx;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.nuxeo.runtime.jtajca.JtaActivator;
 
 import graphql.GraphQL;
@@ -10,6 +13,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpHeaders;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -18,6 +22,7 @@ import io.vertx.ext.auth.oauth2.OAuth2ClientOptions;
 import io.vertx.ext.auth.oauth2.OAuth2FlowType;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.AuthHandler;
+import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.ext.web.handler.OAuth2AuthHandler;
 import io.vertx.ext.web.handler.SessionHandler;
 import io.vertx.ext.web.handler.graphql.GraphQLHandler;
@@ -61,6 +66,29 @@ public abstract class Nuxicle extends AbstractVerticle {
 
                                 Router router = Router.router(vertx);
 
+                                Set<String> allowedHeaders = new HashSet<>();
+                                allowedHeaders.add("x-requested-with");
+                                allowedHeaders.add("Access-Control-Allow-Origin");
+                                allowedHeaders.add("origin");
+                                allowedHeaders.add("Content-Type");
+                                allowedHeaders.add("accept");
+                                allowedHeaders.add("X-PINGARUNER");
+
+                                Set<HttpMethod> allowedMethods = new HashSet<>();
+                                allowedMethods.add(HttpMethod.GET);
+                                allowedMethods.add(HttpMethod.POST);
+                                allowedMethods.add(HttpMethod.OPTIONS);
+                                /*
+                                 * these methods aren't necessary for this sample,
+                                 * but you may need them for your projects
+                                 */
+                                allowedMethods.add(HttpMethod.DELETE);
+                                allowedMethods.add(HttpMethod.PATCH);
+                                allowedMethods.add(HttpMethod.PUT);
+
+                                router.route().handler(CorsHandler.create("*").allowedHeaders(allowedHeaders).allowedMethods(allowedMethods));
+
+
                                 OAuth2Auth oauth = getOAuth(config.getJsonObject("oauth"));
                                 router.route().handler(
                                         SessionHandler.create(LocalSessionStore.create(vertx)).setAuthProvider(oauth));
@@ -68,7 +96,7 @@ public abstract class Nuxicle extends AbstractVerticle {
                                 AuthHandler authHandler = OAuth2AuthHandler.create(oauth) //
                                         .setupCallback(router.route("/callback"))//
                                         .addAuthority("user:email");
-                                router.route("/*").handler(authHandler);
+                                //router.route("/*").handler(authHandler);
 
                                 GraphiQLHandler graphiQLHandler = GraphiQLHandler
                                         .create(new GraphiQLHandlerOptions().setEnabled(true));

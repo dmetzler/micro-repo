@@ -31,10 +31,14 @@ public class Library {
 
     public DocumentModel toDoc(CoreSession session) {
         DocumentModel doc = session.createDocumentModel("/", name, "Library");
+        return toDoc(doc);
+
+    }
+
+    public DocumentModel toDoc(DocumentModel doc) {
         doc.setPropertyValue(LIB_CITY, city);
         doc.setPropertyValue(LIB_COUNTRY, country);
         return doc;
-
     }
 
     public static Library fromDoc(DocumentModel doc) {

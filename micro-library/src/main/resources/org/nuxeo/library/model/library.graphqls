@@ -1,5 +1,5 @@
 type Library {
-  id: String!
+  id: ID!
   path: String
   name: String!
   city: String
@@ -8,11 +8,36 @@ type Library {
 }
 
 type Query {
-  allLibraries(country: String, city: String): [Library]
-  libraryById(id: String!): Library
+  Library(id: ID!): Library
+  allLibraries(page: Int, perPage: Int, sortField: String, sortOrder: String, filter: LibraryFilter): [Library!]!
+  _allLibrariesMeta(page: Int, perPage: Int, sortField: String, sortOrder: String, filter: LibraryFilter): ListMetadata
 }
 
+
 type Mutation {
-  newLibrary(name: String!, city: String, country: String): Library
-  deleteLibrary(id: String!): Library
+  createLibrary(
+    name: String!,
+    city: String,
+    country: String
+  ): Library
+
+  updateLibrary(
+    id: ID!,
+    name: String!,
+    city: String,
+    country: String
+  ): Library
+
+  deleteLibrary(id: ID!): Library
+}
+
+input LibraryFilter {
+    q: String
+    id: ID
+    city: String
+    country: String
+}
+
+type ListMetadata {
+    count: Int!
 }

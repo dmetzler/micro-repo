@@ -2,15 +2,16 @@ package org.nuxeo.library.model;
 
 import static java.util.stream.Collectors.toList;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.IdRef;
+import org.nuxeo.vertx.graphql.ListMetadata;
 import org.nuxeo.vertx.graphql.Mutation;
 import org.nuxeo.vertx.graphql.Query;
+import org.nuxeo.vertx.graphql.QueryBuilder;
 import org.nuxeo.vertx.graphql.Schema;
 
 import graphql.schema.DataFetchingEnvironment;
@@ -18,28 +19,44 @@ import graphql.schema.DataFetchingEnvironment;
 @Schema("library.graphqls")
 public class LibraryOperations {
 
-
     // allLibraries(country: String, city: String) [Library]
     @Query("allLibraries")
     public List<Library> allLibraries(DataFetchingEnvironment env, CoreSession session) {
-        String country = env.getArgument("country");
-        String city = env.getArgument("city");
 
         QueryBuilder qb = new QueryBuilder().from("Library");
-        if (StringUtils.isNotBlank(country)) {
-            qb.addClause(Library.LIB_COUNTRY, country);
-        }
-
-        if (StringUtils.isNotBlank(city)) {
-            qb.addClause(Library.LIB_CITY, city);
-        }
+        LibraryFilter filter = new LibraryFilter(env.getArgument("filter"));
+        fillQueryWithFilter(qb, filter);
         String query = qb.build();
 
         return session.query(query).stream().map(Library::fromDoc).collect(toList());
     }
 
-    // libraryById(id: String!): Library
-    @Query("libraryById")
+    private void fillQueryWithFilter(QueryBuilder qb, LibraryFilter filter) {
+
+        if (StringUtils.isNotBlank(filter.country)) {
+            qb.addClause(Library.LIB_COUNTRY, filter.country);
+        }
+
+        if (StringUtils.isNotBlank(filter.city)) {
+            qb.addClause(Library.LIB_CITY, filter.city);
+        }
+    }
+
+    // _allLibrariesMeta(page: Int, perPage: Int, sortField: String, sortOrder:
+    // String, filter: PostFilter): ListMetadata
+    @Query("_allLibrariesMeta")
+    public ListMetadata allLibrariesMeta(DataFetchingEnvironment env, CoreSession session) {
+        QueryBuilder qb = new QueryBuilder().count("Library");
+        LibraryFilter filter = new LibraryFilter(env.getArgument("filter"));
+        fillQueryWithFilter(qb, filter);
+        String query = qb.build();
+
+        Long count = (long) session.query(query).size();
+        return new ListMetadata(count);
+    }
+
+    // Library(id: ID!): Library
+    @Query("Library")
     public Library libraryById(DataFetchingEnvironment env, CoreSession session) {
         String id = env.getArgument("id");
         IdRef ref = new IdRef(id);
@@ -50,8 +67,8 @@ public class LibraryOperations {
         }
     }
 
-    // newLibrary(name: String!, city: String!, country: String!): Library
-    @Mutation("newLibrary")
+    // createLibrary(name: String!, city: String!, country: String!): Library
+    @Mutation("createLibrary")
     public Library newLibrary(DataFetchingEnvironment env, CoreSession session) {
         String name = env.getArgument("name");
         String city = env.getArgument("city");
@@ -63,7 +80,28 @@ public class LibraryOperations {
 
     }
 
-    // deleteLibrary(libraryId: String!): Library
+    // createLibrary(name: String!, city: String!, country: String!): Library
+    @Mutation("updateLibrary")
+    public Library updateLibrary(DataFetchingEnvironment env, CoreSession session) {
+        String id = env.getArgument("id");
+        String city = env.getArgument("city");
+        String country = env.getArgument("country");
+
+        IdRef ref = new IdRef(id);
+        if (session.exists(ref)) {
+            DocumentModel doc = session.getDocument(ref);
+            Library library = Library.fromDoc(doc);
+            library.city = city;
+            library.country = country;
+            doc = session.saveDocument(library.toDoc(doc));
+            return Library.fromDoc(doc);
+        } else {
+            return null;
+        }
+
+    }
+
+    // deleteLibrary(libraryId: ID!): Library
     @Mutation("deleteLibrary")
     public Library delete(DataFetchingEnvironment env, CoreSession session) {
         String id = env.getArgument("id");
@@ -76,31 +114,5 @@ public class LibraryOperations {
             return null;
         }
 
-    }
-
-
-    public static class QueryBuilder {
-
-        private String docType = "Document";
-        private List<String> clauses = new ArrayList<>();
-
-        public void addClause(String field, String value) {
-            clauses.add(String.format("%s = '%s'", field, value));
-        }
-
-        public QueryBuilder from(String docType) {
-            this.docType = docType;
-            return this;
-        }
-
-        public String build() {
-            StringBuilder sb = new StringBuilder("SELECT * FROM ");
-            sb.append(docType);
-            if (!clauses.isEmpty()) {
-                sb.append(String.join(" AND ", clauses));
-            }
-            return sb.toString();
-
-        }
     }
 }
