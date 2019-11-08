@@ -1,8 +1,5 @@
 package org.nuxeo.vertx;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.nuxeo.runtime.jtajca.JtaActivator;
 
 import graphql.GraphQL;
@@ -12,19 +9,26 @@ import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
-import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.auth.ChainAuth;
+import io.vertx.ext.auth.jwt.JWTAuth;
+import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.ext.auth.oauth2.OAuth2Auth;
 import io.vertx.ext.auth.oauth2.OAuth2ClientOptions;
 import io.vertx.ext.auth.oauth2.OAuth2FlowType;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.handler.AuthHandler;
-import io.vertx.ext.web.handler.CorsHandler;
+import io.vertx.ext.web.client.HttpResponse;
+import io.vertx.ext.web.client.WebClient;
+import io.vertx.ext.web.handler.ChainAuthHandler;
+import io.vertx.ext.web.handler.JWTAuthHandler;
 import io.vertx.ext.web.handler.OAuth2AuthHandler;
 import io.vertx.ext.web.handler.SessionHandler;
+import io.vertx.ext.web.handler.graphql.ApolloWSHandler;
 import io.vertx.ext.web.handler.graphql.GraphQLHandler;
 import io.vertx.ext.web.handler.graphql.GraphiQLHandler;
 import io.vertx.ext.web.handler.graphql.GraphiQLHandlerOptions;
@@ -37,7 +41,7 @@ public abstract class Nuxicle extends AbstractVerticle {
 
     @Override
     public void start(Promise<Void> fut) throws Exception {
-        log.info(String.format("Starting [%s]", Nuxicle.class.getCanonicalName()));
+        log.info(String.format("Starting [%s]", this.getClass().getCanonicalName()));
         long start = System.currentTimeMillis();
 
         // Activate JTA
@@ -59,84 +63,90 @@ public abstract class Nuxicle extends AbstractVerticle {
 
                 JsonObject config = ar.result();
 
-                CoreSessionClient.create(vertx, config.getJsonObject("nuxeo").getString("tenantId"), config,
-                        this.getClass().getClassLoader(), cs -> {
+                Router router = Router.router(vertx);
 
-                            if (cs.succeeded()) {
+                WebClient client = WebClient.create(vertx);
+                client.getAbs(config.getString("jwtIssuer") + "/.well-known/jwks.json").ssl(true).send(result -> {
+                    if (result.succeeded()) {
+                        // Obtain response
+                        HttpResponse<Buffer> response = result.result();
+                        JsonArray jwksKeys = response.bodyAsJsonObject().getJsonArray("keys");
 
-                                Router router = Router.router(vertx);
+                        setupAuthentication(config, router, jwksKeys);
+                        setupGraphiQL(router);
 
-                                Set<String> allowedHeaders = new HashSet<>();
-                                allowedHeaders.add("x-requested-with");
-                                allowedHeaders.add("Access-Control-Allow-Origin");
-                                allowedHeaders.add("origin");
-                                allowedHeaders.add("Content-Type");
-                                allowedHeaders.add("accept");
-                                allowedHeaders.add("X-PINGARUNER");
+                        GraphQL graphQL = configureGraphQL();
 
-                                Set<HttpMethod> allowedMethods = new HashSet<>();
-                                allowedMethods.add(HttpMethod.GET);
-                                allowedMethods.add(HttpMethod.POST);
-                                allowedMethods.add(HttpMethod.OPTIONS);
-                                /*
-                                 * these methods aren't necessary for this sample,
-                                 * but you may need them for your projects
-                                 */
-                                allowedMethods.add(HttpMethod.DELETE);
-                                allowedMethods.add(HttpMethod.PATCH);
-                                allowedMethods.add(HttpMethod.PUT);
+                        CoreSessionClient.create(vertx, config.getJsonObject("nuxeo").getString("tenantId"), config,
+                                this.getClass().getClassLoader(), cs -> {
 
-                                router.route().handler(CorsHandler.create("*").allowedHeaders(allowedHeaders).allowedMethods(allowedMethods));
+                                    if (cs.succeeded()) {
+                                        router.route("/graphql")
+                                                .handler(NuxicleCorsHandler.create(config.getJsonObject("cors")));
+                                        router.route("/graphql")//
+                                                .handler(GraphQLHandler.create(graphQL)
+                                                        .queryContext(rc -> new NuxeoContext(rc, cs.result())));
 
+                                        Integer port = config.getInteger("port", 8080);
+                                        vertx.createHttpServer()//
+                                                .requestHandler(router)//
+                                                .listen(port, http -> {
+                                                    if (http.succeeded()) {
+                                                        fut.complete();
+                                                        log.info(String.format("HTTP server started on port %d", port));
+                                                        log.info(String.format("Started [%s] in %dms",
+                                                                this.getClass().getCanonicalName(),
+                                                                System.currentTimeMillis() - start));
+                                                    } else {
+                                                        fut.fail(http.cause());
+                                                    }
+                                                });
+                                    } else {
+                                        fut.fail(cs.cause());
+                                    }
 
-                                OAuth2Auth oauth = getOAuth(config.getJsonObject("oauth"));
-                                router.route().handler(
-                                        SessionHandler.create(LocalSessionStore.create(vertx)).setAuthProvider(oauth));
-
-                                AuthHandler authHandler = OAuth2AuthHandler.create(oauth) //
-                                        .setupCallback(router.route("/callback"))//
-                                        .addAuthority("user:email");
-                                //router.route("/*").handler(authHandler);
-
-                                GraphiQLHandler graphiQLHandler = GraphiQLHandler
-                                        .create(new GraphiQLHandlerOptions().setEnabled(true));
-                                graphiQLHandler.graphiQLRequestHeaders(rc -> {
-                                    String token = rc.get("token");
-                                    return MultiMap.caseInsensitiveMultiMap().add(HttpHeaders.AUTHORIZATION,
-                                            "Bearer " + token);
                                 });
-                                router.route("/graphiql/*").handler(graphiQLHandler);
-
-                                // Setup the GraphQL Schema
-
-                                GraphQL graphQL = configureGraphQL();
-
-                                router.route("/graphql")//
-                                        .handler(GraphQLHandler.create(graphQL)
-                                                .queryContext(rc -> new NuxeoContext(rc, cs.result())));
-
-                                Integer port = config.getInteger("port", 8080);
-                                vertx.createHttpServer()//
-                                        .requestHandler(router)//
-                                        .listen(port, http -> {
-                                            if (http.succeeded()) {
-                                                fut.complete();
-                                                log.info(String.format("HTTP server started on port %d", port));
-                                                log.info(String.format("Started [%s] in %dms",
-                                                        this.getClass().getCanonicalName(),
-                                                        System.currentTimeMillis() - start));
-                                            } else {
-                                                fut.fail(http.cause());
-                                            }
-                                        });
-                            } else {
-                                fut.fail(cs.cause());
-                            }
-
-                        });
+                    } else {
+                        fut.fail("Unable to get JWKS configuration");
+                    }
+                });
 
             }
         });
+    }
+
+    private void setupGraphiQL(Router router) {
+        GraphiQLHandler graphiQLHandler = GraphiQLHandler.create(new GraphiQLHandlerOptions().setEnabled(true));
+        graphiQLHandler.graphiQLRequestHeaders(rc -> {
+            String token = rc.get("token");
+            return MultiMap.caseInsensitiveMultiMap().add(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+        });
+        router.route("/graphiql/*").handler(graphiQLHandler);
+    }
+
+    private void setupAuthentication(JsonObject config, Router router, JsonArray jwksKeys) {
+        ChainAuth chainAuth = ChainAuth.create();
+        ChainAuthHandler authChainHandler = ChainAuthHandler.create();
+
+        router.route().handler(SessionHandler.create(LocalSessionStore.create(vertx)).setAuthProvider(chainAuth));
+
+        // JWT auth
+        JsonObject jwksConfig = new JsonObject().put("jwks", jwksKeys);
+        JWTAuth provider = JWTAuth.create(vertx, new JWTAuthOptions(jwksConfig));
+        chainAuth.append(provider);
+        authChainHandler.append(JWTAuthHandler.create(provider));
+
+        // OAuth auth
+        if (config.containsKey("oauth")) {
+            OAuth2Auth oauth = getOAuth(config.getJsonObject("oauth"));
+            chainAuth.append(oauth);
+            authChainHandler
+                    .append(OAuth2AuthHandler.create(oauth, config.getJsonObject("oauth").getString("redirect_uri")) //
+                            .setupCallback(router.route("/callback"))//
+                            .addAuthority("openid profile email"));
+        }
+
+        router.route().handler(authChainHandler);
     }
 
     protected abstract GraphQL configureGraphQL();
@@ -151,7 +161,8 @@ public abstract class Nuxicle extends AbstractVerticle {
         String userInfoPath = config.getString("userInfoPath");
         String scopeSeparator = config.getString("scopeSeparator", " ");
 
-        return OAuth2Auth.create(vertx, new OAuth2ClientOptions().setFlow(OAuth2FlowType.AUTH_CODE) //
+        return OAuth2Auth.create(vertx, new OAuth2ClientOptions()//
+                .setFlow(OAuth2FlowType.AUTH_CODE) //
                 .setSite(basePath)//
                 .setTokenPath(tokenPath)//
                 .setAuthorizationPath(authorizationPath)//

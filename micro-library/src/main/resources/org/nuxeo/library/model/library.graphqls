@@ -3,8 +3,10 @@ type Library {
   path: String
   name: String!
   city: String
+  description: String
   country: String
   creator: String
+  inSameCountry: [Library]
 }
 
 type Query {
@@ -19,6 +21,7 @@ type Mutation {
     name: String!,
     city: String,
     country: String
+    description: String
   ): Library
 
   updateLibrary(
@@ -26,6 +29,7 @@ type Mutation {
     name: String!,
     city: String,
     country: String
+    description: String
   ): Library
 
   deleteLibrary(id: ID!): Library

@@ -4,6 +4,7 @@ import static graphql.schema.idl.RuntimeWiring.newRuntimeWiring;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -16,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.nuxeo.vertx.NuxeoContext;
 
 import graphql.GraphQL;
+import graphql.execution.AsyncExecutionStrategy;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.SchemaGenerator;
@@ -28,7 +30,6 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.handler.graphql.VertxDataFetcher;
 
 public class NuxeoGQLConfiguration {
-
 
     protected static final Logger log = LoggerFactory.getLogger(NuxeoGQLConfiguration.class);
 
@@ -81,8 +82,7 @@ public class NuxeoGQLConfiguration {
                     try {
                         URL schemaUrl = this.configuration.getClass().getResource(schemaAnnotation.value());
 
-                        String objectSchema = IOUtils.toString(schemaUrl.openStream(),
-                                Charset.defaultCharset());
+                        String objectSchema = IOUtils.toString(schemaUrl.openStream(), Charset.defaultCharset());
 
                         TypeDefinitionRegistry tdr = schemaParser.parse(objectSchema);
                         if (typeDefinitionRegistry != null) {
@@ -108,7 +108,9 @@ public class NuxeoGQLConfiguration {
             GraphQLSchema graphQLSchema = schemaGenerator.makeExecutableSchema(typeDefinitionRegistry,
                     runtimeWiring.build()); // (4)
 
-            return GraphQL.newGraphQL(graphQLSchema).build(); // (5)
+            return GraphQL.newGraphQL(graphQLSchema)//
+            		.mutationExecutionStrategy(new AsyncExecutionStrategy(new NuxeoDataFetcherExceptionHandler()))//
+            		.build();
         }
 
         private <T> void configureMethod(graphql.schema.idl.RuntimeWiring.Builder runtimeWiring, Method method,
@@ -138,6 +140,8 @@ public class NuxeoGQLConfiguration {
                                 try {
                                     Object result = method.invoke(this.configuration, env, ar.result());
                                     fut.complete((T) result);
+                                } catch (InvocationTargetException e) {
+                                    fut.fail(e.getTargetException());
                                 } catch (ReflectiveOperationException e) {
                                     fut.fail(e);
                                 }
@@ -167,7 +171,5 @@ public class NuxeoGQLConfiguration {
         }
 
     }
-
-
 
 }

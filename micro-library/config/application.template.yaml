@@ -3,15 +3,16 @@ db:
   server: localhost:27017
   dbname: nuxeo
 
+jwtIssuer: https://dev-XXXXXX.auth0.com
 
 oauth:
-  # Create your app on Github at https://github.com/settings/developers
-  clientId: xxxxxxxxxxxxxxxxxx
-  clientSecret: xxxxxxxxxxxxxxxxxx
-  basePath: https://github.com/login
-  tokenPath: /oauth/access_token
-  authorizationPath: /oauth/authorize
-  userInfoPath: https://api.github.com/user
+  clientId: xxxxxxxxxxxxxxxxxxxxxxxxxx
+  clientSecret: xxxxxxxxxxxxxxxxxxxxxxxxxx
+  basePath: https://dev-XXXXXX.auth0.com
+  tokenPath: /oauth/token
+  authorizationPath: /authorize
+  userInfoPath: /userinfo
+  redirect_uri: http://localhost:8080/callback
 
 port: 8080
 

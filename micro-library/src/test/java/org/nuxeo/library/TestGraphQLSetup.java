@@ -1,4 +1,4 @@
-package org.nuxeo.cloud.tenants;
+package org.nuxeo.library;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

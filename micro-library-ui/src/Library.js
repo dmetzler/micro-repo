@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import {
   List,
   Edit,
@@ -6,17 +6,25 @@ import {
   Filter,
   SimpleForm,
   TextInput,
+  DisabledInput,
   Datagrid,
   TextField
 } from 'react-admin';
 
+import RichTextInput from 'ra-input-rich-text';
+
 
 const LibraryFilter = (props) => (
     <Filter {...props}>
-        <TextInput label="City" source="city" alwaysOn />
-        <TextInput label="Country" source="country" alwaysOn />
+        <TextInput label="Search" source="q" alwaysOn />
+        <TextInput label="City" source="city" />
+        <TextInput label="Country" source="country" />
     </Filter>
 );
+
+const LibraryTitle = ({ record }) => {
+    return <span>Library {record ? `${record.name}` : ''}</span>;
+};
 
 export const LibraryList = props => (
     <List filters={<LibraryFilter/>} {...props}>
@@ -30,10 +38,13 @@ export const LibraryList = props => (
 );
 
 export const LibraryEdit = props => (
-    <Edit {...props}>
+    <Edit title={<LibraryTitle />} {...props}>
         <SimpleForm>
+            <DisabledInput label="Id" source="id" />
+            <DisabledInput label="Name" source="name" />
             <TextInput source="city" />
             <TextInput source="country" />
+            <RichTextInput source="description" />
         </SimpleForm>
     </Edit>
 );
@@ -44,6 +55,7 @@ export const LibraryCreate = props => (
             <TextInput source="name" />
             <TextInput source="city" />
             <TextInput source="country" />
+            <RichTextInput source="description" />
         </SimpleForm>
     </Create>
 );
