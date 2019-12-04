@@ -5,7 +5,7 @@
 
   <groupId>org.nuxeo</groupId>
   <artifactId>micro-nuxeo-parent</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>0.0.1-SNAPSHOT</version>
   <name>Micro Nuxeo :: parent</name>
   <description></description>
   <packaging>pom</packaging>
@@ -31,12 +31,20 @@
 
 
 
-  <scm>
-    <connection>scm:git:git://github.com/dmetzler/micro-nuxeo.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/dmetzler/micro-nuxeo.git</developerConnection>
+   <scm>
+    <connection>scm:git:ssh://git@github.com/dmetzler/micro-repo.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/dmetzler/micro-repo.git</developerConnection>
     <url>https://micro-nuxeo.github.io</url>
-    <tag>micro-nuxeo-1.0</tag>
+    <tag>micro-nuxeo-parent-0.0.1</tag>
   </scm>
+
+  <distributionManagement>
+   <repository>
+     <id>github</id>
+     <name>GitHub OWNER Apache Maven Packages</name>
+     <url>https://maven.pkg.github.com/dmetzler/maven</url>
+   </repository>
+  </distributionManagement>
 
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -141,6 +149,16 @@
       <dependency>
         <groupId>org.nuxeo</groupId>
         <artifactId>micro-nuxeo-schema</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.nuxeo</groupId>
+        <artifactId>micro-nuxeo-repo</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.nuxeo</groupId>
+        <artifactId>micro-nuxeo-vertx</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

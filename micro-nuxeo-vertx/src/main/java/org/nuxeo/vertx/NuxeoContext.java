@@ -16,7 +16,6 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.auth.oauth2.impl.OAuth2TokenImpl;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.handler.graphql.ApolloWSMessage;
 import io.vertx.ext.web.impl.RoutingContextDecorator;
 
 public class NuxeoContext extends RoutingContextDecorator {

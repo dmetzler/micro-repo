@@ -1,7 +1,7 @@
 // in App.js
 import React, { Component } from 'react';
 import buildGraphQLProvider from 'ra-data-graphql-simple';
-import { Admin, Resource, AUTH_LOGIN} from 'react-admin';
+import { Admin, Resource, AUTH_LOGIN, ListGuesser } from 'react-admin';
 import authProvider from "./authProvider"
 import LoginPage from "./LoginPage"
 import { LibraryList, LibraryCreate, LibraryEdit } from "./Library"

@@ -7,13 +7,10 @@
   <parent>
     <groupId>org.nuxeo</groupId>
     <artifactId>micro-nuxeo-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
   </parent>
 
-
-  <groupId>org.nuxeo</groupId>
   <artifactId>micro-nuxeo-vertx</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
 
   <name>Micro Nuxeo :: Vertx adapter</name>
 
@@ -30,7 +27,6 @@
 
     <vertx.version>3.8.3</vertx.version>
     <junit-jupiter.version>5.4.0</junit-jupiter.version>
-    <micro-nuxeo.version>1.0.0-SNAPSHOT</micro-nuxeo.version>
 
     <main.verticle>com.nuxeo.cloud.tenants.APIVerticle</main.verticle>
   </properties>
@@ -51,7 +47,6 @@
     <dependency>
       <groupId>org.nuxeo</groupId>
       <artifactId>micro-nuxeo-repo</artifactId>
-      <version>${micro-nuxeo.version}</version>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
