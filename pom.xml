@@ -32,7 +32,6 @@
    <scm>
     <connection>scm:git:ssh://git@github.com/dmetzler/micro-repo.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/dmetzler/micro-repo.git</developerConnection>
-    <url>https://maven.pkg.github.com/dmetzler/maven</url>
     <tag>micro-nuxeo-parent-0.0.1</tag>
   </scm>
 
@@ -40,7 +39,7 @@
    <repository>
      <id>github</id>
      <name>GitHub OWNER Apache Maven Packages</name>
-     <url>https://maven.pkg.github.com/dmetzler/maven</url>
+     <url>https://maven.pkg.github.com/dmetzler/nuxeo</url>
    </repository>
   </distributionManagement>
 
