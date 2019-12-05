@@ -3,7 +3,7 @@
 
   <groupId>org.nuxeo</groupId>
   <artifactId>micro-nuxeo-parent</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.2-SNAPSHOT</version>
   <name>Micro Nuxeo :: parent</name>
   <description />
   <packaging>pom</packaging>
@@ -32,7 +32,7 @@
    <scm>
     <connection>scm:git:ssh://git@github.com/dmetzler/micro-repo.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/dmetzler/micro-repo.git</developerConnection>
-    <url>https://micro-nuxeo.github.io</url>
+    <url>https://maven.pkg.github.com/dmetzler/maven</url>
     <tag>micro-nuxeo-parent-0.0.1</tag>
   </scm>
 
