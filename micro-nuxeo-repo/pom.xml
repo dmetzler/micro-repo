@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.nuxeo</groupId>
+    <groupId>org.nuxeo.micro-repo</groupId>
     <artifactId>micro-nuxeo-parent</artifactId>
     <version>0.0.7-SNAPSHOT</version>
   </parent>
@@ -14,35 +14,35 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.nuxeo</groupId>
+      <groupId>org.nuxeo.micro-repo</groupId>
       <artifactId>micro-nuxeo-event-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.nuxeo</groupId>
+      <groupId>org.nuxeo.micro-repo</groupId>
       <artifactId>micro-nuxeo-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.nuxeo</groupId>
+      <groupId>org.nuxeo.micro-repo</groupId>
       <artifactId>micro-nuxeo-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.nuxeo</groupId>
+      <groupId>org.nuxeo.micro-repo</groupId>
       <artifactId>micro-nuxeo-event-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.nuxeo</groupId>
+      <groupId>org.nuxeo.micro-repo</groupId>
       <artifactId>micro-nuxeo-dublincore</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.nuxeo</groupId>
+      <groupId>org.nuxeo.micro-repo</groupId>
       <artifactId>micro-nuxeo-el</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.nuxeo</groupId>
+      <groupId>org.nuxeo.micro-repo</groupId>
       <artifactId>micro-nuxeo-kv</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.nuxeo</groupId>
+      <groupId>org.nuxeo.micro-repo</groupId>
       <artifactId>micro-nuxeo-dsl</artifactId>
     </dependency>
     <dependency>

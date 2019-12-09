@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.nuxeo</groupId>
+  <groupId>org.nuxeo.micro-repo</groupId>
   <artifactId>micro-nuxeo-parent</artifactId>
   <version>0.0.7-SNAPSHOT</version>
   <name>Micro Nuxeo :: parent</name>
@@ -88,73 +88,73 @@
       </dependency>
 
       <dependency>
-        <groupId>org.nuxeo</groupId>
+        <groupId>org.nuxeo.micro-repo</groupId>
         <artifactId>micro-nuxeo-common</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>org.nuxeo</groupId>
+        <groupId>org.nuxeo.micro-repo</groupId>
         <artifactId>micro-nuxeo-api</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>org.nuxeo</groupId>
+        <groupId>org.nuxeo.micro-repo</groupId>
         <artifactId>micro-nuxeo-el</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>org.nuxeo</groupId>
+        <groupId>org.nuxeo.micro-repo</groupId>
         <artifactId>micro-nuxeo-core</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>org.nuxeo</groupId>
+        <groupId>org.nuxeo.micro-repo</groupId>
         <artifactId>micro-nuxeo-jta</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>org.nuxeo</groupId>
+        <groupId>org.nuxeo.micro-repo</groupId>
         <artifactId>micro-nuxeo-metrics</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>org.nuxeo</groupId>
+        <groupId>org.nuxeo.micro-repo</groupId>
         <artifactId>micro-nuxeo-event-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.nuxeo</groupId>
+        <groupId>org.nuxeo.micro-repo</groupId>
         <artifactId>micro-nuxeo-event-core</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.nuxeo</groupId>
+        <groupId>org.nuxeo.micro-repo</groupId>
         <artifactId>micro-nuxeo-dublincore</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.nuxeo</groupId>
+        <groupId>org.nuxeo.micro-repo</groupId>
         <artifactId>micro-nuxeo-kv</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.nuxeo</groupId>
+        <groupId>org.nuxeo.micro-repo</groupId>
         <artifactId>micro-nuxeo-schema</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.nuxeo</groupId>
+        <groupId>org.nuxeo.micro-repo</groupId>
         <artifactId>micro-nuxeo-repo</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.nuxeo</groupId>
+        <groupId>org.nuxeo.micro-repo</groupId>
         <artifactId>micro-nuxeo-vertx</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -169,7 +169,7 @@
         <version>2.1.1</version>
       </dependency>
       <dependency>
-        <groupId>org.nuxeo</groupId>
+        <groupId>org.nuxeo.micro-repo</groupId>
         <artifactId>micro-nuxeo-dsl</artifactId>
         <version>${project.version}</version>
       </dependency>

@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.nuxeo</groupId>
+    <groupId>org.nuxeo.micro-repo</groupId>
     <artifactId>micro-nuxeo-parent</artifactId>
     <version>0.0.7-SNAPSHOT</version>
   </parent>
