@@ -1,0 +1,15 @@
+doctype Movie  {
+schemas {
+    common dublincore
+    mov:movie { director, year }
+  }
+}
+
+doctype Actor {
+  schemas {
+    common dublincore
+    act:actor { firstname, lastname}
+
+  }
+  crud
+}

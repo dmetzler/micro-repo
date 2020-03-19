@@ -1,0 +1,16 @@
+doctype Library extends Folder {
+schemas {
+    common dublincore
+    lib:library { city, country, description }
+  }
+}
+
+doctype Book {
+  schemas {
+    common dublincore
+    bk:book { author, isbn, pageCount integer}
+
+  }
+
+  crud
+}

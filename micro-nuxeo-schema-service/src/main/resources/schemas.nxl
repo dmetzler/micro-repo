@@ -1,0 +1,8 @@
+doctype TenantConfiguration {
+schemas {
+    common dublincore
+    tc:tenantConfiguration { name, schema }
+  }
+}
+
+
