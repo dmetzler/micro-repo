@@ -28,14 +28,18 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentNotFoundException;
+import org.nuxeo.ecm.core.api.PathRef;
+import org.nuxeo.micro.repo.service.core.CoreSessionService;
+import org.nuxeo.micro.repo.service.core.CoreVerticle;
 
 import io.vertx.core.Vertx;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import io.vertx.serviceproxy.ServiceProxyBuilder;
 
 @ExtendWith(VertxExtension.class)
-public class SchemaServiceTest {
+public class CoreServiceTest {
 
     private File appConfigFile;
 
@@ -49,46 +53,35 @@ public class SchemaServiceTest {
         writer.write(applicationConfigYaml);
         writer.close();
         appConfigFile.deleteOnExit();
-        vertx.deployVerticle(new SchemaVerticle(),
-                testContext.succeeding(id -> testContext.completeNow()));
+        vertx.deployVerticle(new CoreVerticle(), testContext.succeeding(id -> testContext.completeNow()));
 
     }
 
     @Test
-    void can_use_schema_service(Vertx vertx, VertxTestContext testContext) throws Throwable {
+    void can_use_create_document(Vertx vertx, VertxTestContext testContext) throws Throwable {
 
-        SchemaService.create(vertx, null, ar -> {
-            if (ar.succeeded()) {
-                SchemaService ss = ar.result();
+        CoreSessionService.create(vertx, null, testContext.succeeding(css -> {
 
-                ss.getSchema(SchemaService.NUXEO_TENANTS_SCHEMA, sar -> {
-                    if (sar.succeeded()) {
-                        assertThat(sar.result().getDocumentType("Workspace")).isNotNull();
+            css.session(SchemaService.NUXEO_TENANTS_SCHEMA, "Administrator",
+                    testContext.succeeding(session -> testContext.verify(() -> {
+
+                        DocumentModel doc = session.createDocumentModel("/", "Tenants", "Folder");
+                        assertThat(doc).isNotNull();
+                        doc.setPropertyValue("dc:title", "Tenants");
+                        doc = session.createDocument(doc);
+
+                        try {
+                            doc = session.getDocument(new PathRef("/Tenants"));
+                        } catch (DocumentNotFoundException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        assertThat(doc).isNotNull();
                         testContext.completeNow();
-                    } else {
-                        testContext.failNow(sar.cause());
-                    }
-                });
-            }
-        });
 
-    }
+                    })));
 
-    @Test
-    void can_proxy_schema_service(Vertx vertx, VertxTestContext testContext) throws Throwable {
-
-        ServiceProxyBuilder builder = new ServiceProxyBuilder(vertx).setAddress(SchemaService.ADDRESS);
-
-        SchemaService ss = builder.build(SchemaService.class);
-        // or with delivery options:
-        ss.getSchema(SchemaService.NUXEO_TENANTS_SCHEMA, ar -> {
-            if (ar.succeeded()) {
-                assertThat(ar.result().getDocumentType("Workspace")).isNotNull();
-                testContext.completeNow();
-            } else {
-                testContext.failNow(ar.cause());
-            }
-        });
+        }));
 
     }
 

@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.nuxeo.micro-repo</groupId>
@@ -29,18 +31,18 @@
 
 
 
-   <scm>
+  <scm>
     <connection>scm:git:ssh://git@github.com/dmetzler/micro-repo.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/dmetzler/micro-repo.git</developerConnection>
     <tag>micro-nuxeo-parent-0.0.1</tag>
   </scm>
 
   <distributionManagement>
-   <repository>
-     <id>github</id>
-     <name>GitHub OWNER Apache Maven Packages</name>
-     <url>https://maven.pkg.github.com/dmetzler/micro-repo</url>
-   </repository>
+    <repository>
+      <id>github</id>
+      <name>GitHub OWNER Apache Maven Packages</name>
+      <url>https://maven.pkg.github.com/dmetzler/micro-repo</url>
+    </repository>
   </distributionManagement>
 
   <properties>
@@ -156,6 +158,16 @@
       <dependency>
         <groupId>org.nuxeo.micro-repo</groupId>
         <artifactId>micro-nuxeo-vertx</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.nuxeo.micro-repo</groupId>
+        <artifactId>micro-nuxeo-schema-service</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.nuxeo.micro-repo</groupId>
+        <artifactId>micro-nuxeo-core-service</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

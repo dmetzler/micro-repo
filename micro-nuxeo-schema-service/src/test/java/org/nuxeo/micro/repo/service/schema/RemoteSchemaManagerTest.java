@@ -12,7 +12,7 @@ public class RemoteSchemaManagerTest {
     public void can_serialize_schemaManager() throws Exception {
         SchemaServiceImpl ss = new SchemaServiceImpl(null, null);
 
-        ss.getSchema(SchemaServiceImpl.SCHEMA, ar -> {
+        ss.getSchema(SchemaService.NUXEO_TENANTS_SCHEMA, ar -> {
             RemoteSchemaManager rsm = ar.result();
             assertThat(rsm.getDocumentType("Workspace")).isNotNull();
 

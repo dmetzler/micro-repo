@@ -1,0 +1,100 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.nuxeo.micro.repo.service.grpc";
+option java_outer_classname = "NuxeoClientProto";
+
+package NuxeoClient;
+
+// The Session service definition.
+service NuxeoCoreSession {
+ // Gets a document
+ rpc getDocument (DocumentRequest) returns (Document) {}
+ rpc createDocument( DocumentCreationRequest ) returns (Document) {}
+ rpc updateDocument( Document ) returns (Document) {}
+ rpc query( QueryRequest ) returns ( stream QueryResult) {}
+
+}
+
+// The request message containing the user's name.
+message DocumentRequest {
+ string id= 1;
+ string path = 2;
+}
+
+// The request message containing the user's name.
+message DocumentCreationRequest {
+ string path = 1;
+ string name = 2;
+ string type = 3;
+}
+
+message QueryRequest {
+  string nxql = 1;
+}
+
+message QueryResult {
+  int64 totalCount = 1;
+  repeated Document docs = 5;
+}
+
+// The response message containing the greetings
+message Document {
+  string repositoryName = 1;
+  string uid = 2;
+  string path = 3;
+  string type = 4;
+  repeated string facets = 5;
+  message Schema {
+    string name = 1;
+    string prefix = 2;
+  }
+  repeated Schema schema = 6;
+  string state = 7;
+  string parentRef = 8;
+  bool isCheckedOut = 9;
+  string changeToken = 10;
+  string title = 11;
+  int64 lastModified = 12;
+  string versionLabel = 13;
+  string lockOwner = 14;
+  bool lockCreated = 15;
+
+
+
+  message DataModel {
+    string name = 1;
+    message Property {
+       enum PropType {
+         STRING = 0;
+         INT = 1;
+         DOUBLE = 2;
+         DATE = 3;
+         BOOL = 4;
+         BLOB = 5;
+         COMPLEX = 6;
+       }
+
+       PropType type = 1;
+       bool multiple = 2;
+
+       message ScalarProperty {
+         oneof value {
+           string strValue = 1;
+           sint64  intValue = 2;
+           double  doubleValue = 3;
+         }
+       }
+
+       message ComplexProperty {
+         map<string, Property> complexValue = 1;
+       }
+
+       repeated ScalarProperty scalarValue = 3;
+       repeated ComplexProperty complexValue = 4;
+    }
+
+    map<string, Property> properties = 2;
+  }
+  map<string, DataModel> data = 16;
+}

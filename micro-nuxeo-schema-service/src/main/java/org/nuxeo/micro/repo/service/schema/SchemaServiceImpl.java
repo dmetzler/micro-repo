@@ -22,7 +22,6 @@ import io.vertx.core.json.JsonObject;
 
 public class SchemaServiceImpl implements SchemaService {
 
-    static final String SCHEMA = "__schema";
     private Vertx vertx;
     private JsonObject config;
 
@@ -77,7 +76,7 @@ public class SchemaServiceImpl implements SchemaService {
 
     @Override
     public void getSchema(String tenantId, Handler<AsyncResult<RemoteSchemaManager>> resultHandler) {
-        if (SCHEMA.equals(tenantId)) {
+        if (SchemaService.NUXEO_TENANTS_SCHEMA.equals(tenantId)) {
             SchemaManagerImpl sm = new SchemaManagerImpl(FileUtils.getTempDirectory());
             sm.registerConfiguration(new DefaultTypeConfiguration());
             buildSchemasAndTypes(sm);
