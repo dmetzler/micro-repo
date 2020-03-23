@@ -75,10 +75,10 @@ public final class NuxeoClientProto {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_NuxeoClient_Document_DataModel_PropertiesEntry_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_NuxeoClient_Document_DataEntry_descriptor;
+    internal_static_NuxeoClient_Document_DatamodelEntry_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_NuxeoClient_Document_DataEntry_fieldAccessorTable;
+      internal_static_NuxeoClient_Document_DatamodelEntry_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -89,54 +89,55 @@ public final class NuxeoClientProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\013nuxeo.proto\022\013NuxeoClient\"+\n\017DocumentRe" +
-      "quest\022\n\n\002id\030\001 \001(\t\022\014\n\004path\030\002 \001(\t\"C\n\027Docum" +
+      "quest\022\n\n\002id\030\001 \001(\t\022\014\n\004path\030\002 \001(\t\"l\n\027Docum" +
       "entCreationRequest\022\014\n\004path\030\001 \001(\t\022\014\n\004name" +
-      "\030\002 \001(\t\022\014\n\004type\030\003 \001(\t\"\034\n\014QueryRequest\022\014\n\004" +
-      "nxql\030\001 \001(\t\"F\n\013QueryResult\022\022\n\ntotalCount\030" +
-      "\001 \001(\003\022#\n\004docs\030\005 \003(\0132\025.NuxeoClient.Docume" +
-      "nt\"\241\n\n\010Document\022\026\n\016repositoryName\030\001 \001(\t\022" +
-      "\013\n\003uid\030\002 \001(\t\022\014\n\004path\030\003 \001(\t\022\014\n\004type\030\004 \001(\t" +
-      "\022\016\n\006facets\030\005 \003(\t\022,\n\006schema\030\006 \003(\0132\034.Nuxeo" +
-      "Client.Document.Schema\022\r\n\005state\030\007 \001(\t\022\021\n",
-      "\tparentRef\030\010 \001(\t\022\024\n\014isCheckedOut\030\t \001(\010\022\023" +
-      "\n\013changeToken\030\n \001(\t\022\r\n\005title\030\013 \001(\t\022\024\n\014la" +
-      "stModified\030\014 \001(\003\022\024\n\014versionLabel\030\r \001(\t\022\021" +
-      "\n\tlockOwner\030\016 \001(\t\022\023\n\013lockCreated\030\017 \001(\010\022-" +
-      "\n\004data\030\020 \003(\0132\037.NuxeoClient.Document.Data" +
-      "Entry\032&\n\006Schema\022\014\n\004name\030\001 \001(\t\022\016\n\006prefix\030" +
-      "\002 \001(\t\032\300\006\n\tDataModel\022\014\n\004name\030\001 \001(\t\022C\n\npro" +
-      "perties\030\002 \003(\0132/.NuxeoClient.Document.Dat" +
-      "aModel.PropertiesEntry\032\202\005\n\010Property\022?\n\004t" +
-      "ype\030\001 \001(\01621.NuxeoClient.Document.DataMod",
-      "el.Property.PropType\022\020\n\010multiple\030\002 \001(\010\022L" +
-      "\n\013scalarValue\030\003 \003(\01327.NuxeoClient.Docume" +
-      "nt.DataModel.Property.ScalarProperty\022N\n\014" +
-      "complexValue\030\004 \003(\01328.NuxeoClient.Documen" +
-      "t.DataModel.Property.ComplexProperty\032X\n\016" +
-      "ScalarProperty\022\022\n\010strValue\030\001 \001(\tH\000\022\022\n\010in" +
-      "tValue\030\002 \001(\022H\000\022\025\n\013doubleValue\030\003 \001(\001H\000B\007\n" +
-      "\005value\032\322\001\n\017ComplexProperty\022`\n\014complexVal" +
-      "ue\030\001 \003(\0132J.NuxeoClient.Document.DataMode" +
-      "l.Property.ComplexProperty.ComplexValueE",
-      "ntry\032]\n\021ComplexValueEntry\022\013\n\003key\030\001 \001(\t\0227" +
-      "\n\005value\030\002 \001(\0132(.NuxeoClient.Document.Dat" +
-      "aModel.Property:\0028\001\"V\n\010PropType\022\n\n\006STRIN" +
-      "G\020\000\022\007\n\003INT\020\001\022\n\n\006DOUBLE\020\002\022\010\n\004DATE\020\003\022\010\n\004BO" +
-      "OL\020\004\022\010\n\004BLOB\020\005\022\013\n\007COMPLEX\020\006\032[\n\017Propertie" +
-      "sEntry\022\013\n\003key\030\001 \001(\t\0227\n\005value\030\002 \001(\0132(.Nux" +
-      "eoClient.Document.DataModel.Property:\0028\001" +
-      "\032L\n\tDataEntry\022\013\n\003key\030\001 \001(\t\022.\n\005value\030\002 \001(" +
-      "\0132\037.NuxeoClient.Document.DataModel:\0028\0012\255" +
-      "\002\n\020NuxeoCoreSession\022D\n\013getDocument\022\034.Nux",
-      "eoClient.DocumentRequest\032\025.NuxeoClient.D" +
-      "ocument\"\000\022O\n\016createDocument\022$.NuxeoClien" +
-      "t.DocumentCreationRequest\032\025.NuxeoClient." +
-      "Document\"\000\022@\n\016updateDocument\022\025.NuxeoClie" +
-      "nt.Document\032\025.NuxeoClient.Document\"\000\022@\n\005" +
-      "query\022\031.NuxeoClient.QueryRequest\032\030.Nuxeo" +
-      "Client.QueryResult\"\0000\001B7\n!org.nuxeo.micr" +
-      "o.repo.service.grpcB\020NuxeoClientProtoP\001b" +
-      "\006proto3"
+      "\030\002 \001(\t\022\014\n\004type\030\003 \001(\t\022\'\n\010document\030\004 \001(\0132\025" +
+      ".NuxeoClient.Document\"\034\n\014QueryRequest\022\014\n" +
+      "\004nxql\030\001 \001(\t\"F\n\013QueryResult\022\022\n\ntotalCount" +
+      "\030\001 \001(\003\022#\n\004docs\030\005 \003(\0132\025.NuxeoClient.Docum" +
+      "ent\"\277\n\n\010Document\022\026\n\016repositoryName\030\001 \001(\t" +
+      "\022\014\n\004uuid\030\002 \001(\t\022\014\n\004name\030\003 \001(\t\022\014\n\004path\030\004 \001" +
+      "(\t\022\014\n\004type\030\005 \001(\t\022\016\n\006facets\030\006 \003(\t\022,\n\006sche",
+      "ma\030\007 \003(\0132\034.NuxeoClient.Document.Schema\022\r" +
+      "\n\005state\030\010 \001(\t\022\021\n\tparentRef\030\t \001(\t\022\023\n\013chan" +
+      "geToken\030\n \001(\t\022\r\n\005title\030\013 \001(\t\022\024\n\014lastModi" +
+      "fied\030\014 \001(\003\022\024\n\014versionLabel\030\r \001(\t\022\021\n\tlock" +
+      "Owner\030\016 \001(\t\022\023\n\013lockCreated\030\017 \001(\010\022\024\n\014isCh" +
+      "eckedOut\030\020 \001(\010\0227\n\tdatamodel\030\021 \003(\0132$.Nuxe" +
+      "oClient.Document.DatamodelEntry\032&\n\006Schem" +
+      "a\022\014\n\004name\030\001 \001(\t\022\016\n\006prefix\030\002 \001(\t\032\300\006\n\tData" +
+      "Model\022\014\n\004name\030\001 \001(\t\022C\n\nproperties\030\002 \003(\0132" +
+      "/.NuxeoClient.Document.DataModel.Propert",
+      "iesEntry\032\202\005\n\010Property\022?\n\004type\030\001 \001(\01621.Nu" +
+      "xeoClient.Document.DataModel.Property.Pr" +
+      "opType\022\020\n\010multiple\030\002 \001(\010\022L\n\013scalarValue\030" +
+      "\003 \003(\01327.NuxeoClient.Document.DataModel.P" +
+      "roperty.ScalarProperty\022N\n\014complexValue\030\004" +
+      " \003(\01328.NuxeoClient.Document.DataModel.Pr" +
+      "operty.ComplexProperty\032X\n\016ScalarProperty" +
+      "\022\022\n\010strValue\030\001 \001(\tH\000\022\022\n\010intValue\030\002 \001(\022H\000" +
+      "\022\025\n\013doubleValue\030\003 \001(\001H\000B\007\n\005value\032\322\001\n\017Com" +
+      "plexProperty\022`\n\014complexValue\030\001 \003(\0132J.Nux",
+      "eoClient.Document.DataModel.Property.Com" +
+      "plexProperty.ComplexValueEntry\032]\n\021Comple" +
+      "xValueEntry\022\013\n\003key\030\001 \001(\t\0227\n\005value\030\002 \001(\0132" +
+      "(.NuxeoClient.Document.DataModel.Propert" +
+      "y:\0028\001\"V\n\010PropType\022\n\n\006STRING\020\000\022\007\n\003INT\020\001\022\n" +
+      "\n\006DOUBLE\020\002\022\010\n\004DATE\020\003\022\010\n\004BOOL\020\004\022\010\n\004BLOB\020\005" +
+      "\022\013\n\007COMPLEX\020\006\032[\n\017PropertiesEntry\022\013\n\003key\030" +
+      "\001 \001(\t\0227\n\005value\030\002 \001(\0132(.NuxeoClient.Docum" +
+      "ent.DataModel.Property:\0028\001\032Q\n\016DatamodelE" +
+      "ntry\022\013\n\003key\030\001 \001(\t\022.\n\005value\030\002 \001(\0132\037.Nuxeo",
+      "Client.Document.DataModel:\0028\0012\255\002\n\020NuxeoC" +
+      "oreSession\022D\n\013getDocument\022\034.NuxeoClient." +
+      "DocumentRequest\032\025.NuxeoClient.Document\"\000" +
+      "\022O\n\016createDocument\022$.NuxeoClient.Documen" +
+      "tCreationRequest\032\025.NuxeoClient.Document\"" +
+      "\000\022@\n\016updateDocument\022\025.NuxeoClient.Docume" +
+      "nt\032\025.NuxeoClient.Document\"\000\022@\n\005query\022\031.N" +
+      "uxeoClient.QueryRequest\032\030.NuxeoClient.Qu" +
+      "eryResult\"\0000\001B7\n!org.nuxeo.micro.repo.se" +
+      "rvice.grpcB\020NuxeoClientProtoP\001b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -161,7 +162,7 @@ public final class NuxeoClientProto {
     internal_static_NuxeoClient_DocumentCreationRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_NuxeoClient_DocumentCreationRequest_descriptor,
-        new java.lang.String[] { "Path", "Name", "Type", });
+        new java.lang.String[] { "Path", "Name", "Type", "Document", });
     internal_static_NuxeoClient_QueryRequest_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_NuxeoClient_QueryRequest_fieldAccessorTable = new
@@ -179,7 +180,7 @@ public final class NuxeoClientProto {
     internal_static_NuxeoClient_Document_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_NuxeoClient_Document_descriptor,
-        new java.lang.String[] { "RepositoryName", "Uid", "Path", "Type", "Facets", "Schema", "State", "ParentRef", "IsCheckedOut", "ChangeToken", "Title", "LastModified", "VersionLabel", "LockOwner", "LockCreated", "Data", });
+        new java.lang.String[] { "RepositoryName", "Uuid", "Name", "Path", "Type", "Facets", "Schema", "State", "ParentRef", "ChangeToken", "Title", "LastModified", "VersionLabel", "LockOwner", "LockCreated", "IsCheckedOut", "Datamodel", });
     internal_static_NuxeoClient_Document_Schema_descriptor =
       internal_static_NuxeoClient_Document_descriptor.getNestedTypes().get(0);
     internal_static_NuxeoClient_Document_Schema_fieldAccessorTable = new
@@ -222,11 +223,11 @@ public final class NuxeoClientProto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_NuxeoClient_Document_DataModel_PropertiesEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
-    internal_static_NuxeoClient_Document_DataEntry_descriptor =
+    internal_static_NuxeoClient_Document_DatamodelEntry_descriptor =
       internal_static_NuxeoClient_Document_descriptor.getNestedTypes().get(2);
-    internal_static_NuxeoClient_Document_DataEntry_fieldAccessorTable = new
+    internal_static_NuxeoClient_Document_DatamodelEntry_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_NuxeoClient_Document_DataEntry_descriptor,
+        internal_static_NuxeoClient_Document_DatamodelEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
   }
 

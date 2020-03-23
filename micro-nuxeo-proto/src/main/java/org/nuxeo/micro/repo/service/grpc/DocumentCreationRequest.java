@@ -67,6 +67,19 @@ public  final class DocumentCreationRequest extends
             type_ = s;
             break;
           }
+          case 34: {
+            org.nuxeo.micro.repo.service.grpc.Document.Builder subBuilder = null;
+            if (document_ != null) {
+              subBuilder = document_.toBuilder();
+            }
+            document_ = input.readMessage(org.nuxeo.micro.repo.service.grpc.Document.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(document_);
+              document_ = subBuilder.buildPartial();
+            }
+
+            break;
+          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -192,6 +205,27 @@ public  final class DocumentCreationRequest extends
     }
   }
 
+  public static final int DOCUMENT_FIELD_NUMBER = 4;
+  private org.nuxeo.micro.repo.service.grpc.Document document_;
+  /**
+   * <code>.NuxeoClient.Document document = 4;</code>
+   */
+  public boolean hasDocument() {
+    return document_ != null;
+  }
+  /**
+   * <code>.NuxeoClient.Document document = 4;</code>
+   */
+  public org.nuxeo.micro.repo.service.grpc.Document getDocument() {
+    return document_ == null ? org.nuxeo.micro.repo.service.grpc.Document.getDefaultInstance() : document_;
+  }
+  /**
+   * <code>.NuxeoClient.Document document = 4;</code>
+   */
+  public org.nuxeo.micro.repo.service.grpc.DocumentOrBuilder getDocumentOrBuilder() {
+    return getDocument();
+  }
+
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -213,6 +247,9 @@ public  final class DocumentCreationRequest extends
     if (!getTypeBytes().isEmpty()) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 3, type_);
     }
+    if (document_ != null) {
+      output.writeMessage(4, getDocument());
+    }
   }
 
   public int getSerializedSize() {
@@ -228,6 +265,10 @@ public  final class DocumentCreationRequest extends
     }
     if (!getTypeBytes().isEmpty()) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, type_);
+    }
+    if (document_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(4, getDocument());
     }
     memoizedSize = size;
     return size;
@@ -251,6 +292,11 @@ public  final class DocumentCreationRequest extends
         .equals(other.getName());
     result = result && getType()
         .equals(other.getType());
+    result = result && (hasDocument() == other.hasDocument());
+    if (hasDocument()) {
+      result = result && getDocument()
+          .equals(other.getDocument());
+    }
     return result;
   }
 
@@ -267,6 +313,10 @@ public  final class DocumentCreationRequest extends
     hash = (53 * hash) + getName().hashCode();
     hash = (37 * hash) + TYPE_FIELD_NUMBER;
     hash = (53 * hash) + getType().hashCode();
+    if (hasDocument()) {
+      hash = (37 * hash) + DOCUMENT_FIELD_NUMBER;
+      hash = (53 * hash) + getDocument().hashCode();
+    }
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -395,6 +445,12 @@ public  final class DocumentCreationRequest extends
 
       type_ = "";
 
+      if (documentBuilder_ == null) {
+        document_ = null;
+      } else {
+        document_ = null;
+        documentBuilder_ = null;
+      }
       return this;
     }
 
@@ -420,6 +476,11 @@ public  final class DocumentCreationRequest extends
       result.path_ = path_;
       result.name_ = name_;
       result.type_ = type_;
+      if (documentBuilder_ == null) {
+        result.document_ = document_;
+      } else {
+        result.document_ = documentBuilder_.build();
+      }
       onBuilt();
       return result;
     }
@@ -472,6 +533,9 @@ public  final class DocumentCreationRequest extends
       if (!other.getType().isEmpty()) {
         type_ = other.type_;
         onChanged();
+      }
+      if (other.hasDocument()) {
+        mergeDocument(other.getDocument());
       }
       onChanged();
       return this;
@@ -704,6 +768,123 @@ public  final class DocumentCreationRequest extends
       type_ = value;
       onChanged();
       return this;
+    }
+
+    private org.nuxeo.micro.repo.service.grpc.Document document_ = null;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        org.nuxeo.micro.repo.service.grpc.Document, org.nuxeo.micro.repo.service.grpc.Document.Builder, org.nuxeo.micro.repo.service.grpc.DocumentOrBuilder> documentBuilder_;
+    /**
+     * <code>.NuxeoClient.Document document = 4;</code>
+     */
+    public boolean hasDocument() {
+      return documentBuilder_ != null || document_ != null;
+    }
+    /**
+     * <code>.NuxeoClient.Document document = 4;</code>
+     */
+    public org.nuxeo.micro.repo.service.grpc.Document getDocument() {
+      if (documentBuilder_ == null) {
+        return document_ == null ? org.nuxeo.micro.repo.service.grpc.Document.getDefaultInstance() : document_;
+      } else {
+        return documentBuilder_.getMessage();
+      }
+    }
+    /**
+     * <code>.NuxeoClient.Document document = 4;</code>
+     */
+    public Builder setDocument(org.nuxeo.micro.repo.service.grpc.Document value) {
+      if (documentBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        document_ = value;
+        onChanged();
+      } else {
+        documentBuilder_.setMessage(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>.NuxeoClient.Document document = 4;</code>
+     */
+    public Builder setDocument(
+        org.nuxeo.micro.repo.service.grpc.Document.Builder builderForValue) {
+      if (documentBuilder_ == null) {
+        document_ = builderForValue.build();
+        onChanged();
+      } else {
+        documentBuilder_.setMessage(builderForValue.build());
+      }
+
+      return this;
+    }
+    /**
+     * <code>.NuxeoClient.Document document = 4;</code>
+     */
+    public Builder mergeDocument(org.nuxeo.micro.repo.service.grpc.Document value) {
+      if (documentBuilder_ == null) {
+        if (document_ != null) {
+          document_ =
+            org.nuxeo.micro.repo.service.grpc.Document.newBuilder(document_).mergeFrom(value).buildPartial();
+        } else {
+          document_ = value;
+        }
+        onChanged();
+      } else {
+        documentBuilder_.mergeFrom(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>.NuxeoClient.Document document = 4;</code>
+     */
+    public Builder clearDocument() {
+      if (documentBuilder_ == null) {
+        document_ = null;
+        onChanged();
+      } else {
+        document_ = null;
+        documentBuilder_ = null;
+      }
+
+      return this;
+    }
+    /**
+     * <code>.NuxeoClient.Document document = 4;</code>
+     */
+    public org.nuxeo.micro.repo.service.grpc.Document.Builder getDocumentBuilder() {
+      
+      onChanged();
+      return getDocumentFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.NuxeoClient.Document document = 4;</code>
+     */
+    public org.nuxeo.micro.repo.service.grpc.DocumentOrBuilder getDocumentOrBuilder() {
+      if (documentBuilder_ != null) {
+        return documentBuilder_.getMessageOrBuilder();
+      } else {
+        return document_ == null ?
+            org.nuxeo.micro.repo.service.grpc.Document.getDefaultInstance() : document_;
+      }
+    }
+    /**
+     * <code>.NuxeoClient.Document document = 4;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        org.nuxeo.micro.repo.service.grpc.Document, org.nuxeo.micro.repo.service.grpc.Document.Builder, org.nuxeo.micro.repo.service.grpc.DocumentOrBuilder> 
+        getDocumentFieldBuilder() {
+      if (documentBuilder_ == null) {
+        documentBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            org.nuxeo.micro.repo.service.grpc.Document, org.nuxeo.micro.repo.service.grpc.Document.Builder, org.nuxeo.micro.repo.service.grpc.DocumentOrBuilder>(
+                getDocument(),
+                getParentForChildren(),
+                isClean());
+        document_ = null;
+      }
+      return documentBuilder_;
     }
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {

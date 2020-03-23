@@ -20,20 +20,21 @@ public  final class Document extends
   }
   private Document() {
     repositoryName_ = "";
-    uid_ = "";
+    uuid_ = "";
+    name_ = "";
     path_ = "";
     type_ = "";
     facets_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     schema_ = java.util.Collections.emptyList();
     state_ = "";
     parentRef_ = "";
-    isCheckedOut_ = false;
     changeToken_ = "";
     title_ = "";
     lastModified_ = 0L;
     versionLabel_ = "";
     lockOwner_ = "";
     lockCreated_ = false;
+    isCheckedOut_ = false;
   }
 
   @java.lang.Override
@@ -70,54 +71,55 @@ public  final class Document extends
           case 18: {
             java.lang.String s = input.readStringRequireUtf8();
 
-            uid_ = s;
+            uuid_ = s;
             break;
           }
           case 26: {
             java.lang.String s = input.readStringRequireUtf8();
 
-            path_ = s;
+            name_ = s;
             break;
           }
           case 34: {
             java.lang.String s = input.readStringRequireUtf8();
 
-            type_ = s;
+            path_ = s;
             break;
           }
           case 42: {
             java.lang.String s = input.readStringRequireUtf8();
-            if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+
+            type_ = s;
+            break;
+          }
+          case 50: {
+            java.lang.String s = input.readStringRequireUtf8();
+            if (!((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
               facets_ = new com.google.protobuf.LazyStringArrayList();
-              mutable_bitField0_ |= 0x00000010;
+              mutable_bitField0_ |= 0x00000020;
             }
             facets_.add(s);
             break;
           }
-          case 50: {
-            if (!((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
+          case 58: {
+            if (!((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
               schema_ = new java.util.ArrayList<org.nuxeo.micro.repo.service.grpc.Document.Schema>();
-              mutable_bitField0_ |= 0x00000020;
+              mutable_bitField0_ |= 0x00000040;
             }
             schema_.add(
                 input.readMessage(org.nuxeo.micro.repo.service.grpc.Document.Schema.parser(), extensionRegistry));
             break;
           }
-          case 58: {
+          case 66: {
             java.lang.String s = input.readStringRequireUtf8();
 
             state_ = s;
             break;
           }
-          case 66: {
+          case 74: {
             java.lang.String s = input.readStringRequireUtf8();
 
             parentRef_ = s;
-            break;
-          }
-          case 72: {
-
-            isCheckedOut_ = input.readBool();
             break;
           }
           case 82: {
@@ -154,17 +156,22 @@ public  final class Document extends
             lockCreated_ = input.readBool();
             break;
           }
-          case 130: {
-            if (!((mutable_bitField0_ & 0x00008000) == 0x00008000)) {
-              data_ = com.google.protobuf.MapField.newMapField(
-                  DataDefaultEntryHolder.defaultEntry);
-              mutable_bitField0_ |= 0x00008000;
+          case 128: {
+
+            isCheckedOut_ = input.readBool();
+            break;
+          }
+          case 138: {
+            if (!((mutable_bitField0_ & 0x00010000) == 0x00010000)) {
+              datamodel_ = com.google.protobuf.MapField.newMapField(
+                  DatamodelDefaultEntryHolder.defaultEntry);
+              mutable_bitField0_ |= 0x00010000;
             }
             com.google.protobuf.MapEntry<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel>
-            data__ = input.readMessage(
-                DataDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
-            data_.getMutableMap().put(
-                data__.getKey(), data__.getValue());
+            datamodel__ = input.readMessage(
+                DatamodelDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+            datamodel_.getMutableMap().put(
+                datamodel__.getKey(), datamodel__.getValue());
             break;
           }
         }
@@ -175,10 +182,10 @@ public  final class Document extends
       throw new com.google.protobuf.InvalidProtocolBufferException(
           e).setUnfinishedMessage(this);
     } finally {
-      if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+      if (((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
         facets_ = facets_.getUnmodifiableView();
       }
-      if (((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
+      if (((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
         schema_ = java.util.Collections.unmodifiableList(schema_);
       }
       makeExtensionsImmutable();
@@ -193,8 +200,8 @@ public  final class Document extends
   protected com.google.protobuf.MapField internalGetMapField(
       int number) {
     switch (number) {
-      case 16:
-        return internalGetData();
+      case 17:
+        return internalGetDatamodel();
       default:
         throw new RuntimeException(
             "Invalid map field number: " + number);
@@ -4532,44 +4539,78 @@ public  final class Document extends
     }
   }
 
-  public static final int UID_FIELD_NUMBER = 2;
-  private volatile java.lang.Object uid_;
+  public static final int UUID_FIELD_NUMBER = 2;
+  private volatile java.lang.Object uuid_;
   /**
-   * <code>string uid = 2;</code>
+   * <code>string uuid = 2;</code>
    */
-  public java.lang.String getUid() {
-    java.lang.Object ref = uid_;
+  public java.lang.String getUuid() {
+    java.lang.Object ref = uuid_;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
       com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
-      uid_ = s;
+      uuid_ = s;
       return s;
     }
   }
   /**
-   * <code>string uid = 2;</code>
+   * <code>string uuid = 2;</code>
    */
   public com.google.protobuf.ByteString
-      getUidBytes() {
-    java.lang.Object ref = uid_;
+      getUuidBytes() {
+    java.lang.Object ref = uuid_;
     if (ref instanceof java.lang.String) {
       com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
-      uid_ = b;
+      uuid_ = b;
       return b;
     } else {
       return (com.google.protobuf.ByteString) ref;
     }
   }
 
-  public static final int PATH_FIELD_NUMBER = 3;
+  public static final int NAME_FIELD_NUMBER = 3;
+  private volatile java.lang.Object name_;
+  /**
+   * <code>string name = 3;</code>
+   */
+  public java.lang.String getName() {
+    java.lang.Object ref = name_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      name_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string name = 3;</code>
+   */
+  public com.google.protobuf.ByteString
+      getNameBytes() {
+    java.lang.Object ref = name_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      name_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int PATH_FIELD_NUMBER = 4;
   private volatile java.lang.Object path_;
   /**
-   * <code>string path = 3;</code>
+   * <code>string path = 4;</code>
    */
   public java.lang.String getPath() {
     java.lang.Object ref = path_;
@@ -4584,7 +4625,7 @@ public  final class Document extends
     }
   }
   /**
-   * <code>string path = 3;</code>
+   * <code>string path = 4;</code>
    */
   public com.google.protobuf.ByteString
       getPathBytes() {
@@ -4600,10 +4641,10 @@ public  final class Document extends
     }
   }
 
-  public static final int TYPE_FIELD_NUMBER = 4;
+  public static final int TYPE_FIELD_NUMBER = 5;
   private volatile java.lang.Object type_;
   /**
-   * <code>string type = 4;</code>
+   * <code>string type = 5;</code>
    */
   public java.lang.String getType() {
     java.lang.Object ref = type_;
@@ -4618,7 +4659,7 @@ public  final class Document extends
     }
   }
   /**
-   * <code>string type = 4;</code>
+   * <code>string type = 5;</code>
    */
   public com.google.protobuf.ByteString
       getTypeBytes() {
@@ -4634,74 +4675,74 @@ public  final class Document extends
     }
   }
 
-  public static final int FACETS_FIELD_NUMBER = 5;
+  public static final int FACETS_FIELD_NUMBER = 6;
   private com.google.protobuf.LazyStringList facets_;
   /**
-   * <code>repeated string facets = 5;</code>
+   * <code>repeated string facets = 6;</code>
    */
   public com.google.protobuf.ProtocolStringList
       getFacetsList() {
     return facets_;
   }
   /**
-   * <code>repeated string facets = 5;</code>
+   * <code>repeated string facets = 6;</code>
    */
   public int getFacetsCount() {
     return facets_.size();
   }
   /**
-   * <code>repeated string facets = 5;</code>
+   * <code>repeated string facets = 6;</code>
    */
   public java.lang.String getFacets(int index) {
     return facets_.get(index);
   }
   /**
-   * <code>repeated string facets = 5;</code>
+   * <code>repeated string facets = 6;</code>
    */
   public com.google.protobuf.ByteString
       getFacetsBytes(int index) {
     return facets_.getByteString(index);
   }
 
-  public static final int SCHEMA_FIELD_NUMBER = 6;
+  public static final int SCHEMA_FIELD_NUMBER = 7;
   private java.util.List<org.nuxeo.micro.repo.service.grpc.Document.Schema> schema_;
   /**
-   * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+   * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
    */
   public java.util.List<org.nuxeo.micro.repo.service.grpc.Document.Schema> getSchemaList() {
     return schema_;
   }
   /**
-   * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+   * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
    */
   public java.util.List<? extends org.nuxeo.micro.repo.service.grpc.Document.SchemaOrBuilder> 
       getSchemaOrBuilderList() {
     return schema_;
   }
   /**
-   * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+   * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
    */
   public int getSchemaCount() {
     return schema_.size();
   }
   /**
-   * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+   * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
    */
   public org.nuxeo.micro.repo.service.grpc.Document.Schema getSchema(int index) {
     return schema_.get(index);
   }
   /**
-   * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+   * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
    */
   public org.nuxeo.micro.repo.service.grpc.Document.SchemaOrBuilder getSchemaOrBuilder(
       int index) {
     return schema_.get(index);
   }
 
-  public static final int STATE_FIELD_NUMBER = 7;
+  public static final int STATE_FIELD_NUMBER = 8;
   private volatile java.lang.Object state_;
   /**
-   * <code>string state = 7;</code>
+   * <code>string state = 8;</code>
    */
   public java.lang.String getState() {
     java.lang.Object ref = state_;
@@ -4716,7 +4757,7 @@ public  final class Document extends
     }
   }
   /**
-   * <code>string state = 7;</code>
+   * <code>string state = 8;</code>
    */
   public com.google.protobuf.ByteString
       getStateBytes() {
@@ -4732,10 +4773,10 @@ public  final class Document extends
     }
   }
 
-  public static final int PARENTREF_FIELD_NUMBER = 8;
+  public static final int PARENTREF_FIELD_NUMBER = 9;
   private volatile java.lang.Object parentRef_;
   /**
-   * <code>string parentRef = 8;</code>
+   * <code>string parentRef = 9;</code>
    */
   public java.lang.String getParentRef() {
     java.lang.Object ref = parentRef_;
@@ -4750,7 +4791,7 @@ public  final class Document extends
     }
   }
   /**
-   * <code>string parentRef = 8;</code>
+   * <code>string parentRef = 9;</code>
    */
   public com.google.protobuf.ByteString
       getParentRefBytes() {
@@ -4764,15 +4805,6 @@ public  final class Document extends
     } else {
       return (com.google.protobuf.ByteString) ref;
     }
-  }
-
-  public static final int ISCHECKEDOUT_FIELD_NUMBER = 9;
-  private boolean isCheckedOut_;
-  /**
-   * <code>bool isCheckedOut = 9;</code>
-   */
-  public boolean getIsCheckedOut() {
-    return isCheckedOut_;
   }
 
   public static final int CHANGETOKEN_FIELD_NUMBER = 10;
@@ -4929,76 +4961,85 @@ public  final class Document extends
     return lockCreated_;
   }
 
-  public static final int DATA_FIELD_NUMBER = 16;
-  private static final class DataDefaultEntryHolder {
+  public static final int ISCHECKEDOUT_FIELD_NUMBER = 16;
+  private boolean isCheckedOut_;
+  /**
+   * <code>bool isCheckedOut = 16;</code>
+   */
+  public boolean getIsCheckedOut() {
+    return isCheckedOut_;
+  }
+
+  public static final int DATAMODEL_FIELD_NUMBER = 17;
+  private static final class DatamodelDefaultEntryHolder {
     static final com.google.protobuf.MapEntry<
         java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel> defaultEntry =
             com.google.protobuf.MapEntry
             .<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel>newDefaultInstance(
-                org.nuxeo.micro.repo.service.grpc.NuxeoClientProto.internal_static_NuxeoClient_Document_DataEntry_descriptor, 
+                org.nuxeo.micro.repo.service.grpc.NuxeoClientProto.internal_static_NuxeoClient_Document_DatamodelEntry_descriptor, 
                 com.google.protobuf.WireFormat.FieldType.STRING,
                 "",
                 com.google.protobuf.WireFormat.FieldType.MESSAGE,
                 org.nuxeo.micro.repo.service.grpc.Document.DataModel.getDefaultInstance());
   }
   private com.google.protobuf.MapField<
-      java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel> data_;
+      java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel> datamodel_;
   private com.google.protobuf.MapField<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel>
-  internalGetData() {
-    if (data_ == null) {
+  internalGetDatamodel() {
+    if (datamodel_ == null) {
       return com.google.protobuf.MapField.emptyMapField(
-          DataDefaultEntryHolder.defaultEntry);
+          DatamodelDefaultEntryHolder.defaultEntry);
     }
-    return data_;
+    return datamodel_;
   }
 
-  public int getDataCount() {
-    return internalGetData().getMap().size();
+  public int getDatamodelCount() {
+    return internalGetDatamodel().getMap().size();
   }
   /**
-   * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; data = 16;</code>
+   * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; datamodel = 17;</code>
    */
 
-  public boolean containsData(
+  public boolean containsDatamodel(
       java.lang.String key) {
     if (key == null) { throw new java.lang.NullPointerException(); }
-    return internalGetData().getMap().containsKey(key);
+    return internalGetDatamodel().getMap().containsKey(key);
   }
   /**
-   * Use {@link #getDataMap()} instead.
+   * Use {@link #getDatamodelMap()} instead.
    */
   @java.lang.Deprecated
-  public java.util.Map<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel> getData() {
-    return getDataMap();
+  public java.util.Map<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel> getDatamodel() {
+    return getDatamodelMap();
   }
   /**
-   * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; data = 16;</code>
+   * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; datamodel = 17;</code>
    */
 
-  public java.util.Map<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel> getDataMap() {
-    return internalGetData().getMap();
+  public java.util.Map<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel> getDatamodelMap() {
+    return internalGetDatamodel().getMap();
   }
   /**
-   * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; data = 16;</code>
+   * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; datamodel = 17;</code>
    */
 
-  public org.nuxeo.micro.repo.service.grpc.Document.DataModel getDataOrDefault(
+  public org.nuxeo.micro.repo.service.grpc.Document.DataModel getDatamodelOrDefault(
       java.lang.String key,
       org.nuxeo.micro.repo.service.grpc.Document.DataModel defaultValue) {
     if (key == null) { throw new java.lang.NullPointerException(); }
     java.util.Map<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel> map =
-        internalGetData().getMap();
+        internalGetDatamodel().getMap();
     return map.containsKey(key) ? map.get(key) : defaultValue;
   }
   /**
-   * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; data = 16;</code>
+   * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; datamodel = 17;</code>
    */
 
-  public org.nuxeo.micro.repo.service.grpc.Document.DataModel getDataOrThrow(
+  public org.nuxeo.micro.repo.service.grpc.Document.DataModel getDatamodelOrThrow(
       java.lang.String key) {
     if (key == null) { throw new java.lang.NullPointerException(); }
     java.util.Map<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel> map =
-        internalGetData().getMap();
+        internalGetDatamodel().getMap();
     if (!map.containsKey(key)) {
       throw new java.lang.IllegalArgumentException();
     }
@@ -5020,29 +5061,29 @@ public  final class Document extends
     if (!getRepositoryNameBytes().isEmpty()) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 1, repositoryName_);
     }
-    if (!getUidBytes().isEmpty()) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 2, uid_);
+    if (!getUuidBytes().isEmpty()) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 2, uuid_);
+    }
+    if (!getNameBytes().isEmpty()) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 3, name_);
     }
     if (!getPathBytes().isEmpty()) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 3, path_);
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 4, path_);
     }
     if (!getTypeBytes().isEmpty()) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 4, type_);
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 5, type_);
     }
     for (int i = 0; i < facets_.size(); i++) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 5, facets_.getRaw(i));
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 6, facets_.getRaw(i));
     }
     for (int i = 0; i < schema_.size(); i++) {
-      output.writeMessage(6, schema_.get(i));
+      output.writeMessage(7, schema_.get(i));
     }
     if (!getStateBytes().isEmpty()) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 7, state_);
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 8, state_);
     }
     if (!getParentRefBytes().isEmpty()) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 8, parentRef_);
-    }
-    if (isCheckedOut_ != false) {
-      output.writeBool(9, isCheckedOut_);
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 9, parentRef_);
     }
     if (!getChangeTokenBytes().isEmpty()) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 10, changeToken_);
@@ -5062,12 +5103,15 @@ public  final class Document extends
     if (lockCreated_ != false) {
       output.writeBool(15, lockCreated_);
     }
+    if (isCheckedOut_ != false) {
+      output.writeBool(16, isCheckedOut_);
+    }
     com.google.protobuf.GeneratedMessageV3
       .serializeStringMapTo(
         output,
-        internalGetData(),
-        DataDefaultEntryHolder.defaultEntry,
-        16);
+        internalGetDatamodel(),
+        DatamodelDefaultEntryHolder.defaultEntry,
+        17);
   }
 
   public int getSerializedSize() {
@@ -5078,14 +5122,17 @@ public  final class Document extends
     if (!getRepositoryNameBytes().isEmpty()) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, repositoryName_);
     }
-    if (!getUidBytes().isEmpty()) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, uid_);
+    if (!getUuidBytes().isEmpty()) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, uuid_);
+    }
+    if (!getNameBytes().isEmpty()) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, name_);
     }
     if (!getPathBytes().isEmpty()) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, path_);
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, path_);
     }
     if (!getTypeBytes().isEmpty()) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, type_);
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, type_);
     }
     {
       int dataSize = 0;
@@ -5097,17 +5144,13 @@ public  final class Document extends
     }
     for (int i = 0; i < schema_.size(); i++) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(6, schema_.get(i));
+        .computeMessageSize(7, schema_.get(i));
     }
     if (!getStateBytes().isEmpty()) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, state_);
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(8, state_);
     }
     if (!getParentRefBytes().isEmpty()) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(8, parentRef_);
-    }
-    if (isCheckedOut_ != false) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeBoolSize(9, isCheckedOut_);
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(9, parentRef_);
     }
     if (!getChangeTokenBytes().isEmpty()) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(10, changeToken_);
@@ -5129,15 +5172,19 @@ public  final class Document extends
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(15, lockCreated_);
     }
+    if (isCheckedOut_ != false) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(16, isCheckedOut_);
+    }
     for (java.util.Map.Entry<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel> entry
-         : internalGetData().getMap().entrySet()) {
+         : internalGetDatamodel().getMap().entrySet()) {
       com.google.protobuf.MapEntry<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel>
-      data__ = DataDefaultEntryHolder.defaultEntry.newBuilderForType()
+      datamodel__ = DatamodelDefaultEntryHolder.defaultEntry.newBuilderForType()
           .setKey(entry.getKey())
           .setValue(entry.getValue())
           .build();
       size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(16, data__);
+          .computeMessageSize(17, datamodel__);
     }
     memoizedSize = size;
     return size;
@@ -5157,8 +5204,10 @@ public  final class Document extends
     boolean result = true;
     result = result && getRepositoryName()
         .equals(other.getRepositoryName());
-    result = result && getUid()
-        .equals(other.getUid());
+    result = result && getUuid()
+        .equals(other.getUuid());
+    result = result && getName()
+        .equals(other.getName());
     result = result && getPath()
         .equals(other.getPath());
     result = result && getType()
@@ -5171,8 +5220,6 @@ public  final class Document extends
         .equals(other.getState());
     result = result && getParentRef()
         .equals(other.getParentRef());
-    result = result && (getIsCheckedOut()
-        == other.getIsCheckedOut());
     result = result && getChangeToken()
         .equals(other.getChangeToken());
     result = result && getTitle()
@@ -5185,8 +5232,10 @@ public  final class Document extends
         .equals(other.getLockOwner());
     result = result && (getLockCreated()
         == other.getLockCreated());
-    result = result && internalGetData().equals(
-        other.internalGetData());
+    result = result && (getIsCheckedOut()
+        == other.getIsCheckedOut());
+    result = result && internalGetDatamodel().equals(
+        other.internalGetDatamodel());
     return result;
   }
 
@@ -5199,8 +5248,10 @@ public  final class Document extends
     hash = (19 * hash) + getDescriptor().hashCode();
     hash = (37 * hash) + REPOSITORYNAME_FIELD_NUMBER;
     hash = (53 * hash) + getRepositoryName().hashCode();
-    hash = (37 * hash) + UID_FIELD_NUMBER;
-    hash = (53 * hash) + getUid().hashCode();
+    hash = (37 * hash) + UUID_FIELD_NUMBER;
+    hash = (53 * hash) + getUuid().hashCode();
+    hash = (37 * hash) + NAME_FIELD_NUMBER;
+    hash = (53 * hash) + getName().hashCode();
     hash = (37 * hash) + PATH_FIELD_NUMBER;
     hash = (53 * hash) + getPath().hashCode();
     hash = (37 * hash) + TYPE_FIELD_NUMBER;
@@ -5217,9 +5268,6 @@ public  final class Document extends
     hash = (53 * hash) + getState().hashCode();
     hash = (37 * hash) + PARENTREF_FIELD_NUMBER;
     hash = (53 * hash) + getParentRef().hashCode();
-    hash = (37 * hash) + ISCHECKEDOUT_FIELD_NUMBER;
-    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-        getIsCheckedOut());
     hash = (37 * hash) + CHANGETOKEN_FIELD_NUMBER;
     hash = (53 * hash) + getChangeToken().hashCode();
     hash = (37 * hash) + TITLE_FIELD_NUMBER;
@@ -5234,9 +5282,12 @@ public  final class Document extends
     hash = (37 * hash) + LOCKCREATED_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
         getLockCreated());
-    if (!internalGetData().getMap().isEmpty()) {
-      hash = (37 * hash) + DATA_FIELD_NUMBER;
-      hash = (53 * hash) + internalGetData().hashCode();
+    hash = (37 * hash) + ISCHECKEDOUT_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+        getIsCheckedOut());
+    if (!internalGetDatamodel().getMap().isEmpty()) {
+      hash = (37 * hash) + DATAMODEL_FIELD_NUMBER;
+      hash = (53 * hash) + internalGetDatamodel().hashCode();
     }
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
@@ -5340,8 +5391,8 @@ public  final class Document extends
     protected com.google.protobuf.MapField internalGetMapField(
         int number) {
       switch (number) {
-        case 16:
-          return internalGetData();
+        case 17:
+          return internalGetDatamodel();
         default:
           throw new RuntimeException(
               "Invalid map field number: " + number);
@@ -5351,8 +5402,8 @@ public  final class Document extends
     protected com.google.protobuf.MapField internalGetMutableMapField(
         int number) {
       switch (number) {
-        case 16:
-          return internalGetMutableData();
+        case 17:
+          return internalGetMutableDatamodel();
         default:
           throw new RuntimeException(
               "Invalid map field number: " + number);
@@ -5385,25 +5436,25 @@ public  final class Document extends
       super.clear();
       repositoryName_ = "";
 
-      uid_ = "";
+      uuid_ = "";
+
+      name_ = "";
 
       path_ = "";
 
       type_ = "";
 
       facets_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      bitField0_ = (bitField0_ & ~0x00000010);
+      bitField0_ = (bitField0_ & ~0x00000020);
       if (schemaBuilder_ == null) {
         schema_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000040);
       } else {
         schemaBuilder_.clear();
       }
       state_ = "";
 
       parentRef_ = "";
-
-      isCheckedOut_ = false;
 
       changeToken_ = "";
 
@@ -5417,7 +5468,9 @@ public  final class Document extends
 
       lockCreated_ = false;
 
-      internalGetMutableData().clear();
+      isCheckedOut_ = false;
+
+      internalGetMutableDatamodel().clear();
       return this;
     }
 
@@ -5443,18 +5496,19 @@ public  final class Document extends
       int from_bitField0_ = bitField0_;
       int to_bitField0_ = 0;
       result.repositoryName_ = repositoryName_;
-      result.uid_ = uid_;
+      result.uuid_ = uuid_;
+      result.name_ = name_;
       result.path_ = path_;
       result.type_ = type_;
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
         facets_ = facets_.getUnmodifiableView();
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000020);
       }
       result.facets_ = facets_;
       if (schemaBuilder_ == null) {
-        if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        if (((bitField0_ & 0x00000040) == 0x00000040)) {
           schema_ = java.util.Collections.unmodifiableList(schema_);
-          bitField0_ = (bitField0_ & ~0x00000020);
+          bitField0_ = (bitField0_ & ~0x00000040);
         }
         result.schema_ = schema_;
       } else {
@@ -5462,15 +5516,15 @@ public  final class Document extends
       }
       result.state_ = state_;
       result.parentRef_ = parentRef_;
-      result.isCheckedOut_ = isCheckedOut_;
       result.changeToken_ = changeToken_;
       result.title_ = title_;
       result.lastModified_ = lastModified_;
       result.versionLabel_ = versionLabel_;
       result.lockOwner_ = lockOwner_;
       result.lockCreated_ = lockCreated_;
-      result.data_ = internalGetData();
-      result.data_.makeImmutable();
+      result.isCheckedOut_ = isCheckedOut_;
+      result.datamodel_ = internalGetDatamodel();
+      result.datamodel_.makeImmutable();
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -5517,8 +5571,12 @@ public  final class Document extends
         repositoryName_ = other.repositoryName_;
         onChanged();
       }
-      if (!other.getUid().isEmpty()) {
-        uid_ = other.uid_;
+      if (!other.getUuid().isEmpty()) {
+        uuid_ = other.uuid_;
+        onChanged();
+      }
+      if (!other.getName().isEmpty()) {
+        name_ = other.name_;
         onChanged();
       }
       if (!other.getPath().isEmpty()) {
@@ -5532,7 +5590,7 @@ public  final class Document extends
       if (!other.facets_.isEmpty()) {
         if (facets_.isEmpty()) {
           facets_ = other.facets_;
-          bitField0_ = (bitField0_ & ~0x00000010);
+          bitField0_ = (bitField0_ & ~0x00000020);
         } else {
           ensureFacetsIsMutable();
           facets_.addAll(other.facets_);
@@ -5543,7 +5601,7 @@ public  final class Document extends
         if (!other.schema_.isEmpty()) {
           if (schema_.isEmpty()) {
             schema_ = other.schema_;
-            bitField0_ = (bitField0_ & ~0x00000020);
+            bitField0_ = (bitField0_ & ~0x00000040);
           } else {
             ensureSchemaIsMutable();
             schema_.addAll(other.schema_);
@@ -5556,7 +5614,7 @@ public  final class Document extends
             schemaBuilder_.dispose();
             schemaBuilder_ = null;
             schema_ = other.schema_;
-            bitField0_ = (bitField0_ & ~0x00000020);
+            bitField0_ = (bitField0_ & ~0x00000040);
             schemaBuilder_ = 
               com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                  getSchemaFieldBuilder() : null;
@@ -5572,9 +5630,6 @@ public  final class Document extends
       if (!other.getParentRef().isEmpty()) {
         parentRef_ = other.parentRef_;
         onChanged();
-      }
-      if (other.getIsCheckedOut() != false) {
-        setIsCheckedOut(other.getIsCheckedOut());
       }
       if (!other.getChangeToken().isEmpty()) {
         changeToken_ = other.changeToken_;
@@ -5598,8 +5653,11 @@ public  final class Document extends
       if (other.getLockCreated() != false) {
         setLockCreated(other.getLockCreated());
       }
-      internalGetMutableData().mergeFrom(
-          other.internalGetData());
+      if (other.getIsCheckedOut() != false) {
+        setIsCheckedOut(other.getIsCheckedOut());
+      }
+      internalGetMutableDatamodel().mergeFrom(
+          other.internalGetDatamodel());
       onChanged();
       return this;
     }
@@ -5696,78 +5754,147 @@ public  final class Document extends
       return this;
     }
 
-    private java.lang.Object uid_ = "";
+    private java.lang.Object uuid_ = "";
     /**
-     * <code>string uid = 2;</code>
+     * <code>string uuid = 2;</code>
      */
-    public java.lang.String getUid() {
-      java.lang.Object ref = uid_;
+    public java.lang.String getUuid() {
+      java.lang.Object ref = uuid_;
       if (!(ref instanceof java.lang.String)) {
         com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        uid_ = s;
+        uuid_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
       }
     }
     /**
-     * <code>string uid = 2;</code>
+     * <code>string uuid = 2;</code>
      */
     public com.google.protobuf.ByteString
-        getUidBytes() {
-      java.lang.Object ref = uid_;
+        getUuidBytes() {
+      java.lang.Object ref = uuid_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        uid_ = b;
+        uuid_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
     /**
-     * <code>string uid = 2;</code>
+     * <code>string uuid = 2;</code>
      */
-    public Builder setUid(
+    public Builder setUuid(
         java.lang.String value) {
       if (value == null) {
     throw new NullPointerException();
   }
   
-      uid_ = value;
+      uuid_ = value;
       onChanged();
       return this;
     }
     /**
-     * <code>string uid = 2;</code>
+     * <code>string uuid = 2;</code>
      */
-    public Builder clearUid() {
+    public Builder clearUuid() {
       
-      uid_ = getDefaultInstance().getUid();
+      uuid_ = getDefaultInstance().getUuid();
       onChanged();
       return this;
     }
     /**
-     * <code>string uid = 2;</code>
+     * <code>string uuid = 2;</code>
      */
-    public Builder setUidBytes(
+    public Builder setUuidBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
       
-      uid_ = value;
+      uuid_ = value;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object name_ = "";
+    /**
+     * <code>string name = 3;</code>
+     */
+    public java.lang.String getName() {
+      java.lang.Object ref = name_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        name_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string name = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getNameBytes() {
+      java.lang.Object ref = name_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        name_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string name = 3;</code>
+     */
+    public Builder setName(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
+      name_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string name = 3;</code>
+     */
+    public Builder clearName() {
+      
+      name_ = getDefaultInstance().getName();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string name = 3;</code>
+     */
+    public Builder setNameBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      
+      name_ = value;
       onChanged();
       return this;
     }
 
     private java.lang.Object path_ = "";
     /**
-     * <code>string path = 3;</code>
+     * <code>string path = 4;</code>
      */
     public java.lang.String getPath() {
       java.lang.Object ref = path_;
@@ -5782,7 +5909,7 @@ public  final class Document extends
       }
     }
     /**
-     * <code>string path = 3;</code>
+     * <code>string path = 4;</code>
      */
     public com.google.protobuf.ByteString
         getPathBytes() {
@@ -5798,7 +5925,7 @@ public  final class Document extends
       }
     }
     /**
-     * <code>string path = 3;</code>
+     * <code>string path = 4;</code>
      */
     public Builder setPath(
         java.lang.String value) {
@@ -5811,7 +5938,7 @@ public  final class Document extends
       return this;
     }
     /**
-     * <code>string path = 3;</code>
+     * <code>string path = 4;</code>
      */
     public Builder clearPath() {
       
@@ -5820,7 +5947,7 @@ public  final class Document extends
       return this;
     }
     /**
-     * <code>string path = 3;</code>
+     * <code>string path = 4;</code>
      */
     public Builder setPathBytes(
         com.google.protobuf.ByteString value) {
@@ -5836,7 +5963,7 @@ public  final class Document extends
 
     private java.lang.Object type_ = "";
     /**
-     * <code>string type = 4;</code>
+     * <code>string type = 5;</code>
      */
     public java.lang.String getType() {
       java.lang.Object ref = type_;
@@ -5851,7 +5978,7 @@ public  final class Document extends
       }
     }
     /**
-     * <code>string type = 4;</code>
+     * <code>string type = 5;</code>
      */
     public com.google.protobuf.ByteString
         getTypeBytes() {
@@ -5867,7 +5994,7 @@ public  final class Document extends
       }
     }
     /**
-     * <code>string type = 4;</code>
+     * <code>string type = 5;</code>
      */
     public Builder setType(
         java.lang.String value) {
@@ -5880,7 +6007,7 @@ public  final class Document extends
       return this;
     }
     /**
-     * <code>string type = 4;</code>
+     * <code>string type = 5;</code>
      */
     public Builder clearType() {
       
@@ -5889,7 +6016,7 @@ public  final class Document extends
       return this;
     }
     /**
-     * <code>string type = 4;</code>
+     * <code>string type = 5;</code>
      */
     public Builder setTypeBytes(
         com.google.protobuf.ByteString value) {
@@ -5905,39 +6032,39 @@ public  final class Document extends
 
     private com.google.protobuf.LazyStringList facets_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     private void ensureFacetsIsMutable() {
-      if (!((bitField0_ & 0x00000010) == 0x00000010)) {
+      if (!((bitField0_ & 0x00000020) == 0x00000020)) {
         facets_ = new com.google.protobuf.LazyStringArrayList(facets_);
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
        }
     }
     /**
-     * <code>repeated string facets = 5;</code>
+     * <code>repeated string facets = 6;</code>
      */
     public com.google.protobuf.ProtocolStringList
         getFacetsList() {
       return facets_.getUnmodifiableView();
     }
     /**
-     * <code>repeated string facets = 5;</code>
+     * <code>repeated string facets = 6;</code>
      */
     public int getFacetsCount() {
       return facets_.size();
     }
     /**
-     * <code>repeated string facets = 5;</code>
+     * <code>repeated string facets = 6;</code>
      */
     public java.lang.String getFacets(int index) {
       return facets_.get(index);
     }
     /**
-     * <code>repeated string facets = 5;</code>
+     * <code>repeated string facets = 6;</code>
      */
     public com.google.protobuf.ByteString
         getFacetsBytes(int index) {
       return facets_.getByteString(index);
     }
     /**
-     * <code>repeated string facets = 5;</code>
+     * <code>repeated string facets = 6;</code>
      */
     public Builder setFacets(
         int index, java.lang.String value) {
@@ -5950,7 +6077,7 @@ public  final class Document extends
       return this;
     }
     /**
-     * <code>repeated string facets = 5;</code>
+     * <code>repeated string facets = 6;</code>
      */
     public Builder addFacets(
         java.lang.String value) {
@@ -5963,7 +6090,7 @@ public  final class Document extends
       return this;
     }
     /**
-     * <code>repeated string facets = 5;</code>
+     * <code>repeated string facets = 6;</code>
      */
     public Builder addAllFacets(
         java.lang.Iterable<java.lang.String> values) {
@@ -5974,16 +6101,16 @@ public  final class Document extends
       return this;
     }
     /**
-     * <code>repeated string facets = 5;</code>
+     * <code>repeated string facets = 6;</code>
      */
     public Builder clearFacets() {
       facets_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      bitField0_ = (bitField0_ & ~0x00000010);
+      bitField0_ = (bitField0_ & ~0x00000020);
       onChanged();
       return this;
     }
     /**
-     * <code>repeated string facets = 5;</code>
+     * <code>repeated string facets = 6;</code>
      */
     public Builder addFacetsBytes(
         com.google.protobuf.ByteString value) {
@@ -6000,9 +6127,9 @@ public  final class Document extends
     private java.util.List<org.nuxeo.micro.repo.service.grpc.Document.Schema> schema_ =
       java.util.Collections.emptyList();
     private void ensureSchemaIsMutable() {
-      if (!((bitField0_ & 0x00000020) == 0x00000020)) {
+      if (!((bitField0_ & 0x00000040) == 0x00000040)) {
         schema_ = new java.util.ArrayList<org.nuxeo.micro.repo.service.grpc.Document.Schema>(schema_);
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
        }
     }
 
@@ -6010,7 +6137,7 @@ public  final class Document extends
         org.nuxeo.micro.repo.service.grpc.Document.Schema, org.nuxeo.micro.repo.service.grpc.Document.Schema.Builder, org.nuxeo.micro.repo.service.grpc.Document.SchemaOrBuilder> schemaBuilder_;
 
     /**
-     * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+     * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
      */
     public java.util.List<org.nuxeo.micro.repo.service.grpc.Document.Schema> getSchemaList() {
       if (schemaBuilder_ == null) {
@@ -6020,7 +6147,7 @@ public  final class Document extends
       }
     }
     /**
-     * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+     * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
      */
     public int getSchemaCount() {
       if (schemaBuilder_ == null) {
@@ -6030,7 +6157,7 @@ public  final class Document extends
       }
     }
     /**
-     * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+     * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
      */
     public org.nuxeo.micro.repo.service.grpc.Document.Schema getSchema(int index) {
       if (schemaBuilder_ == null) {
@@ -6040,7 +6167,7 @@ public  final class Document extends
       }
     }
     /**
-     * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+     * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
      */
     public Builder setSchema(
         int index, org.nuxeo.micro.repo.service.grpc.Document.Schema value) {
@@ -6057,7 +6184,7 @@ public  final class Document extends
       return this;
     }
     /**
-     * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+     * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
      */
     public Builder setSchema(
         int index, org.nuxeo.micro.repo.service.grpc.Document.Schema.Builder builderForValue) {
@@ -6071,7 +6198,7 @@ public  final class Document extends
       return this;
     }
     /**
-     * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+     * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
      */
     public Builder addSchema(org.nuxeo.micro.repo.service.grpc.Document.Schema value) {
       if (schemaBuilder_ == null) {
@@ -6087,7 +6214,7 @@ public  final class Document extends
       return this;
     }
     /**
-     * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+     * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
      */
     public Builder addSchema(
         int index, org.nuxeo.micro.repo.service.grpc.Document.Schema value) {
@@ -6104,7 +6231,7 @@ public  final class Document extends
       return this;
     }
     /**
-     * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+     * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
      */
     public Builder addSchema(
         org.nuxeo.micro.repo.service.grpc.Document.Schema.Builder builderForValue) {
@@ -6118,7 +6245,7 @@ public  final class Document extends
       return this;
     }
     /**
-     * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+     * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
      */
     public Builder addSchema(
         int index, org.nuxeo.micro.repo.service.grpc.Document.Schema.Builder builderForValue) {
@@ -6132,7 +6259,7 @@ public  final class Document extends
       return this;
     }
     /**
-     * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+     * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
      */
     public Builder addAllSchema(
         java.lang.Iterable<? extends org.nuxeo.micro.repo.service.grpc.Document.Schema> values) {
@@ -6147,12 +6274,12 @@ public  final class Document extends
       return this;
     }
     /**
-     * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+     * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
      */
     public Builder clearSchema() {
       if (schemaBuilder_ == null) {
         schema_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000040);
         onChanged();
       } else {
         schemaBuilder_.clear();
@@ -6160,7 +6287,7 @@ public  final class Document extends
       return this;
     }
     /**
-     * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+     * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
      */
     public Builder removeSchema(int index) {
       if (schemaBuilder_ == null) {
@@ -6173,14 +6300,14 @@ public  final class Document extends
       return this;
     }
     /**
-     * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+     * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
      */
     public org.nuxeo.micro.repo.service.grpc.Document.Schema.Builder getSchemaBuilder(
         int index) {
       return getSchemaFieldBuilder().getBuilder(index);
     }
     /**
-     * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+     * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
      */
     public org.nuxeo.micro.repo.service.grpc.Document.SchemaOrBuilder getSchemaOrBuilder(
         int index) {
@@ -6190,7 +6317,7 @@ public  final class Document extends
       }
     }
     /**
-     * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+     * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
      */
     public java.util.List<? extends org.nuxeo.micro.repo.service.grpc.Document.SchemaOrBuilder> 
          getSchemaOrBuilderList() {
@@ -6201,14 +6328,14 @@ public  final class Document extends
       }
     }
     /**
-     * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+     * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
      */
     public org.nuxeo.micro.repo.service.grpc.Document.Schema.Builder addSchemaBuilder() {
       return getSchemaFieldBuilder().addBuilder(
           org.nuxeo.micro.repo.service.grpc.Document.Schema.getDefaultInstance());
     }
     /**
-     * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+     * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
      */
     public org.nuxeo.micro.repo.service.grpc.Document.Schema.Builder addSchemaBuilder(
         int index) {
@@ -6216,7 +6343,7 @@ public  final class Document extends
           index, org.nuxeo.micro.repo.service.grpc.Document.Schema.getDefaultInstance());
     }
     /**
-     * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+     * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
      */
     public java.util.List<org.nuxeo.micro.repo.service.grpc.Document.Schema.Builder> 
          getSchemaBuilderList() {
@@ -6229,7 +6356,7 @@ public  final class Document extends
         schemaBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
             org.nuxeo.micro.repo.service.grpc.Document.Schema, org.nuxeo.micro.repo.service.grpc.Document.Schema.Builder, org.nuxeo.micro.repo.service.grpc.Document.SchemaOrBuilder>(
                 schema_,
-                ((bitField0_ & 0x00000020) == 0x00000020),
+                ((bitField0_ & 0x00000040) == 0x00000040),
                 getParentForChildren(),
                 isClean());
         schema_ = null;
@@ -6239,7 +6366,7 @@ public  final class Document extends
 
     private java.lang.Object state_ = "";
     /**
-     * <code>string state = 7;</code>
+     * <code>string state = 8;</code>
      */
     public java.lang.String getState() {
       java.lang.Object ref = state_;
@@ -6254,7 +6381,7 @@ public  final class Document extends
       }
     }
     /**
-     * <code>string state = 7;</code>
+     * <code>string state = 8;</code>
      */
     public com.google.protobuf.ByteString
         getStateBytes() {
@@ -6270,7 +6397,7 @@ public  final class Document extends
       }
     }
     /**
-     * <code>string state = 7;</code>
+     * <code>string state = 8;</code>
      */
     public Builder setState(
         java.lang.String value) {
@@ -6283,7 +6410,7 @@ public  final class Document extends
       return this;
     }
     /**
-     * <code>string state = 7;</code>
+     * <code>string state = 8;</code>
      */
     public Builder clearState() {
       
@@ -6292,7 +6419,7 @@ public  final class Document extends
       return this;
     }
     /**
-     * <code>string state = 7;</code>
+     * <code>string state = 8;</code>
      */
     public Builder setStateBytes(
         com.google.protobuf.ByteString value) {
@@ -6308,7 +6435,7 @@ public  final class Document extends
 
     private java.lang.Object parentRef_ = "";
     /**
-     * <code>string parentRef = 8;</code>
+     * <code>string parentRef = 9;</code>
      */
     public java.lang.String getParentRef() {
       java.lang.Object ref = parentRef_;
@@ -6323,7 +6450,7 @@ public  final class Document extends
       }
     }
     /**
-     * <code>string parentRef = 8;</code>
+     * <code>string parentRef = 9;</code>
      */
     public com.google.protobuf.ByteString
         getParentRefBytes() {
@@ -6339,7 +6466,7 @@ public  final class Document extends
       }
     }
     /**
-     * <code>string parentRef = 8;</code>
+     * <code>string parentRef = 9;</code>
      */
     public Builder setParentRef(
         java.lang.String value) {
@@ -6352,7 +6479,7 @@ public  final class Document extends
       return this;
     }
     /**
-     * <code>string parentRef = 8;</code>
+     * <code>string parentRef = 9;</code>
      */
     public Builder clearParentRef() {
       
@@ -6361,7 +6488,7 @@ public  final class Document extends
       return this;
     }
     /**
-     * <code>string parentRef = 8;</code>
+     * <code>string parentRef = 9;</code>
      */
     public Builder setParentRefBytes(
         com.google.protobuf.ByteString value) {
@@ -6371,32 +6498,6 @@ public  final class Document extends
   checkByteStringIsUtf8(value);
       
       parentRef_ = value;
-      onChanged();
-      return this;
-    }
-
-    private boolean isCheckedOut_ ;
-    /**
-     * <code>bool isCheckedOut = 9;</code>
-     */
-    public boolean getIsCheckedOut() {
-      return isCheckedOut_;
-    }
-    /**
-     * <code>bool isCheckedOut = 9;</code>
-     */
-    public Builder setIsCheckedOut(boolean value) {
-      
-      isCheckedOut_ = value;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>bool isCheckedOut = 9;</code>
-     */
-    public Builder clearIsCheckedOut() {
-      
-      isCheckedOut_ = false;
       onChanged();
       return this;
     }
@@ -6729,95 +6830,121 @@ public  final class Document extends
       return this;
     }
 
-    private com.google.protobuf.MapField<
-        java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel> data_;
-    private com.google.protobuf.MapField<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel>
-    internalGetData() {
-      if (data_ == null) {
-        return com.google.protobuf.MapField.emptyMapField(
-            DataDefaultEntryHolder.defaultEntry);
-      }
-      return data_;
-    }
-    private com.google.protobuf.MapField<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel>
-    internalGetMutableData() {
-      onChanged();;
-      if (data_ == null) {
-        data_ = com.google.protobuf.MapField.newMapField(
-            DataDefaultEntryHolder.defaultEntry);
-      }
-      if (!data_.isMutable()) {
-        data_ = data_.copy();
-      }
-      return data_;
-    }
-
-    public int getDataCount() {
-      return internalGetData().getMap().size();
+    private boolean isCheckedOut_ ;
+    /**
+     * <code>bool isCheckedOut = 16;</code>
+     */
+    public boolean getIsCheckedOut() {
+      return isCheckedOut_;
     }
     /**
-     * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; data = 16;</code>
+     * <code>bool isCheckedOut = 16;</code>
+     */
+    public Builder setIsCheckedOut(boolean value) {
+      
+      isCheckedOut_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>bool isCheckedOut = 16;</code>
+     */
+    public Builder clearIsCheckedOut() {
+      
+      isCheckedOut_ = false;
+      onChanged();
+      return this;
+    }
+
+    private com.google.protobuf.MapField<
+        java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel> datamodel_;
+    private com.google.protobuf.MapField<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel>
+    internalGetDatamodel() {
+      if (datamodel_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            DatamodelDefaultEntryHolder.defaultEntry);
+      }
+      return datamodel_;
+    }
+    private com.google.protobuf.MapField<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel>
+    internalGetMutableDatamodel() {
+      onChanged();;
+      if (datamodel_ == null) {
+        datamodel_ = com.google.protobuf.MapField.newMapField(
+            DatamodelDefaultEntryHolder.defaultEntry);
+      }
+      if (!datamodel_.isMutable()) {
+        datamodel_ = datamodel_.copy();
+      }
+      return datamodel_;
+    }
+
+    public int getDatamodelCount() {
+      return internalGetDatamodel().getMap().size();
+    }
+    /**
+     * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; datamodel = 17;</code>
      */
 
-    public boolean containsData(
+    public boolean containsDatamodel(
         java.lang.String key) {
       if (key == null) { throw new java.lang.NullPointerException(); }
-      return internalGetData().getMap().containsKey(key);
+      return internalGetDatamodel().getMap().containsKey(key);
     }
     /**
-     * Use {@link #getDataMap()} instead.
+     * Use {@link #getDatamodelMap()} instead.
      */
     @java.lang.Deprecated
-    public java.util.Map<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel> getData() {
-      return getDataMap();
+    public java.util.Map<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel> getDatamodel() {
+      return getDatamodelMap();
     }
     /**
-     * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; data = 16;</code>
+     * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; datamodel = 17;</code>
      */
 
-    public java.util.Map<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel> getDataMap() {
-      return internalGetData().getMap();
+    public java.util.Map<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel> getDatamodelMap() {
+      return internalGetDatamodel().getMap();
     }
     /**
-     * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; data = 16;</code>
+     * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; datamodel = 17;</code>
      */
 
-    public org.nuxeo.micro.repo.service.grpc.Document.DataModel getDataOrDefault(
+    public org.nuxeo.micro.repo.service.grpc.Document.DataModel getDatamodelOrDefault(
         java.lang.String key,
         org.nuxeo.micro.repo.service.grpc.Document.DataModel defaultValue) {
       if (key == null) { throw new java.lang.NullPointerException(); }
       java.util.Map<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel> map =
-          internalGetData().getMap();
+          internalGetDatamodel().getMap();
       return map.containsKey(key) ? map.get(key) : defaultValue;
     }
     /**
-     * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; data = 16;</code>
+     * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; datamodel = 17;</code>
      */
 
-    public org.nuxeo.micro.repo.service.grpc.Document.DataModel getDataOrThrow(
+    public org.nuxeo.micro.repo.service.grpc.Document.DataModel getDatamodelOrThrow(
         java.lang.String key) {
       if (key == null) { throw new java.lang.NullPointerException(); }
       java.util.Map<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel> map =
-          internalGetData().getMap();
+          internalGetDatamodel().getMap();
       if (!map.containsKey(key)) {
         throw new java.lang.IllegalArgumentException();
       }
       return map.get(key);
     }
 
-    public Builder clearData() {
-      internalGetMutableData().getMutableMap()
+    public Builder clearDatamodel() {
+      internalGetMutableDatamodel().getMutableMap()
           .clear();
       return this;
     }
     /**
-     * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; data = 16;</code>
+     * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; datamodel = 17;</code>
      */
 
-    public Builder removeData(
+    public Builder removeDatamodel(
         java.lang.String key) {
       if (key == null) { throw new java.lang.NullPointerException(); }
-      internalGetMutableData().getMutableMap()
+      internalGetMutableDatamodel().getMutableMap()
           .remove(key);
       return this;
     }
@@ -6826,28 +6953,28 @@ public  final class Document extends
      */
     @java.lang.Deprecated
     public java.util.Map<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel>
-    getMutableData() {
-      return internalGetMutableData().getMutableMap();
+    getMutableDatamodel() {
+      return internalGetMutableDatamodel().getMutableMap();
     }
     /**
-     * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; data = 16;</code>
+     * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; datamodel = 17;</code>
      */
-    public Builder putData(
+    public Builder putDatamodel(
         java.lang.String key,
         org.nuxeo.micro.repo.service.grpc.Document.DataModel value) {
       if (key == null) { throw new java.lang.NullPointerException(); }
       if (value == null) { throw new java.lang.NullPointerException(); }
-      internalGetMutableData().getMutableMap()
+      internalGetMutableDatamodel().getMutableMap()
           .put(key, value);
       return this;
     }
     /**
-     * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; data = 16;</code>
+     * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; datamodel = 17;</code>
      */
 
-    public Builder putAllData(
+    public Builder putAllDatamodel(
         java.util.Map<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel> values) {
-      internalGetMutableData().getMutableMap()
+      internalGetMutableDatamodel().getMutableMap()
           .putAll(values);
       return this;
     }

@@ -27,6 +27,7 @@ message DocumentCreationRequest {
  string path = 1;
  string name = 2;
  string type = 3;
+ Document document = 4;
 }
 
 message QueryRequest {
@@ -41,24 +42,26 @@ message QueryResult {
 // The response message containing the greetings
 message Document {
   string repositoryName = 1;
-  string uid = 2;
-  string path = 3;
-  string type = 4;
-  repeated string facets = 5;
+  string uuid = 2;
+  string name = 3;
+  string path = 4;
+  string type = 5;
+  repeated string facets = 6;
   message Schema {
     string name = 1;
     string prefix = 2;
   }
-  repeated Schema schema = 6;
-  string state = 7;
-  string parentRef = 8;
-  bool isCheckedOut = 9;
+
+  repeated Schema schema = 7;
+  string state = 8;
+  string parentRef = 9;
   string changeToken = 10;
   string title = 11;
   int64 lastModified = 12;
   string versionLabel = 13;
   string lockOwner = 14;
   bool lockCreated = 15;
+  bool isCheckedOut = 16;
 
 
 
@@ -96,5 +99,5 @@ message Document {
 
     map<string, Property> properties = 2;
   }
-  map<string, DataModel> data = 16;
+  map<string, DataModel> datamodel = 17;
 }

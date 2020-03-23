@@ -1,70 +1,96 @@
 package org.nuxeo.micro.repo.service.core;
 
-import org.nuxeo.micro.repo.service.grpc.Document;
-import org.nuxeo.micro.repo.service.grpc.DocumentRequest;
-import org.nuxeo.micro.repo.service.grpc.SessionGrpc;
+import java.io.IOException;
 
+import org.apache.commons.lang3.time.StopWatch;
+import org.nuxeo.micro.repo.service.core.impl.NuxeoCoreSessionGrpcImpl;
+import org.nuxeo.micro.repo.service.grpc.NuxeoCoreSessionGrpc;
+import org.nuxeo.micro.repo.service.grpc.NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxImplBase;
+import org.nuxeo.runtime.jtajca.JtaActivator;
+
+import io.vertx.config.ConfigRetriever;
+import io.vertx.config.ConfigRetrieverOptions;
+import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
-import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.core.net.JksOptions;
 import io.vertx.grpc.VertxServer;
 import io.vertx.grpc.VertxServerBuilder;
-import io.vertx.serviceproxy.ServiceBinder;
 
 public class CoreVerticle extends AbstractVerticle {
     private static final Logger log = LoggerFactory.getLogger(CoreVerticle.class);
-    private MessageConsumer<JsonObject> consumer;
-    private ServiceBinder binder;
+    private VertxServer rpcServer;
+    private ConfigStoreOptions configOptions;
 
+    private JtaActivator jta;
+
+    public CoreVerticle() {
+        this.configOptions = getConfigDefaultStoreOptions();
+    }
+
+    public CoreVerticle(ConfigStoreOptions configOptions) {
+        this.configOptions = configOptions;
+
+    }
+
+    protected ConfigStoreOptions getConfigDefaultStoreOptions() {
+        return new ConfigStoreOptions().setType("file")//
+                .setFormat("yaml")//
+                .setOptional(true)//
+                .setConfig(new JsonObject()//
+                        .put("path", "config/application.yaml"));
+    }
 
     @Override
     public void start(Promise<Void> startFuture) throws Exception {
 
+        StopWatch watch = new StopWatch();
+        watch.start();
 
-        SessionGrpc.SessionVertxImplBase service = new SessionGrpc.SessionVertxImplBase() {
+        // Activate JTA
+        jta = new JtaActivator();
+        jta.activate();
 
-            @Override
-            public void getDocument(DocumentRequest request, Promise<Document> response) {
-                // TODO Auto-generated method stub
-                super.getDocument(request, response);
-            }
-        };
+        ConfigRetrieverOptions options = new ConfigRetrieverOptions().addStore(configOptions);
+        ConfigRetriever retriever = ConfigRetriever.create(vertx, options);
 
-        VertxServer rpcServer = VertxServerBuilder
-                  .forAddress(vertx, "0.0.0.0", 8080)
-                  .addService(service)
-                  .build();
+        retriever.getConfig(ch -> {
+            if (ch.succeeded()) {
 
-        rpcServer.start();
-
-
-        binder = new ServiceBinder(vertx);
-        CoreSessionService.create(vertx, new JsonObject(), ar -> {
-            if (ar.succeeded()) {
-                CoreSessionService css = ar.result();
-
-
-
-                log.info("Nuxeo Core Session Service  published");
-
-                // Used for health check
-                vertx.createHttpServer().requestHandler(req -> req.response().end("OK")).listen(8080);
-                startFuture.complete();
+                NuxeoCoreSessionGrpcImpl.create(vertx, ch.result(), sh -> {
+                    if (sh.succeeded()) {
+                        try {
+                            NuxeoCoreSessionVertxImplBase service = sh.result();
+                            rpcServer = VertxServerBuilder.forAddress(vertx, "0.0.0.0", 8888).addService(service)
+                                    .build();
+                            rpcServer.start();
+                            watch.stop();
+                            System.out.println("Time Elapsed: " + watch.getTime());
+                            log.info("Started Nuxeo Core Verticle in {}ms", watch.getTime());
+                            startFuture.complete();
+                        } catch (IOException e) {
+                            startFuture.fail(e);
+                        }
+                    } else {
+                        startFuture.fail(sh.cause());
+                    }
+                });
 
             } else {
-                startFuture.fail(ar.cause());
+                startFuture.fail(ch.cause());
             }
+
         });
+
     }
 
     @Override
     public void stop(Promise<Void> stopFuture) throws Exception {
-        binder.unregister(consumer);
-        stopFuture.complete();
+        jta.deactivate();
+        rpcServer.shutdown(h -> stopFuture.complete());
+
     }
 
 }

@@ -24,8 +24,9 @@
     <module>micro-nuxeo-repo</module>
     <!-- <module>micro-nuxeo-todo</module> -->
     <module>micro-nuxeo-dsl</module>
-    <module>micro-nuxeo-vertx</module>
-    <module>micro-library</module>
+    <module>micro-nuxeo-proto</module>
+    <module>micro-nuxeo-schema-service</module>
+    <module>micro-nuxeo-core-service</module>
 
   </modules>
 
@@ -75,7 +76,7 @@
     <maven-surefire-plugin.version>2.22.1</maven-surefire-plugin.version>
     <exec-maven-plugin.version>1.5.0</exec-maven-plugin.version>
     <vertx.version>3.8.3</vertx.version>
-    <junit-jupiter.version>5.4.0</junit-jupiter.version>
+    <junit-jupiter.version>5.5.2</junit-jupiter.version>
 
   </properties>
 
@@ -85,6 +86,14 @@
         <groupId>io.grpc</groupId>
         <artifactId>grpc-bom</artifactId>
         <version>${grpc.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>5.5.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -168,6 +177,11 @@
       <dependency>
         <groupId>org.nuxeo.micro-repo</groupId>
         <artifactId>micro-nuxeo-core-service</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.nuxeo.micro-repo</groupId>
+        <artifactId>micro-nuxeo-proto</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

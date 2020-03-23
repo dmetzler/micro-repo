@@ -18,102 +18,107 @@ public interface DocumentOrBuilder extends
       getRepositoryNameBytes();
 
   /**
-   * <code>string uid = 2;</code>
+   * <code>string uuid = 2;</code>
    */
-  java.lang.String getUid();
+  java.lang.String getUuid();
   /**
-   * <code>string uid = 2;</code>
+   * <code>string uuid = 2;</code>
    */
   com.google.protobuf.ByteString
-      getUidBytes();
+      getUuidBytes();
 
   /**
-   * <code>string path = 3;</code>
+   * <code>string name = 3;</code>
+   */
+  java.lang.String getName();
+  /**
+   * <code>string name = 3;</code>
+   */
+  com.google.protobuf.ByteString
+      getNameBytes();
+
+  /**
+   * <code>string path = 4;</code>
    */
   java.lang.String getPath();
   /**
-   * <code>string path = 3;</code>
+   * <code>string path = 4;</code>
    */
   com.google.protobuf.ByteString
       getPathBytes();
 
   /**
-   * <code>string type = 4;</code>
+   * <code>string type = 5;</code>
    */
   java.lang.String getType();
   /**
-   * <code>string type = 4;</code>
+   * <code>string type = 5;</code>
    */
   com.google.protobuf.ByteString
       getTypeBytes();
 
   /**
-   * <code>repeated string facets = 5;</code>
+   * <code>repeated string facets = 6;</code>
    */
   java.util.List<java.lang.String>
       getFacetsList();
   /**
-   * <code>repeated string facets = 5;</code>
+   * <code>repeated string facets = 6;</code>
    */
   int getFacetsCount();
   /**
-   * <code>repeated string facets = 5;</code>
+   * <code>repeated string facets = 6;</code>
    */
   java.lang.String getFacets(int index);
   /**
-   * <code>repeated string facets = 5;</code>
+   * <code>repeated string facets = 6;</code>
    */
   com.google.protobuf.ByteString
       getFacetsBytes(int index);
 
   /**
-   * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+   * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
    */
   java.util.List<org.nuxeo.micro.repo.service.grpc.Document.Schema> 
       getSchemaList();
   /**
-   * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+   * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
    */
   org.nuxeo.micro.repo.service.grpc.Document.Schema getSchema(int index);
   /**
-   * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+   * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
    */
   int getSchemaCount();
   /**
-   * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+   * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
    */
   java.util.List<? extends org.nuxeo.micro.repo.service.grpc.Document.SchemaOrBuilder> 
       getSchemaOrBuilderList();
   /**
-   * <code>repeated .NuxeoClient.Document.Schema schema = 6;</code>
+   * <code>repeated .NuxeoClient.Document.Schema schema = 7;</code>
    */
   org.nuxeo.micro.repo.service.grpc.Document.SchemaOrBuilder getSchemaOrBuilder(
       int index);
 
   /**
-   * <code>string state = 7;</code>
+   * <code>string state = 8;</code>
    */
   java.lang.String getState();
   /**
-   * <code>string state = 7;</code>
+   * <code>string state = 8;</code>
    */
   com.google.protobuf.ByteString
       getStateBytes();
 
   /**
-   * <code>string parentRef = 8;</code>
+   * <code>string parentRef = 9;</code>
    */
   java.lang.String getParentRef();
   /**
-   * <code>string parentRef = 8;</code>
+   * <code>string parentRef = 9;</code>
    */
   com.google.protobuf.ByteString
       getParentRefBytes();
-
-  /**
-   * <code>bool isCheckedOut = 9;</code>
-   */
-  boolean getIsCheckedOut();
 
   /**
    * <code>string changeToken = 10;</code>
@@ -166,36 +171,41 @@ public interface DocumentOrBuilder extends
   boolean getLockCreated();
 
   /**
-   * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; data = 16;</code>
+   * <code>bool isCheckedOut = 16;</code>
    */
-  int getDataCount();
+  boolean getIsCheckedOut();
+
   /**
-   * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; data = 16;</code>
+   * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; datamodel = 17;</code>
    */
-  boolean containsData(
+  int getDatamodelCount();
+  /**
+   * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; datamodel = 17;</code>
+   */
+  boolean containsDatamodel(
       java.lang.String key);
   /**
-   * Use {@link #getDataMap()} instead.
+   * Use {@link #getDatamodelMap()} instead.
    */
   @java.lang.Deprecated
   java.util.Map<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel>
-  getData();
+  getDatamodel();
   /**
-   * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; data = 16;</code>
+   * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; datamodel = 17;</code>
    */
   java.util.Map<java.lang.String, org.nuxeo.micro.repo.service.grpc.Document.DataModel>
-  getDataMap();
+  getDatamodelMap();
   /**
-   * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; data = 16;</code>
+   * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; datamodel = 17;</code>
    */
 
-  org.nuxeo.micro.repo.service.grpc.Document.DataModel getDataOrDefault(
+  org.nuxeo.micro.repo.service.grpc.Document.DataModel getDatamodelOrDefault(
       java.lang.String key,
       org.nuxeo.micro.repo.service.grpc.Document.DataModel defaultValue);
   /**
-   * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; data = 16;</code>
+   * <code>map&lt;string, .NuxeoClient.Document.DataModel&gt; datamodel = 17;</code>
    */
 
-  org.nuxeo.micro.repo.service.grpc.Document.DataModel getDataOrThrow(
+  org.nuxeo.micro.repo.service.grpc.Document.DataModel getDatamodelOrThrow(
       java.lang.String key);
 }

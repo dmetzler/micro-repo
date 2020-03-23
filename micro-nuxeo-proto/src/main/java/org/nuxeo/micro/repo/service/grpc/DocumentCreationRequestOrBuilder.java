@@ -36,4 +36,17 @@ public interface DocumentCreationRequestOrBuilder extends
    */
   com.google.protobuf.ByteString
       getTypeBytes();
+
+  /**
+   * <code>.NuxeoClient.Document document = 4;</code>
+   */
+  boolean hasDocument();
+  /**
+   * <code>.NuxeoClient.Document document = 4;</code>
+   */
+  org.nuxeo.micro.repo.service.grpc.Document getDocument();
+  /**
+   * <code>.NuxeoClient.Document document = 4;</code>
+   */
+  org.nuxeo.micro.repo.service.grpc.DocumentOrBuilder getDocumentOrBuilder();
 }

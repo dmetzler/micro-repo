@@ -46,20 +46,21 @@ public class CoreSessionServiceImpl implements CoreSessionService {
                 if (ssh.succeeded()) {
                     // TODO: Create a UserManagerService that resolve a principal base on username
                     // and tenant.
-
                     NuxeoPrincipalImpl p = new NuxeoPrincipalImpl(username, tenantId);
                     p.setAdministrator(username.endsWith("@nuxeo.com"));
 
-                    CoreSession session = ssh.result().createCoreSession(p);
-                    sessionHandler.handle(Future.succeededFuture(session));
+                    TransactionHelper.runInTransaction(() -> {
+                        CoreSession session = ssh.result().createCoreSession(p);
+                        sessionHandler.handle(Future.succeededFuture(session));
+                    });
                 } else {
                     sessionHandler.handle(Future.failedFuture(ssh.cause()));
                 }
 
             });
+        } else {
+            sessionHandler.handle(Future.failedFuture("not implemented"));
         }
-
-        sessionHandler.handle(Future.failedFuture("not implemented"));
 
     }
 
@@ -83,7 +84,7 @@ public class CoreSessionServiceImpl implements CoreSessionService {
                 MongoDBConnectionConfig mongoconfig = new MongoDBConnectionConfig();
                 mongoconfig.server = config.getJsonObject("db").getString("server");
                 mongoconfig.dbname = tenantId;
-                mongoconfig.id = tenantId;
+                mongoconfig.id = "default";
 
                 theHolder = new CoreSessionServiceHolder(vertx, tenantId, mongoconfig,
                         () -> removeFromMap(map, tenantId));

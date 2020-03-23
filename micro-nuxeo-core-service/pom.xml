@@ -14,18 +14,12 @@
 
 
   <properties>
-    <java.version>11</java.version>
-    <maven.compiler.source>${java.version}</maven.compiler.source>
-    <maven.compiler.target>${java.version}</maven.compiler.target>
-    <maven.compiler.release>${java.version}</maven.compiler.release>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <vertx.verticle>org.nuxeo.micro.repo.service.core.CoreVerticle</vertx.verticle>
 
     <vertx.version>3.8.3</vertx.version>
-    <vertx.grpc.version>1.25.0</vertx.grpc.version>
     <fabric8-vertx-maven-plugin.projectVersion>1.0.9</fabric8-vertx-maven-plugin.projectVersion>
-    <junit-jupiter.version>5.6.0</junit-jupiter.version>
+
   </properties>
 
 
@@ -63,6 +57,10 @@
     <dependency>
       <groupId>org.nuxeo.micro-repo</groupId>
       <artifactId>micro-nuxeo-schema-service</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.nuxeo.micro-repo</groupId>
+      <artifactId>micro-nuxeo-proto</artifactId>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
@@ -131,14 +129,15 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
-      <version>${junit-jupiter.version}</version>
-      <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-launcher</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
-      <version>${junit-jupiter.version}</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
@@ -148,29 +147,9 @@
       <groupId>io.vertx</groupId>
       <artifactId>vertx-core</artifactId>
     </dependency>
-    <dependency>
-      <groupId>com.google.protobuf</groupId>
-      <artifactId>protobuf-java</artifactId>
-      <version>3.11.0</version>
-    </dependency>
-    <dependency>
-      <groupId>io.grpc</groupId>
-      <artifactId>grpc-stub</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.grpc</groupId>
-      <artifactId>grpc-protobuf</artifactId>
-    </dependency>
   </dependencies>
   <build>
-    <finalName>micro-nuxeo-schema-${project.version}</finalName>
-    <extensions>
-      <extension>
-        <groupId>kr.motd.maven</groupId>
-        <artifactId>os-maven-plugin</artifactId>
-        <version>1.4.1.Final</version>
-      </extension>
-    </extensions>
+    <finalName>micro-nuxeo-core-${project.version}</finalName>
     <plugins>
       <plugin>
         <groupId>io.fabric8</groupId>
@@ -215,37 +194,6 @@
         <configuration>
           <generateRoute>false</generateRoute>
         </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.xolstice.maven.plugins</groupId>
-        <artifactId>protobuf-maven-plugin</artifactId>
-        <version>0.5.0</version>
-        <configuration>
-          <protocArtifact>com.google.protobuf:protoc:3.2.0:exe:${os.detected.classifier}</protocArtifact>
-          <pluginId>grpc-java</pluginId>
-          <pluginArtifact>io.vertx:protoc-gen-grpc-java:${vertx.grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
-        </configuration>
-        <executions>
-          <execution>
-            <id>compile</id>
-            <configuration>
-              <outputDirectory>${project.basedir}/src/main/java</outputDirectory>
-              <clearOutputDirectory>false</clearOutputDirectory>
-            </configuration>
-            <goals>
-              <goal>compile</goal>
-              <goal>compile-custom</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>test-compile</id>
-            <goals>
-              <goal>test-compile</goal>
-              <goal>test-compile-custom</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
