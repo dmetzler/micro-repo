@@ -114,16 +114,17 @@ public final class NuxeoClientProto {
       "L\020\004\022\010\n\004BLOB\020\005\022\013\n\007COMPLEX\020\006\022\010\n\004BYTE\020\007\032Q\n\017" +
       "PropertiesEntry\022\013\n\003key\030\001 \001(\t\022-\n\005value\030\002 " +
       "\001(\0132\036.NuxeoClient.Document.Property:\0028\0012" +
-      "\255\002\n\020NuxeoCoreSession\022D\n\013getDocument\022\034.Nu" +
+      "\357\002\n\020NuxeoCoreSession\022D\n\013getDocument\022\034.Nu" +
       "xeoClient.DocumentRequest\032\025.NuxeoClient." +
       "Document\"\000\022O\n\016createDocument\022$.NuxeoClie" +
       "nt.DocumentCreationRequest\032\025.NuxeoClient",
       ".Document\"\000\022@\n\016updateDocument\022\025.NuxeoCli" +
       "ent.Document\032\025.NuxeoClient.Document\"\000\022@\n" +
       "\005query\022\031.NuxeoClient.QueryRequest\032\030.Nuxe" +
-      "oClient.QueryResult\"\0000\001B0\n\032org.nuxeo.mic" +
-      "ro.repo.protoB\020NuxeoClientProtoP\001b\006proto" +
-      "3"
+      "oClient.QueryResult\"\0000\001\022@\n\016deleteDocumen" +
+      "t\022\025.NuxeoClient.Document\032\025.NuxeoClient.D" +
+      "ocument\"\000B0\n\032org.nuxeo.micro.repo.protoB" +
+      "\020NuxeoClientProtoP\001b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

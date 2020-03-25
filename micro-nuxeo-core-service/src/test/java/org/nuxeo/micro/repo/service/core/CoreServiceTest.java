@@ -16,7 +16,7 @@
  * Contributors:
  *     Damien Metzler
  */
-package org.nuxeo.micro.repo.service.schema;
+package org.nuxeo.micro.repo.service.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,6 +33,8 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentNotFoundException;
 import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.micro.repo.service.core.CoreSessionService;
+import org.nuxeo.micro.repo.service.schema.SchemaService;
+import org.nuxeo.micro.repo.service.schema.SchemaVerticle;
 import org.nuxeo.runtime.jtajca.JtaActivator;
 import org.nuxeo.runtime.transaction.TransactionHelper;
 

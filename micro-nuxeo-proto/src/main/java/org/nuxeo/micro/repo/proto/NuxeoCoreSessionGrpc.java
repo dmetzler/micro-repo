@@ -167,6 +167,33 @@ public final class NuxeoCoreSessionGrpc {
      return getQueryMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<org.nuxeo.micro.repo.proto.Document,
+      org.nuxeo.micro.repo.proto.Document> getDeleteDocumentMethod;
+
+  public static io.grpc.MethodDescriptor<org.nuxeo.micro.repo.proto.Document,
+      org.nuxeo.micro.repo.proto.Document> getDeleteDocumentMethod() {
+    io.grpc.MethodDescriptor<org.nuxeo.micro.repo.proto.Document, org.nuxeo.micro.repo.proto.Document> getDeleteDocumentMethod;
+    if ((getDeleteDocumentMethod = NuxeoCoreSessionGrpc.getDeleteDocumentMethod) == null) {
+      synchronized (NuxeoCoreSessionGrpc.class) {
+        if ((getDeleteDocumentMethod = NuxeoCoreSessionGrpc.getDeleteDocumentMethod) == null) {
+          NuxeoCoreSessionGrpc.getDeleteDocumentMethod = getDeleteDocumentMethod = 
+              io.grpc.MethodDescriptor.<org.nuxeo.micro.repo.proto.Document, org.nuxeo.micro.repo.proto.Document>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(
+                  "NuxeoClient.NuxeoCoreSession", "deleteDocument"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  org.nuxeo.micro.repo.proto.Document.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  org.nuxeo.micro.repo.proto.Document.getDefaultInstance()))
+                  .setSchemaDescriptor(new NuxeoCoreSessionMethodDescriptorSupplier("deleteDocument"))
+                  .build();
+          }
+        }
+     }
+     return getDeleteDocumentMethod;
+  }
+
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -235,6 +262,13 @@ public final class NuxeoCoreSessionGrpc {
       asyncUnimplementedUnaryCall(getQueryMethod(), responseObserver);
     }
 
+    /**
+     */
+    public void deleteDocument(org.nuxeo.micro.repo.proto.Document request,
+        io.grpc.stub.StreamObserver<org.nuxeo.micro.repo.proto.Document> responseObserver) {
+      asyncUnimplementedUnaryCall(getDeleteDocumentMethod(), responseObserver);
+    }
+
     @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
       return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
           .addMethod(
@@ -265,6 +299,13 @@ public final class NuxeoCoreSessionGrpc {
                 org.nuxeo.micro.repo.proto.QueryRequest,
                 org.nuxeo.micro.repo.proto.QueryResult>(
                   this, METHODID_QUERY)))
+          .addMethod(
+            getDeleteDocumentMethod(),
+            asyncUnaryCall(
+              new MethodHandlers<
+                org.nuxeo.micro.repo.proto.Document,
+                org.nuxeo.micro.repo.proto.Document>(
+                  this, METHODID_DELETE_DOCUMENT)))
           .build();
     }
   }
@@ -324,6 +365,14 @@ public final class NuxeoCoreSessionGrpc {
       asyncServerStreamingCall(
           getChannel().newCall(getQueryMethod(), getCallOptions()), request, responseObserver);
     }
+
+    /**
+     */
+    public void deleteDocument(org.nuxeo.micro.repo.proto.Document request,
+        io.grpc.stub.StreamObserver<org.nuxeo.micro.repo.proto.Document> responseObserver) {
+      asyncUnaryCall(
+          getChannel().newCall(getDeleteDocumentMethod(), getCallOptions()), request, responseObserver);
+    }
   }
 
   /**
@@ -378,6 +427,13 @@ public final class NuxeoCoreSessionGrpc {
       return blockingServerStreamingCall(
           getChannel(), getQueryMethod(), getCallOptions(), request);
     }
+
+    /**
+     */
+    public org.nuxeo.micro.repo.proto.Document deleteDocument(org.nuxeo.micro.repo.proto.Document request) {
+      return blockingUnaryCall(
+          getChannel(), getDeleteDocumentMethod(), getCallOptions(), request);
+    }
   }
 
   /**
@@ -427,6 +483,14 @@ public final class NuxeoCoreSessionGrpc {
       return futureUnaryCall(
           getChannel().newCall(getUpdateDocumentMethod(), getCallOptions()), request);
     }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<org.nuxeo.micro.repo.proto.Document> deleteDocument(
+        org.nuxeo.micro.repo.proto.Document request) {
+      return futureUnaryCall(
+          getChannel().newCall(getDeleteDocumentMethod(), getCallOptions()), request);
+    }
   }
 
   /**
@@ -467,6 +531,13 @@ public final class NuxeoCoreSessionGrpc {
       asyncUnimplementedUnaryCall(getQueryMethod(), response.writeObserver());
     }
 
+    /**
+     */
+    public void deleteDocument(org.nuxeo.micro.repo.proto.Document request,
+        io.vertx.core.Promise<org.nuxeo.micro.repo.proto.Document> response) {
+      asyncUnimplementedUnaryCall(getDeleteDocumentMethod(), NuxeoCoreSessionGrpc.toObserver(response));
+    }
+
     @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
       return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
           .addMethod(
@@ -497,6 +568,13 @@ public final class NuxeoCoreSessionGrpc {
                 org.nuxeo.micro.repo.proto.QueryRequest,
                 org.nuxeo.micro.repo.proto.QueryResult>(
                   this, METHODID_QUERY)))
+          .addMethod(
+            getDeleteDocumentMethod(),
+            asyncUnaryCall(
+              new VertxMethodHandlers<
+                org.nuxeo.micro.repo.proto.Document,
+                org.nuxeo.micro.repo.proto.Document>(
+                  this, METHODID_DELETE_DOCUMENT)))
           .build();
     }
   }
@@ -560,12 +638,21 @@ public final class NuxeoCoreSessionGrpc {
       asyncServerStreamingCall(
           getChannel().newCall(getQueryMethod(), getCallOptions()), request, readStream.readObserver());
     }
+
+    /**
+     */
+    public void deleteDocument(org.nuxeo.micro.repo.proto.Document request,
+        io.vertx.core.Handler<io.vertx.core.AsyncResult<org.nuxeo.micro.repo.proto.Document>> response) {
+      asyncUnaryCall(
+          getChannel().newCall(getDeleteDocumentMethod(), getCallOptions()), request, NuxeoCoreSessionGrpc.toObserver(response));
+    }
   }
 
   private static final int METHODID_GET_DOCUMENT = 0;
   private static final int METHODID_CREATE_DOCUMENT = 1;
   private static final int METHODID_UPDATE_DOCUMENT = 2;
   private static final int METHODID_QUERY = 3;
+  private static final int METHODID_DELETE_DOCUMENT = 4;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -599,6 +686,10 @@ public final class NuxeoCoreSessionGrpc {
         case METHODID_QUERY:
           serviceImpl.query((org.nuxeo.micro.repo.proto.QueryRequest) request,
               (io.grpc.stub.StreamObserver<org.nuxeo.micro.repo.proto.QueryResult>) responseObserver);
+          break;
+        case METHODID_DELETE_DOCUMENT:
+          serviceImpl.deleteDocument((org.nuxeo.micro.repo.proto.Document) request,
+              (io.grpc.stub.StreamObserver<org.nuxeo.micro.repo.proto.Document>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -670,6 +761,17 @@ public final class NuxeoCoreSessionGrpc {
           serviceImpl.query((org.nuxeo.micro.repo.proto.QueryRequest) request,
               (io.vertx.grpc.GrpcWriteStream<org.nuxeo.micro.repo.proto.QueryResult>) io.vertx.grpc.GrpcWriteStream.create(responseObserver));
           break;
+        case METHODID_DELETE_DOCUMENT:
+          serviceImpl.deleteDocument((org.nuxeo.micro.repo.proto.Document) request,
+              (io.vertx.core.Promise<org.nuxeo.micro.repo.proto.Document>) io.vertx.core.Promise.<org.nuxeo.micro.repo.proto.Document>promise().future().setHandler(ar -> {
+                if (ar.succeeded()) {
+                  ((io.grpc.stub.StreamObserver<org.nuxeo.micro.repo.proto.Document>) responseObserver).onNext(ar.result());
+                  responseObserver.onCompleted();
+                } else {
+                  responseObserver.onError(ar.cause());
+                }
+              }));
+          break;
         default:
           throw new AssertionError();
       }
@@ -735,6 +837,7 @@ public final class NuxeoCoreSessionGrpc {
               .addMethod(getCreateDocumentMethod())
               .addMethod(getUpdateDocumentMethod())
               .addMethod(getQueryMethod())
+              .addMethod(getDeleteDocumentMethod())
               .build();
         }
       }

@@ -13,6 +13,8 @@ service NuxeoCoreSession {
  rpc createDocument( DocumentCreationRequest ) returns (Document) {}
  rpc updateDocument( Document ) returns (Document) {}
  rpc query( QueryRequest ) returns ( stream QueryResult) {}
+ rpc deleteDocument( Document ) returns (Document) {}
+
 
 }
 
@@ -28,6 +30,7 @@ message DocumentCreationRequest {
  string name = 2;
  Document document = 4;
 }
+
 
 message QueryRequest {
   string nxql = 1;

@@ -4,9 +4,12 @@ import java.io.IOException;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxImplBase;
+import org.nuxeo.micro.repo.service.core.impl.GrpcInterceptor;
 import org.nuxeo.micro.repo.service.core.impl.NuxeoCoreSessionGrpcImpl;
 import org.nuxeo.runtime.jtajca.JtaActivator;
 
+import io.grpc.ServerInterceptor;
+import io.grpc.ServerInterceptors;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
@@ -15,10 +18,12 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.grpc.BlockingServerInterceptor;
 import io.vertx.grpc.VertxServer;
 import io.vertx.grpc.VertxServerBuilder;
 
 public class CoreVerticle extends AbstractVerticle {
+    static final int DEFAULT_PORT = 8787;
     private static final Logger log = LoggerFactory.getLogger(CoreVerticle.class);
     private VertxServer rpcServer;
     private ConfigStoreOptions configOptions;
@@ -58,12 +63,18 @@ public class CoreVerticle extends AbstractVerticle {
         retriever.getConfig(ch -> {
             if (ch.succeeded()) {
 
-                NuxeoCoreSessionGrpcImpl.create(vertx, ch.result(), sh -> {
+                JsonObject config = ch.result();
+                NuxeoCoreSessionGrpcImpl.create(vertx, config, sh -> {
                     if (sh.succeeded()) {
                         try {
                             NuxeoCoreSessionVertxImplBase service = sh.result();
-                            rpcServer = VertxServerBuilder.forAddress(vertx, "0.0.0.0", 8888).addService(service)
-                                    .build();
+
+                            GrpcInterceptor interceptor = new GrpcInterceptor();
+                            ServerInterceptor wrapped = BlockingServerInterceptor.wrap(vertx, interceptor);
+
+                            rpcServer = VertxServerBuilder
+                                    .forAddress(vertx, "0.0.0.0", config.getInteger("port", DEFAULT_PORT))
+                                    .addService(ServerInterceptors.intercept(service, wrapped)).build();
                             rpcServer.start();
                             watch.stop();
                             System.out.println("Time Elapsed: " + watch.getTime());
