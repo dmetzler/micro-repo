@@ -1,17 +1,17 @@
 package org.nuxeo.micro.repo.service.schema;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.io.IOException;
+
+import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.nuxeo.micro.repo.proto.Document;
+import org.nuxeo.micro.repo.proto.DocumentCreationRequest;
+import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc;
 import org.nuxeo.micro.repo.service.core.CoreVerticle;
-import org.nuxeo.micro.repo.service.grpc.Document;
-import org.nuxeo.micro.repo.service.grpc.DocumentCreationRequest;
-import org.nuxeo.micro.repo.service.grpc.NuxeoCoreSessionGrpc;
 
 import io.grpc.ManagedChannel;
 import io.vertx.config.ConfigStoreOptions;
@@ -48,19 +48,19 @@ public class GrpcServerTest {
     @Test
     void can_start_grpc_server(Vertx vertx, VertxTestContext testContext) throws Exception {
 
-        DocumentCreationRequest req = DocumentCreationRequest.newBuilder().setPath("/").setName("test")
-                .setType("Folder").build();
+        Document.Property title = Document.Property.newBuilder()
+                .addScalarValue(Document.Property.ScalarProperty.newBuilder().setStrValue("Test")).build();
 
-        Document.DataModel.Property title = Document.DataModel.Property.newBuilder().addScalarValue(Document.DataModel.Property.ScalarProperty.newBuilder().setStrValue("Test")).build();
-        Document.DataModel dm = Document.DataModel.newBuilder().setName("dc").putProperties("title", title).build();
-        Document.newBuilder().putDatamodel("dc", dm);
+        Document doc = Document.newBuilder().setType("Folder").putProperties("dc:title", title).build();
 
-        nuxeoSession.createDocument(req, testContext.succeeding(resp -> testContext.verify(()-> {
+        DocumentCreationRequest req = DocumentCreationRequest.newBuilder().setPath("/").setName("test").setDocument(doc)
+                .build();
 
+        nuxeoSession.createDocument(req, testContext.succeeding(resp -> testContext.verify(() -> {
             assertThat(resp.getType()).isEqualTo("Folder");
-            assertThat(resp.getDatamodelMap()).isNotNull();
-            assertThat(resp.getDatamodelMap().get("dc")).isNotNull();
-            assertThat(resp.getDatamodelMap().get("dc").getPropertiesMap().get("title").getScalarValue(0).getStrValue()).isEqualTo("Test");
+            assertThat(resp.getPropertiesMap()).isNotNull();
+            assertThat(resp.getPropertiesMap().get("dc:title")).isNotNull();
+            assertThat(resp.getPropertiesMap().get("dc:title").getScalarValue(0).getStrValue()).isEqualTo("Test");
             testContext.completeNow();
         })));
     }

@@ -3,9 +3,8 @@ package org.nuxeo.micro.repo.service.core;
 import java.io.IOException;
 
 import org.apache.commons.lang3.time.StopWatch;
+import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxImplBase;
 import org.nuxeo.micro.repo.service.core.impl.NuxeoCoreSessionGrpcImpl;
-import org.nuxeo.micro.repo.service.grpc.NuxeoCoreSessionGrpc;
-import org.nuxeo.micro.repo.service.grpc.NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxImplBase;
 import org.nuxeo.runtime.jtajca.JtaActivator;
 
 import io.vertx.config.ConfigRetriever;

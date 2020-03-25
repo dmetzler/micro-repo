@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 option java_multiple_files = true;
-option java_package = "org.nuxeo.micro.repo.service.grpc";
+option java_package = "org.nuxeo.micro.repo.proto";
 option java_outer_classname = "NuxeoClientProto";
 
 package NuxeoClient;
@@ -26,7 +26,6 @@ message DocumentRequest {
 message DocumentCreationRequest {
  string path = 1;
  string name = 2;
- string type = 3;
  Document document = 4;
 }
 
@@ -36,7 +35,7 @@ message QueryRequest {
 
 message QueryResult {
   int64 totalCount = 1;
-  repeated Document docs = 5;
+  repeated Document docs = 10;
 }
 
 // The response message containing the greetings
@@ -44,7 +43,7 @@ message Document {
   string repositoryName = 1;
   string uuid = 2;
   string name = 3;
-  string path = 4;
+  string parentPath = 4;
   string type = 5;
   repeated string facets = 6;
   message Schema {
@@ -60,44 +59,38 @@ message Document {
   int64 lastModified = 12;
   string versionLabel = 13;
   string lockOwner = 14;
-  bool lockCreated = 15;
+  int64 lockCreated = 15;
   bool isCheckedOut = 16;
 
 
-
-  message DataModel {
-    string name = 1;
-    message Property {
-       enum PropType {
-         STRING = 0;
-         INT = 1;
-         DOUBLE = 2;
-         DATE = 3;
-         BOOL = 4;
-         BLOB = 5;
-         COMPLEX = 6;
+  message Property {
+     enum PropType {
+       STRING = 0;
+       INT = 1;
+       DOUBLE = 2;
+       DATE = 3;
+       BOOL = 4;
+       BLOB = 5;
+       COMPLEX = 6;
+       BYTE = 7;
+     }
+    PropType type = 1;
+     bool multiple = 2;
+    message ScalarProperty {
+       oneof value {
+         string strValue = 1;
+         sint64  intValue = 2;
+         double  doubleValue = 3;
+         bytes byteValue = 4;
+         bool booleanValue = 5;
        }
-
-       PropType type = 1;
-       bool multiple = 2;
-
-       message ScalarProperty {
-         oneof value {
-           string strValue = 1;
-           sint64  intValue = 2;
-           double  doubleValue = 3;
-         }
-       }
-
-       message ComplexProperty {
-         map<string, Property> complexValue = 1;
-       }
-
-       repeated ScalarProperty scalarValue = 3;
-       repeated ComplexProperty complexValue = 4;
-    }
-
-    map<string, Property> properties = 2;
+     }
+    message ComplexProperty {
+       map<string, Property> complexValue = 1;
+     }
+    repeated ScalarProperty scalarValue = 3;
+     repeated ComplexProperty complexValue = 4;
   }
-  map<string, DataModel> datamodel = 17;
+
+  map<string, Property> properties = 17;
 }

@@ -54,6 +54,10 @@ public class DocumentPartImpl extends ComplexProperty implements DocumentPart {
         super(null, IS_PHANTOM);
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder {
         private DocumentPartImpl docPart;
 

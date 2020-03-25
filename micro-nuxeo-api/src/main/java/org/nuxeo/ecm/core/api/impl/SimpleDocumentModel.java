@@ -31,6 +31,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.nuxeo.common.utils.Path;
 import org.nuxeo.ecm.core.api.CoreSession;
@@ -66,7 +68,7 @@ public class SimpleDocumentModel implements DocumentModel {
 
     protected final Map<String, DataModel> dataModels = new HashMap<>();
 
-    protected Set<String> schemas;
+    protected Set<String> schemas = new HashSet<>();
 
     protected final Map<String, Serializable> contextData = new HashMap<>();
 
@@ -78,7 +80,6 @@ public class SimpleDocumentModel implements DocumentModel {
 
     public SimpleDocumentModel(SchemaManager schemaManager, List<String> schemas) {
         this.schemaManager = schemaManager;
-        this.schemas = new HashSet<>();
         anySchema = false;
         for (String schema : schemas) {
             Schema s = schemaManager.getSchema(schema);
@@ -93,9 +94,89 @@ public class SimpleDocumentModel implements DocumentModel {
         this(schemaManager, Arrays.asList(schemas));
     }
 
+    /**
+     * @deprecated since 11.1. Use {@link #empty()} instead.
+     */
+    @Deprecated
     public SimpleDocumentModel() {
-        schemas = new HashSet<>();
         anySchema = true;
+    }
+
+    /**
+     * Returns a new empty {@link SimpleDocumentModel} instance.
+     *
+     * @since 11.1
+     */
+    public static SimpleDocumentModel empty(SchemaManager schemaManager) {
+        return new SimpleDocumentModel(schemaManager);
+    }
+
+    /**
+     * @since 11.1
+     */
+    protected SimpleDocumentModel(DocumentType documentType, SchemaManager schemaManager) {
+        this.schemaManager = schemaManager;
+        anySchema = false;
+        type = documentType.getName();
+        initSchemas(Arrays.asList(documentType.getSchemaNames()));
+    }
+
+    /**
+     * Returns a {@link SimpleDocumentModel} instance initialized with the given
+     * {@code type} and its related schemas.
+     *
+     * @since 11.1
+     */
+    public static SimpleDocumentModel ofType(String type, SchemaManager schemaManager) {
+        DocumentType dType = schemaManager.getDocumentType(type);
+        return new SimpleDocumentModel(dType, schemaManager);
+    }
+
+    /**
+     * @deprecated since 11.1. Use {@link #ofSchemas(List)} instead.
+     */
+    @Deprecated
+    public SimpleDocumentModel(List<String> schemas) {
+        anySchema = false;
+        initSchemas(schemas);
+    }
+
+    /**
+     * Returns a {@link SimpleDocumentModel} instance initialized with the given
+     * {@code schemas}.
+     *
+     * @since 11.1
+     */
+    public static SimpleDocumentModel ofSchemas(List<String> schemas) {
+        return new SimpleDocumentModel(schemas);
+    }
+
+    /**
+     * @deprecated since 11.1. Use {@link #ofSchemas(String, String...)} instead.
+     */
+    @Deprecated
+    public SimpleDocumentModel(String... schemas) {
+        this(Arrays.asList(schemas));
+    }
+
+    /**
+     * Returns a {@link SimpleDocumentModel} instance initialized with the given
+     * {@code schema} and optional {@code schemas}.
+     *
+     * @since 11.1
+     */
+    public static SimpleDocumentModel ofSchemas(String schema, String... schemas) {
+        return ofSchemas(Stream.concat(Stream.of(schema), Stream.of(schemas)).collect(Collectors.toList()));
+    }
+
+    protected final void initSchemas(List<String> schemas) {
+        for (String schema : schemas) {
+            Schema s = schemaManager.getSchema(schema);
+            DocumentPart part = DocumentPartImpl.builder().schema(s).build();
+
+            dataModels.put(schema, new DataModelImpl(part));
+            this.schemas.add(schema);
+        }
     }
 
     protected DataModel getDataModelInternal(String schema) {

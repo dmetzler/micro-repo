@@ -44,7 +44,7 @@ public interface SchemaService {
     void getSchema(String tenantId, Handler<AsyncResult<RemoteSchemaManager>> resultHandler);
 
 
-    static SchemaService createProxy(Vertx vertx, String nuxeoTenantsSchema) {
+    static SchemaService createProxy(Vertx vertx) {
         return new SchemaServiceVertxEBProxy(vertx, ADDRESS);
     }
 }

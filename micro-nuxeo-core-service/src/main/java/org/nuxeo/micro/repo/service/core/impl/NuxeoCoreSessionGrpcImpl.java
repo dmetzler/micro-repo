@@ -2,10 +2,11 @@ package org.nuxeo.micro.repo.service.core.impl;
 
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.micro.repo.proto.Document;
+import org.nuxeo.micro.repo.proto.DocumentCreationRequest;
+import org.nuxeo.micro.repo.proto.DocumentModelMapper;
+import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc;
 import org.nuxeo.micro.repo.service.core.CoreSessionService;
-import org.nuxeo.micro.repo.service.grpc.Document;
-import org.nuxeo.micro.repo.service.grpc.DocumentCreationRequest;
-import org.nuxeo.micro.repo.service.grpc.NuxeoCoreSessionGrpc;
 import org.nuxeo.micro.repo.service.schema.SchemaService;
 
 import io.vertx.core.AsyncResult;
@@ -20,6 +21,7 @@ public class NuxeoCoreSessionGrpcImpl extends NuxeoCoreSessionGrpc.NuxeoCoreSess
     private Vertx vertx;
     private JsonObject config;
     private CoreSessionService coreSessionService;
+    private DocumentModelMapper dmm = new DocumentModelMapper();
 
     public NuxeoCoreSessionGrpcImpl(Vertx vertx, JsonObject config, CoreSessionService coreSessionService) {
         this.vertx = vertx;
@@ -46,14 +48,18 @@ public class NuxeoCoreSessionGrpcImpl extends NuxeoCoreSessionGrpc.NuxeoCoreSess
                 response.fail(sh.cause());
             } else {
                 CoreSession session = sh.result();
+
+
+                DocumentModel documentModel = dmm.toDocumentModel(request.getDocument(), session);
+
                 DocumentModel doc = session.createDocumentModel(request.getPath(), request.getName(),
-                        request.getType());
-                // TODO: map a Document from the document creation request
+                        request.getDocument().getType());
+
+                DocumentModelMapper.applyPropertyValues(documentModel, doc, session.getRepository().getSchemaManager());
 
                 doc = session.createDocument(doc);
 
-                Document result = Document.newBuilder().setName(doc.getName()).setUuid(doc.getId())
-                        .setPath(doc.getPathAsString()).setType(doc.getType()).build();
+                Document result = dmm.toDocument(doc, session.getRepository().getSchemaManager());
 
                 response.complete(result);
 

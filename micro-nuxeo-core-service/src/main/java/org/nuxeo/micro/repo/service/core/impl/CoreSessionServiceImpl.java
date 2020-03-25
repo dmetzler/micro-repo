@@ -117,7 +117,7 @@ public class CoreSessionServiceImpl implements CoreSessionService {
             if (css == null) {
                 // Should be built by an Injection Manager (HK2, Guice....)
 
-                SchemaService ss = SchemaService.createProxy(vertx, SchemaService.NUXEO_TENANTS_SCHEMA);
+                SchemaService ss = SchemaService.createProxy(vertx);
 
                 ss.getSchema(tenantId, sh -> {
                     if (sh.succeeded()) {
