@@ -9,12 +9,13 @@ import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.micro.repo.proto.Document;
 import org.nuxeo.micro.repo.proto.DocumentCreationRequest;
-import org.nuxeo.micro.repo.proto.DocumentModelMapper;
 import org.nuxeo.micro.repo.proto.DocumentRequest;
 import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc;
+import org.nuxeo.micro.repo.proto.utils.DocumentModelMapper;
 import org.nuxeo.micro.repo.service.core.CoreSessionService;
 import org.nuxeo.micro.repo.service.schema.SchemaService;
 
+import io.grpc.Context;
 import io.grpc.Status;
 import io.grpc.StatusException;
 import io.grpc.stub.StreamObserver;
@@ -52,7 +53,7 @@ public class NuxeoCoreSessionGrpcImpl extends NuxeoCoreSessionGrpc.NuxeoCoreSess
 
     @Override
     public void createDocument(DocumentCreationRequest request, Promise<Document> response) {
-        coreSessionService.session(SchemaService.NUXEO_TENANTS_SCHEMA, "dmetzler@nuxeo.com", sh -> {
+        coreSessionService.session(getCurrentSchema(), "dmetzler@nuxeo.com", sh -> {
             if (sh.failed()) {
                 response.fail(sh.cause());
             } else {
@@ -73,6 +74,10 @@ public class NuxeoCoreSessionGrpcImpl extends NuxeoCoreSessionGrpc.NuxeoCoreSess
 
             }
         });
+    }
+
+    private String getCurrentSchema() {
+        return GrpcInterceptor.TENANT_ID_KEY.get();
     }
 
     @Override

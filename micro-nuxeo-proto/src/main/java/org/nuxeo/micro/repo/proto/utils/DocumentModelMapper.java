@@ -1,4 +1,4 @@
-package org.nuxeo.micro.repo.proto;
+package org.nuxeo.micro.repo.proto.utils;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
@@ -36,8 +36,10 @@ import org.nuxeo.ecm.core.schema.types.primitives.DoubleType;
 import org.nuxeo.ecm.core.schema.types.primitives.IntegerType;
 import org.nuxeo.ecm.core.schema.types.primitives.LongType;
 import org.nuxeo.ecm.core.schema.types.primitives.StringType;
+import org.nuxeo.micro.repo.proto.Document;
 import org.nuxeo.micro.repo.proto.Document.Builder;
 import org.nuxeo.micro.repo.proto.Document.Property.PropType;
+import org.nuxeo.micro.repo.proto.Document.Property.ScalarProperty;
 
 public class DocumentModelMapper {
 
@@ -96,7 +98,7 @@ public class DocumentModelMapper {
         return builder.build();
     }
 
-    private org.nuxeo.micro.repo.proto.Document.Property buildProperty(Property prop) {
+    static org.nuxeo.micro.repo.proto.Document.Property buildProperty(Property prop) {
         Document.Property.Builder propBuilder = Document.Property.newBuilder();
         if (prop.isScalar()) {
             Type type = prop.getType();

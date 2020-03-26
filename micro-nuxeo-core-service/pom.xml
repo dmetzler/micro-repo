@@ -108,6 +108,10 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-context</artifactId>
+    </dependency>
+    <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-infinispan</artifactId>
     </dependency>

@@ -12,9 +12,14 @@ import org.nuxeo.micro.repo.proto.Document;
 import org.nuxeo.micro.repo.proto.DocumentCreationRequest;
 import org.nuxeo.micro.repo.proto.DocumentRequest;
 import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc;
+import org.nuxeo.micro.repo.proto.utils.DocumentBuilder;
+import org.nuxeo.micro.repo.service.core.impl.GrpcInterceptor;
+import org.nuxeo.micro.repo.service.schema.SchemaService;
 import org.nuxeo.micro.repo.service.schema.SchemaVerticle;
 
 import io.grpc.ManagedChannel;
+import io.grpc.Metadata;
+import io.grpc.stub.MetadataUtils;
 import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -38,7 +43,10 @@ public class GrpcServerTest {
                 ManagedChannel channel = VertxChannelBuilder.forAddress(vertx, "localhost", CoreVerticle.DEFAULT_PORT)
                         .usePlaintext(true).build();
 
-                nuxeoSession = NuxeoCoreSessionGrpc.newVertxStub(channel);
+                Metadata headers = new Metadata();
+                headers.put(GrpcInterceptor.TENANTID_METADATA_KEY, SchemaService.NUXEO_TENANTS_SCHEMA);
+                nuxeoSession = NuxeoCoreSessionGrpc.newVertxStub(channel)
+                        .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(headers));
                 testContext.completeNow();
             }));
 
@@ -76,11 +84,7 @@ public class GrpcServerTest {
     }
 
     private DocumentCreationRequest.Builder documentCreationRequest(String path, String name, String type) {
-        Document.Property title = Document.Property.newBuilder()
-                .addScalarValue(Document.Property.ScalarProperty.newBuilder().setStrValue(name)).build();
-
-        Document doc = Document.newBuilder().setType(type).putProperties("dc:title", title).build();
-
+        Document doc = DocumentBuilder.create(type).setPropertyValue("dc:title", name).build();
         return DocumentCreationRequest.newBuilder().setPath("/").setName(name).setDocument(doc);
     }
 
@@ -123,8 +127,7 @@ public class GrpcServerTest {
             nuxeoSession.deleteDocument(resp, testContext.succeeding(protoDoc -> testContext.verify(() -> {
 
                 nuxeoSession.getDocument(DocumentRequest.newBuilder().setId(resp.getUuid()).build(),
-                       testContext.failing(t -> testContext.verify(() -> {
-                            t.printStackTrace();
+                        testContext.failing(t -> testContext.verify(() -> {
                             testContext.completeNow();
                         })));
             })));

@@ -77,7 +77,6 @@ public class CoreVerticle extends AbstractVerticle {
                                     .addService(ServerInterceptors.intercept(service, wrapped)).build();
                             rpcServer.start();
                             watch.stop();
-                            System.out.println("Time Elapsed: " + watch.getTime());
                             log.info("Started Nuxeo Core Verticle in {}ms", watch.getTime());
                             startFuture.complete();
                         } catch (IOException e) {
