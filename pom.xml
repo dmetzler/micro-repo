@@ -25,8 +25,10 @@
     <!-- <module>micro-nuxeo-todo</module> -->
     <module>micro-nuxeo-dsl</module>
     <module>micro-nuxeo-proto</module>
+    <module>micro-nuxeo-base-service</module>
     <module>micro-nuxeo-schema-service</module>
     <module>micro-nuxeo-core-service</module>
+    <module>micro-nuxeo-graphql-service</module>
 
   </modules>
 
@@ -77,6 +79,10 @@
     <exec-maven-plugin.version>1.5.0</exec-maven-plugin.version>
     <vertx.version>3.8.3</vertx.version>
     <junit-jupiter.version>5.5.2</junit-jupiter.version>
+
+
+    <fabric8-vertx-maven-plugin.projectVersion>1.0.9</fabric8-vertx-maven-plugin.projectVersion>
+
 
   </properties>
 
@@ -184,6 +190,17 @@
         <artifactId>micro-nuxeo-proto</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.nuxeo.micro-repo</groupId>
+        <artifactId>micro-nuxeo-base-service</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.nuxeo.micro-repo</groupId>
+        <artifactId>micro-nuxeo-graphql-service</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <dependency>
         <groupId>commons-collections</groupId>
         <artifactId>commons-collections</artifactId>
@@ -378,6 +395,17 @@
         <groupId>com.sun.xsom</groupId>
         <artifactId>xsom</artifactId>
         <version>20140925</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.infinispan</groupId>
+        <artifactId>infinispan-cloud</artifactId>
+        <version>9.4.10.Final</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.2.3</version>
       </dependency>
 
     </dependencies>

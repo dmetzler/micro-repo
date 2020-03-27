@@ -9,14 +9,17 @@
     <artifactId>micro-nuxeo-parent</artifactId>
     <version>0.0.8-SNAPSHOT</version>
   </parent>
-  <artifactId>micro-nuxeo-schema-service</artifactId>
-  <name>Micro Nuxeo :: Schema Service</name>
+  <artifactId>micro-nuxeo-graphql-service</artifactId>
+  <name>Micro Nuxeo :: GraphQL Service</name>
 
 
   <properties>
-    <vertx.verticle>org.nuxeo.micro.repo.service.schema.SchemaVerticle</vertx.verticle>
+
+    <vertx.verticle>org.nuxeo.micro.repo.service.graphql.GraphqlVerticle</vertx.verticle>
+
     <vertx.version>3.8.3</vertx.version>
     <fabric8-vertx-maven-plugin.projectVersion>1.0.9</fabric8-vertx-maven-plugin.projectVersion>
+
   </properties>
 
 
@@ -41,15 +44,47 @@
   <dependencies>
     <dependency>
       <groupId>org.nuxeo.micro-repo</groupId>
-      <artifactId>micro-nuxeo-schema</artifactId>
+      <artifactId>micro-nuxeo-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.nuxeo.micro-repo</groupId>
-      <artifactId>micro-nuxeo-base-service</artifactId>
+      <artifactId>micro-nuxeo-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.nuxeo.micro-repo</groupId>
+      <artifactId>micro-nuxeo-repo</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.nuxeo.micro-repo</groupId>
+      <artifactId>micro-nuxeo-schema-service</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.nuxeo.micro-repo</groupId>
+      <artifactId>micro-nuxeo-proto</artifactId>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-config</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-grpc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-config-yaml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-web-graphql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-auth-jwt</artifactId>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
@@ -65,12 +100,30 @@
       <artifactId>vertx-web-client</artifactId>
     </dependency>
     <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-auth-oauth2</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-context</artifactId>
+    </dependency>
+    <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-infinispan</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.infinispan</groupId>
+      <artifactId>infinispan-cloud</artifactId>
+      <version>9.4.10.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.3</version>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
@@ -80,12 +133,15 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
-      <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-launcher</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
@@ -97,7 +153,7 @@
     </dependency>
   </dependencies>
   <build>
-    <finalName>micro-nuxeo-schema-${project.version}</finalName>
+    <finalName>micro-nuxeo-core-${project.version}</finalName>
     <plugins>
       <plugin>
         <groupId>io.fabric8</groupId>
@@ -142,14 +198,6 @@
         <configuration>
           <generateRoute>false</generateRoute>
         </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>resource</goal>
-              <goal>build</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
