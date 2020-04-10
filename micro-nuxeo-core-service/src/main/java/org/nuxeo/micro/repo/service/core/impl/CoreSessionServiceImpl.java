@@ -2,8 +2,8 @@ package org.nuxeo.micro.repo.service.core.impl;
 
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.CoreSessionService.CoreSessionRegistrationInfo;
+import org.nuxeo.ecm.core.api.impl.NuxeoPrincipalImpl;
 import org.nuxeo.ecm.core.schema.SchemaManager;
-import org.nuxeo.micro.NuxeoPrincipalImpl;
 import org.nuxeo.micro.repo.RepoConfiguration;
 import org.nuxeo.micro.repo.RepoConfigurationFactory;
 import org.nuxeo.micro.repo.provider.DocumentBlobManagerProvider;
@@ -122,12 +122,7 @@ public class CoreSessionServiceImpl implements CoreSessionService {
                 ss.getSchema(tenantId, sh -> {
                     if (sh.succeeded()) {
 
-                        SchemaManagerProvider schemaManagerProvider = new SchemaManagerProvider() {
-                            @Override
-                            public SchemaManager getForTenant(String tenantId) {
-                                return sh.result();
-                            }
-                        };
+                        SchemaManagerProvider schemaManagerProvider = t -> sh.result();
 
                         DocumentBlobManagerProvider documentBlobManagerProvider = new MockDocumentBloblManagerProvider();
                         UIDGeneratorServiceProvider uidGenProvider = new DefaultUIDGeneratorServiceProvider();

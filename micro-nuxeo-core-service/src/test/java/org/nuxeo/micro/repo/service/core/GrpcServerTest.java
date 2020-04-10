@@ -3,6 +3,7 @@ package org.nuxeo.micro.repo.service.core;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,10 +13,11 @@ import org.nuxeo.micro.repo.proto.Document;
 import org.nuxeo.micro.repo.proto.DocumentCreationRequest;
 import org.nuxeo.micro.repo.proto.DocumentRequest;
 import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc;
+import org.nuxeo.micro.repo.proto.QueryRequest;
 import org.nuxeo.micro.repo.proto.utils.DocumentBuilder;
 import org.nuxeo.micro.repo.service.core.impl.GrpcInterceptor;
 import org.nuxeo.micro.repo.service.schema.SchemaService;
-import org.nuxeo.micro.repo.service.schema.SchemaVerticle;
+import org.nuxeo.micro.repo.service.schema.impl.SchemaVerticle;
 
 import io.grpc.ManagedChannel;
 import io.grpc.Metadata;
@@ -132,6 +134,27 @@ public class GrpcServerTest {
                         })));
             })));
 
+        })));
+    }
+
+    @Test
+    void can_query_documents(Vertx vertx, VertxTestContext testContext) throws Exception {
+
+        DocumentCreationRequest req = documentCreationRequest("/", "Test", "Folder").build();
+
+        nuxeoSession.createDocument(req, testContext.succeeding(r -> testContext.verify(() -> {
+
+            QueryRequest query = QueryRequest.newBuilder().setNxql("SELECT * FROM Folder WHERE dc:title = 'Test'")
+                    .build();
+
+            nuxeoSession.query(query, testContext.succeeding(resp -> testContext.verify(() -> {
+
+                List<Document> docs = resp.getDocsList();
+                assertThat(docs).hasSize(1);
+                assertThat(docs.get(0).getPropertiesMap().get("dc:title").getScalarValue(0).getStrValue())
+                        .isEqualTo("Test");
+
+            })));
         })));
     }
 

@@ -1,5 +1,7 @@
 package org.nuxeo.micro.repo.service.schema;
 
+import org.nuxeo.micro.repo.service.schema.impl.SchemaServiceImpl;
+
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
@@ -42,6 +44,7 @@ public interface SchemaService {
 
 
     void getSchema(String tenantId, Handler<AsyncResult<RemoteSchemaManager>> resultHandler);
+
 
 
     static SchemaService createProxy(Vertx vertx) {

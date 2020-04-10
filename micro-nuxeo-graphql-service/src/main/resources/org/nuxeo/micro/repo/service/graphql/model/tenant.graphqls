@@ -1,0 +1,35 @@
+
+type Tenant {
+  id: ID!
+  path: String
+  name: String!
+  schemaDef: String
+}
+
+type Query {
+  Tenant(id: ID!): Tenant
+  allTenants(page: Int, perPage: Int, sortField: String, sortOrder: String, filter: TenantFilter): [Tenant!]!
+  _allTenantsMeta(page: Int, perPage: Int, sortField: String, sortOrder: String, filter: TenantFilter): ListMetadata
+}
+
+type Mutation {
+  createTenant(
+    name: String!
+    schemaDef: String
+  ): Tenant
+
+  updateTenant(
+    id: ID!,
+    schemaDef: String
+  ): Tenant
+
+  deleteTenant(id: ID!): Tenant
+}
+
+input TenantFilter {
+    q: String
+}
+
+type ListMetadata {
+    count: Int!
+}

@@ -1,3 +1,6 @@
+metadata:
+  annotations:
+    configmap.fabric8.io/update-on-change: ${project.artifactId}
 spec:
   template:
     spec:
@@ -13,3 +16,14 @@ spec:
               value: '-Dvertx.cacheDirBase=/tmp -Dvertx.jgroups.config=default-configs/default-jgroups-kubernetes.xml -Djava.net.preferIPv4Stack=true'
             - name: JAVA_ARGS
               value: '-Dvertx.cacheDirBase=/tmp -Dvertx.jgroups.config=default-configs/default-jgroups-kubernetes.xml -Djava.net.preferIPv4Stack=true -cluster'
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              
+          ports:  
+          - containerPort: 8787
+            protocol: TCP
+      volumes:
+      - name: config
+        configMap:
+          name: micro-nuxeo-core-service

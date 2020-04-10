@@ -12,7 +12,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.VersioningOption;
-import org.nuxeo.micro.NuxeoPrincipalImpl;
+import org.nuxeo.ecm.core.api.impl.NuxeoPrincipalImpl;
 import org.nuxeo.micro.repo.provider.DocumentBlobManagerProvider;
 import org.nuxeo.micro.repo.provider.SchemaManagerProvider;
 import org.nuxeo.micro.repo.provider.TenantSchemaUrlResolver;

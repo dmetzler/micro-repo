@@ -1,4 +1,4 @@
-package org.nuxeo.micro.repo.service.schema;
+package org.nuxeo.micro.repo.service.schema.impl;
 
 import java.util.List;
 import java.util.Map;
@@ -10,6 +10,8 @@ import org.nuxeo.ecm.core.schema.FacetDescriptor;
 import org.nuxeo.ecm.core.schema.SchemaBindingDescriptor;
 import org.nuxeo.ecm.core.schema.SchemaDescriptor;
 import org.nuxeo.ecm.core.schema.SchemaManagerImpl;
+import org.nuxeo.micro.repo.service.schema.RemoteSchemaManager;
+import org.nuxeo.micro.repo.service.schema.SchemaService;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -80,6 +82,19 @@ public class SchemaServiceImpl implements SchemaService {
             SchemaManagerImpl sm = new SchemaManagerImpl(FileUtils.getTempDirectory());
             sm.registerConfiguration(new DefaultTypeConfiguration());
             buildSchemasAndTypes(sm);
+
+            sm.registerSchema(buildSchemaDescriptor("tenant"));
+
+            DocumentTypeDescriptor dtd = new DTDBuilder()//
+            .parent("Document")//
+            .name("Tenant")//
+            .schemas("common", "dublincore", "tenant")
+            .build();
+
+            sm.registerDocumentType(dtd);
+
+            sm.flushPendingsRegistration();
+
             resultHandler.handle(Future.succeededFuture(new RemoteSchemaManager(sm)));
         } else {
             resultHandler.handle(Future.failedFuture("Tenant Not Found"));

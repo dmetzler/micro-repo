@@ -1,4 +1,4 @@
-package org.nuxeo.micro;
+package org.nuxeo.ecm.core.api.impl;
 
 import java.util.List;
 

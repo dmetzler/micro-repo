@@ -151,7 +151,7 @@ public final class NuxeoCoreSessionGrpc {
         if ((getQueryMethod = NuxeoCoreSessionGrpc.getQueryMethod) == null) {
           NuxeoCoreSessionGrpc.getQueryMethod = getQueryMethod = 
               io.grpc.MethodDescriptor.<org.nuxeo.micro.repo.proto.QueryRequest, org.nuxeo.micro.repo.proto.QueryResult>newBuilder()
-              .setType(io.grpc.MethodDescriptor.MethodType.SERVER_STREAMING)
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
                   "NuxeoClient.NuxeoCoreSession", "query"))
               .setSampledToLocalTracing(true)
@@ -294,7 +294,7 @@ public final class NuxeoCoreSessionGrpc {
                   this, METHODID_UPDATE_DOCUMENT)))
           .addMethod(
             getQueryMethod(),
-            asyncServerStreamingCall(
+            asyncUnaryCall(
               new MethodHandlers<
                 org.nuxeo.micro.repo.proto.QueryRequest,
                 org.nuxeo.micro.repo.proto.QueryResult>(
@@ -362,7 +362,7 @@ public final class NuxeoCoreSessionGrpc {
      */
     public void query(org.nuxeo.micro.repo.proto.QueryRequest request,
         io.grpc.stub.StreamObserver<org.nuxeo.micro.repo.proto.QueryResult> responseObserver) {
-      asyncServerStreamingCall(
+      asyncUnaryCall(
           getChannel().newCall(getQueryMethod(), getCallOptions()), request, responseObserver);
     }
 
@@ -422,9 +422,8 @@ public final class NuxeoCoreSessionGrpc {
 
     /**
      */
-    public java.util.Iterator<org.nuxeo.micro.repo.proto.QueryResult> query(
-        org.nuxeo.micro.repo.proto.QueryRequest request) {
-      return blockingServerStreamingCall(
+    public org.nuxeo.micro.repo.proto.QueryResult query(org.nuxeo.micro.repo.proto.QueryRequest request) {
+      return blockingUnaryCall(
           getChannel(), getQueryMethod(), getCallOptions(), request);
     }
 
@@ -486,6 +485,14 @@ public final class NuxeoCoreSessionGrpc {
 
     /**
      */
+    public com.google.common.util.concurrent.ListenableFuture<org.nuxeo.micro.repo.proto.QueryResult> query(
+        org.nuxeo.micro.repo.proto.QueryRequest request) {
+      return futureUnaryCall(
+          getChannel().newCall(getQueryMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
     public com.google.common.util.concurrent.ListenableFuture<org.nuxeo.micro.repo.proto.Document> deleteDocument(
         org.nuxeo.micro.repo.proto.Document request) {
       return futureUnaryCall(
@@ -527,8 +534,8 @@ public final class NuxeoCoreSessionGrpc {
     /**
      */
     public void query(org.nuxeo.micro.repo.proto.QueryRequest request,
-        io.vertx.grpc.GrpcWriteStream<org.nuxeo.micro.repo.proto.QueryResult> response) {
-      asyncUnimplementedUnaryCall(getQueryMethod(), response.writeObserver());
+        io.vertx.core.Promise<org.nuxeo.micro.repo.proto.QueryResult> response) {
+      asyncUnimplementedUnaryCall(getQueryMethod(), NuxeoCoreSessionGrpc.toObserver(response));
     }
 
     /**
@@ -563,7 +570,7 @@ public final class NuxeoCoreSessionGrpc {
                   this, METHODID_UPDATE_DOCUMENT)))
           .addMethod(
             getQueryMethod(),
-            asyncServerStreamingCall(
+            asyncUnaryCall(
               new VertxMethodHandlers<
                 org.nuxeo.micro.repo.proto.QueryRequest,
                 org.nuxeo.micro.repo.proto.QueryResult>(
@@ -630,13 +637,9 @@ public final class NuxeoCoreSessionGrpc {
     /**
      */
     public void query(org.nuxeo.micro.repo.proto.QueryRequest request,
-        io.vertx.core.Handler<io.vertx.grpc.GrpcReadStream<org.nuxeo.micro.repo.proto.QueryResult>> handler) {
-      final io.vertx.grpc.GrpcReadStream<org.nuxeo.micro.repo.proto.QueryResult> readStream =
-          io.vertx.grpc.GrpcReadStream.<org.nuxeo.micro.repo.proto.QueryResult>create();
-
-      handler.handle(readStream);
-      asyncServerStreamingCall(
-          getChannel().newCall(getQueryMethod(), getCallOptions()), request, readStream.readObserver());
+        io.vertx.core.Handler<io.vertx.core.AsyncResult<org.nuxeo.micro.repo.proto.QueryResult>> response) {
+      asyncUnaryCall(
+          getChannel().newCall(getQueryMethod(), getCallOptions()), request, NuxeoCoreSessionGrpc.toObserver(response));
     }
 
     /**
@@ -759,7 +762,14 @@ public final class NuxeoCoreSessionGrpc {
           break;
         case METHODID_QUERY:
           serviceImpl.query((org.nuxeo.micro.repo.proto.QueryRequest) request,
-              (io.vertx.grpc.GrpcWriteStream<org.nuxeo.micro.repo.proto.QueryResult>) io.vertx.grpc.GrpcWriteStream.create(responseObserver));
+              (io.vertx.core.Promise<org.nuxeo.micro.repo.proto.QueryResult>) io.vertx.core.Promise.<org.nuxeo.micro.repo.proto.QueryResult>promise().future().setHandler(ar -> {
+                if (ar.succeeded()) {
+                  ((io.grpc.stub.StreamObserver<org.nuxeo.micro.repo.proto.QueryResult>) responseObserver).onNext(ar.result());
+                  responseObserver.onCompleted();
+                } else {
+                  responseObserver.onError(ar.cause());
+                }
+              }));
           break;
         case METHODID_DELETE_DOCUMENT:
           serviceImpl.deleteDocument((org.nuxeo.micro.repo.proto.Document) request,

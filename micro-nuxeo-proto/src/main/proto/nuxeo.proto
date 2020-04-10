@@ -12,7 +12,7 @@ service NuxeoCoreSession {
  rpc getDocument (DocumentRequest) returns (Document) {}
  rpc createDocument( DocumentCreationRequest ) returns (Document) {}
  rpc updateDocument( Document ) returns (Document) {}
- rpc query( QueryRequest ) returns ( stream QueryResult) {}
+ rpc query( QueryRequest ) returns ( QueryResult) {}
  rpc deleteDocument( Document ) returns (Document) {}
 
 

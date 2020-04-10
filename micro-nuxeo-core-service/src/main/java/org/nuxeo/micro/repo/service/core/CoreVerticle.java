@@ -15,7 +15,11 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.spi.cluster.ClusterManager;
+import io.vertx.ext.cluster.infinispan.InfinispanClusterManager;
 import io.vertx.grpc.BlockingServerInterceptor;
 import io.vertx.grpc.VertxServer;
 import io.vertx.grpc.VertxServerBuilder;
@@ -24,7 +28,26 @@ public class CoreVerticle extends BaseVerticle {
     static final int DEFAULT_PORT = 8787;
     private VertxServer rpcServer;
 
+    public static void main(String[] args) {
+        ClusterManager mgr = new InfinispanClusterManager();
+
+        VertxOptions options = new VertxOptions().setClusterManager(mgr);
+
+        Vertx.clusteredVertx(options, res -> {
+            if (res.succeeded()) {
+                Vertx vertx = res.result();
+                vertx.deployVerticle(new CoreVerticle());
+            } else {
+                // failed!
+            }
+        });
+    }
+
     private JtaActivator jta;
+
+    public CoreVerticle() {
+        super();
+    }
 
     public CoreVerticle(ConfigStoreOptions config) {
         super(config);

@@ -191,8 +191,7 @@ public class DocumentModelMapper {
 
     }
 
-    private Property readProperty(DocumentPart parent, Field field,
-            org.nuxeo.micro.repo.proto.Document.Property prop) {
+    private Property readProperty(DocumentPart parent, Field field, org.nuxeo.micro.repo.proto.Document.Property prop) {
         Property property = PropertyFactory.createProperty(parent, field, 0);
         property.setForceDirty(true);
         if (property.isScalar()) {
@@ -277,7 +276,9 @@ public class DocumentModelMapper {
         if (StringUtils.isNotBlank(uid)) {
             DocumentModel doc = coreSession.getDocument(new IdRef(uid));
             String changeToken = protoDoc.getChangeToken();
-            doc.putContextData(CoreSession.CHANGE_TOKEN, changeToken);
+            if (StringUtils.isNotBlank(changeToken)) {
+                doc.putContextData(CoreSession.CHANGE_TOKEN, changeToken);
+            }
             return doc;
         } else {
             String type = protoDoc.getType();

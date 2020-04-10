@@ -1,6 +1,7 @@
-package org.nuxeo.micro.repo.service.schema;
+package org.nuxeo.micro.repo.service.schema.impl;
 
 import org.nuxeo.micro.repo.service.BaseVerticle;
+import org.nuxeo.micro.repo.service.schema.SchemaService;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -14,7 +15,7 @@ import io.vertx.serviceproxy.ServiceBinder;
 
 public class SchemaVerticle extends BaseVerticle {
     private static final Logger log = LoggerFactory.getLogger(SchemaVerticle.class);
-    private static final Integer DEFAULT_PORT = 8080;
+    private static final Integer DEFAULT_PORT = 8081;
     private MessageConsumer<JsonObject> consumer;
     private ServiceBinder binder;
 

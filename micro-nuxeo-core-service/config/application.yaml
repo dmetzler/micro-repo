@@ -1,0 +1,6 @@
+db:
+  type: mongodb
+  server: localhost:27017
+  dbname: nuxeo
+
+

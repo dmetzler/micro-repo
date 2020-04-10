@@ -14,12 +14,7 @@
 
 
   <properties>
-
     <vertx.verticle>org.nuxeo.micro.repo.service.core.CoreVerticle</vertx.verticle>
-
-    <vertx.version>3.8.3</vertx.version>
-    <fabric8-vertx-maven-plugin.projectVersion>1.0.9</fabric8-vertx-maven-plugin.projectVersion>
-
   </properties>
 
 
@@ -122,12 +117,10 @@
     <dependency>
       <groupId>org.infinispan</groupId>
       <artifactId>infinispan-cloud</artifactId>
-      <version>9.4.10.Final</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.2.3</version>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>

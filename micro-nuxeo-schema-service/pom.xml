@@ -14,7 +14,7 @@
 
 
   <properties>
-    <vertx.verticle>org.nuxeo.micro.repo.service.schema.SchemaVerticle</vertx.verticle>
+    <vertx.verticle>org.nuxeo.micro.repo.service.schema.impl.SchemaVerticle</vertx.verticle>
     <vertx.version>3.8.3</vertx.version>
     <fabric8-vertx-maven-plugin.projectVersion>1.0.9</fabric8-vertx-maven-plugin.projectVersion>
   </properties>
@@ -142,15 +142,28 @@
         <configuration>
           <generateRoute>false</generateRoute>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.0.2</version>
         <executions>
           <execution>
+            <phase>package</phase>
             <goals>
-              <goal>resource</goal>
-              <goal>build</goal>
+              <goal>jar</goal>
             </goals>
+            <configuration>
+              <classifier>client</classifier>
+              <includes>
+                <include>org/nuxeo/micro/repo/service/schema/*</include>
+              </includes>
+            </configuration>
           </execution>
         </executions>
       </plugin>
+
+
     </plugins>
   </build>
 </project>

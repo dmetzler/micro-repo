@@ -15,7 +15,7 @@ import io.vertx.core.logging.LoggerFactory;
 
 public abstract class BaseVerticle extends AbstractVerticle {
 
-    private static final Logger log = LoggerFactory.getLogger(BaseVerticle.class);
+    protected static final Logger log = LoggerFactory.getLogger(BaseVerticle.class);
     private ConfigStoreOptions configOptions;
 
     public BaseVerticle() {

@@ -182,6 +182,12 @@
       </dependency>
       <dependency>
         <groupId>org.nuxeo.micro-repo</groupId>
+        <artifactId>micro-nuxeo-schema-service</artifactId>
+        <classifier>client</classifier>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.nuxeo.micro-repo</groupId>
         <artifactId>micro-nuxeo-core-service</artifactId>
         <version>${project.version}</version>
       </dependency>

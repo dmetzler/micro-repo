@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.nuxeo.ecm.core.schema.types.Type;
 import org.nuxeo.ecm.core.schema.types.primitives.BinaryType;
 import org.nuxeo.ecm.core.schema.types.primitives.BooleanType;
@@ -23,6 +24,8 @@ public class DocumentBuilder {
 
     private String type;
 
+    private String id;
+
     Map<String, Property> props = new HashMap<>();
 
     public static DocumentBuilder create(String type) {
@@ -35,7 +38,11 @@ public class DocumentBuilder {
     }
 
     public Builder toBuilder() {
-        return Document.newBuilder().setType(type).putAllProperties(props);
+        Builder builder = Document.newBuilder().setType(type).putAllProperties(props);
+        if(StringUtils.isNotBlank(id)) {
+            builder.setUuid(id);
+        }
+        return builder;
     }
 
     public DocumentBuilder setPropertyValue(String xPath, Serializable value) {
@@ -84,5 +91,9 @@ public class DocumentBuilder {
 
     public Document build() {
         return toBuilder().build();
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

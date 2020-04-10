@@ -32,11 +32,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentNotFoundException;
 import org.nuxeo.ecm.core.api.PathRef;
-import org.nuxeo.micro.repo.service.core.CoreSessionService;
 import org.nuxeo.micro.repo.service.schema.SchemaService;
-import org.nuxeo.micro.repo.service.schema.SchemaVerticle;
+import org.nuxeo.micro.repo.service.schema.impl.SchemaVerticle;
 import org.nuxeo.runtime.jtajca.JtaActivator;
-import org.nuxeo.runtime.transaction.TransactionHelper;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;

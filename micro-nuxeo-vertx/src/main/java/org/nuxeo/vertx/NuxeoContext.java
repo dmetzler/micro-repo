@@ -7,7 +7,7 @@ import java.util.Map;
 import org.nuxeo.ecm.core.api.CloseableCoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.NuxeoPrincipal;
-import org.nuxeo.micro.NuxeoPrincipalImpl;
+import org.nuxeo.ecm.core.api.impl.NuxeoPrincipalImpl;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;

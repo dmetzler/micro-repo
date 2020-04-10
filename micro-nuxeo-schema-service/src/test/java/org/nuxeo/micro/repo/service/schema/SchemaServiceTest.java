@@ -28,6 +28,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.nuxeo.micro.repo.service.schema.impl.SchemaVerticle;
 
 import io.vertx.core.Vertx;
 import io.vertx.junit5.VertxExtension;
@@ -64,6 +65,27 @@ public class SchemaServiceTest {
                 ss.getSchema(SchemaService.NUXEO_TENANTS_SCHEMA, sar -> {
                     if (sar.succeeded()) {
                         assertThat(sar.result().getDocumentType("Workspace")).isNotNull();
+                        testContext.completeNow();
+                    } else {
+                        testContext.failNow(sar.cause());
+                    }
+                });
+            }
+        });
+
+    }
+
+
+    @Test
+    void can_have_tenant_doctype(Vertx vertx, VertxTestContext testContext) throws Throwable {
+
+        SchemaService.create(vertx, null, ar -> {
+            if (ar.succeeded()) {
+                SchemaService ss = ar.result();
+
+                ss.getSchema(SchemaService.NUXEO_TENANTS_SCHEMA, sar -> {
+                    if (sar.succeeded()) {
+                        assertThat(sar.result().getDocumentType("Tenant")).isNotNull();
                         testContext.completeNow();
                     } else {
                         testContext.failNow(sar.cause());

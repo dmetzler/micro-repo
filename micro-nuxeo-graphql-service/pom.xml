@@ -15,7 +15,7 @@
 
   <properties>
 
-    <vertx.verticle>org.nuxeo.micro.repo.service.graphql.GraphqlVerticle</vertx.verticle>
+    <vertx.verticle>org.nuxeo.micro.repo.service.graphql.GraphQLVerticle</vertx.verticle>
 
     <vertx.version>3.8.3</vertx.version>
     <fabric8-vertx-maven-plugin.projectVersion>1.0.9</fabric8-vertx-maven-plugin.projectVersion>
@@ -48,15 +48,16 @@
     </dependency>
     <dependency>
       <groupId>org.nuxeo.micro-repo</groupId>
-      <artifactId>micro-nuxeo-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.nuxeo.micro-repo</groupId>
-      <artifactId>micro-nuxeo-repo</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.nuxeo.micro-repo</groupId>
       <artifactId>micro-nuxeo-schema-service</artifactId>
+      <classifier>client</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.nuxeo.micro-repo</groupId>
+      <artifactId>micro-nuxeo-base-service</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.nuxeo.micro-repo</groupId>
+      <artifactId>micro-nuxeo-el</artifactId>
     </dependency>
     <dependency>
       <groupId>org.nuxeo.micro-repo</groupId>
@@ -88,15 +89,6 @@
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
-      <artifactId>vertx-service-proxy</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-codegen</artifactId>
-      <classifier>processor</classifier>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
       <artifactId>vertx-web-client</artifactId>
     </dependency>
     <dependency>
@@ -108,22 +100,16 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>io.grpc</groupId>
-      <artifactId>grpc-context</artifactId>
-    </dependency>
-    <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-infinispan</artifactId>
     </dependency>
     <dependency>
       <groupId>org.infinispan</groupId>
       <artifactId>infinispan-cloud</artifactId>
-      <version>9.4.10.Final</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.2.3</version>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
@@ -153,7 +139,7 @@
     </dependency>
   </dependencies>
   <build>
-    <finalName>micro-nuxeo-core-${project.version}</finalName>
+    <finalName>micro-nuxeo-graphql-${project.version}</finalName>
     <plugins>
       <plugin>
         <groupId>io.fabric8</groupId>
