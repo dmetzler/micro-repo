@@ -45,7 +45,19 @@
     </dependency>
     <dependency>
       <groupId>org.nuxeo.micro-repo</groupId>
+      <artifactId>micro-nuxeo-dsl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.nuxeo.micro-repo</groupId>
       <artifactId>micro-nuxeo-base-service</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.nuxeo.micro-repo</groupId>
+      <artifactId>micro-nuxeo-dsl-service</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.nuxeo.micro-repo</groupId>
+      <artifactId>micro-nuxeo-proto</artifactId>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
@@ -67,6 +79,10 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.dom4j</groupId>
+      <artifactId>dom4j</artifactId>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>

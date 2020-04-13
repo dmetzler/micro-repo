@@ -19,6 +19,7 @@ import org.nuxeo.micro.repo.proto.QueryRequest;
 import org.nuxeo.micro.repo.proto.QueryResult;
 import org.nuxeo.micro.repo.proto.QueryResult.Builder;
 import org.nuxeo.micro.repo.proto.utils.DocumentModelMapper;
+import org.nuxeo.micro.repo.proto.utils.GrpcInterceptor;
 import org.nuxeo.micro.repo.service.core.CoreSessionService;
 
 import io.grpc.Status;

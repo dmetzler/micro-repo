@@ -41,7 +41,7 @@ public class CoreSessionServiceImpl implements CoreSessionService {
     @Override
     public void session(String tenantId, String username, Handler<AsyncResult<CoreSession>> sessionHandler) {
 
-        if (SchemaService.NUXEO_TENANTS_SCHEMA.equals(tenantId)) {
+        //if (SchemaService.NUXEO_TENANTS_SCHEMA.equals(tenantId)) {
             lookupHolder(tenantId).sessionService(ssh -> {
                 if (ssh.succeeded()) {
                     // TODO: Create a UserManagerService that resolve a principal base on username
@@ -58,9 +58,9 @@ public class CoreSessionServiceImpl implements CoreSessionService {
                 }
 
             });
-        } else {
-            sessionHandler.handle(Future.failedFuture("not implemented"));
-        }
+//        } else {
+//            sessionHandler.handle(Future.failedFuture("not implemented"));
+//        }
 
     }
 

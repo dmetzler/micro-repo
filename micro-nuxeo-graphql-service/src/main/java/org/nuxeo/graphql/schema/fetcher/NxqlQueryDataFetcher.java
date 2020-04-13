@@ -10,6 +10,7 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.platform.el.ELService;
 import org.nuxeo.ecm.platform.el.ELServiceServiceImpl;
 import org.nuxeo.ecm.platform.el.ExpressionEvaluator;
+import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxStub;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
@@ -18,7 +19,7 @@ public class NxqlQueryDataFetcher extends AbstractDataFetcher implements DataFet
 
     @Override
     public DocumentModelList get(DataFetchingEnvironment environment) {
-        CoreSession session = getSession(environment.getContext());
+        NuxeoCoreSessionVertxStub session = getSession(environment.getContext());
         if (session == null) {
             return null;
         }
@@ -27,7 +28,7 @@ public class NxqlQueryDataFetcher extends AbstractDataFetcher implements DataFet
         String finalQuery = getQuery(environment);
         ELService elService = new ELServiceServiceImpl();
         ELContext elContext = elService.createELContext();
-        el.bindValue(elContext, "principal", session.getPrincipal());
+        el.bindValue(elContext, "principal", getPrincipal(environment.getContext()));
 
         if (environment.getArguments().size() > 0) {
             for (Entry<String, Object> paramEntry : environment.getArguments().entrySet()) {

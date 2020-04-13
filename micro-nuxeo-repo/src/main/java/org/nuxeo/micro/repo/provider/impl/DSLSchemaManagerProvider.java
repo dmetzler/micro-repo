@@ -20,12 +20,12 @@ import org.dom4j.io.XMLWriter;
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.schema.SchemaManagerImpl;
 import org.nuxeo.micro.dsl.DslModel;
-import org.nuxeo.micro.dsl.features.DocumentTypeFeature;
-import org.nuxeo.micro.dsl.features.SchemaFeature;
-import org.nuxeo.micro.dsl.features.SchemaFeature.FieldsDef;
 import org.nuxeo.micro.dsl.parser.DslParser;
 import org.nuxeo.micro.dsl.parser.DslParserImpl;
 import org.nuxeo.micro.repo.provider.TenantSchemaUrlResolver;
+import org.nuxeo.micro.repo.service.schema.impl.DocumentTypeFeature;
+import org.nuxeo.micro.repo.service.schema.impl.SchemaFeature;
+import org.nuxeo.micro.repo.service.schema.impl.SchemaFeature.FieldsDef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

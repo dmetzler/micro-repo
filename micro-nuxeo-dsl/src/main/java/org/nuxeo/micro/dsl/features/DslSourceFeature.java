@@ -10,7 +10,7 @@ public class DslSourceFeature implements DslFeature {
 
     @Override
     public void visit(DslModel model, Map<String, Object> ast) {
-        src = model.getSource();
+        src = (String) ast.get("src");
     }
 
     public String getSrc() {

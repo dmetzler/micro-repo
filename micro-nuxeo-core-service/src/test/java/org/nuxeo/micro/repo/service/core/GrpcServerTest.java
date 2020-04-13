@@ -15,7 +15,7 @@ import org.nuxeo.micro.repo.proto.DocumentRequest;
 import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc;
 import org.nuxeo.micro.repo.proto.QueryRequest;
 import org.nuxeo.micro.repo.proto.utils.DocumentBuilder;
-import org.nuxeo.micro.repo.service.core.impl.GrpcInterceptor;
+import org.nuxeo.micro.repo.proto.utils.GrpcInterceptor;
 import org.nuxeo.micro.repo.service.schema.SchemaService;
 import org.nuxeo.micro.repo.service.schema.impl.SchemaVerticle;
 

@@ -1,5 +1,6 @@
 package org.nuxeo.micro.dsl;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -11,11 +12,10 @@ import com.google.common.collect.ImmutableMap;;
 public class DslModel {
 
     private final ImmutableMap<Class<? extends DslFeature>, DslFeature> features;
-    private String src;
 
     private DslModel(Set<Class<? extends DslFeature>> featureClasses) {
-        ImmutableMap.Builder<Class<? extends DslFeature>, DslFeature> builder = new ImmutableMap.Builder<Class<? extends DslFeature>,DslFeature>();
-        for(Class<? extends DslFeature> klass : featureClasses) {
+        ImmutableMap.Builder<Class<? extends DslFeature>, DslFeature> builder = new ImmutableMap.Builder<Class<? extends DslFeature>, DslFeature>();
+        for (Class<? extends DslFeature> klass : featureClasses) {
             try {
                 builder.put(klass, klass.newInstance());
             } catch (InstantiationException | IllegalAccessException e) {
@@ -26,14 +26,13 @@ public class DslModel {
     }
 
     public void visit(Map<String, Object> ast) {
-         for(DslFeature feature : features.values()) {
-             feature.visit(this, ast);
-         }
+        for (DslFeature feature : features.values()) {
+            feature.visit(this, ast);
+        }
     }
 
-
     @SuppressWarnings("unchecked")
-    public <T extends DslFeature> T  getFeature(Class<T> klass) {
+    public <T extends DslFeature> T getFeature(Class<T> klass) {
         return (T) features.get(klass);
     }
 
@@ -52,16 +51,13 @@ public class DslModel {
             classes.add(klass);
             return this;
         }
+
+        @SafeVarargs
+        @SuppressWarnings("unchecked")
+        public final DslModelBuilder with(Class<? extends DslFeature>... klasses) {
+            Arrays.asList(klasses).stream().forEach(k -> classes.add(k));
+            return this;
+        }
     }
-
-    public void setSource(String src) {
-        this.src = src;
-    }
-
-    public String getSource() {
-        return src;
-    }
-
-
 
 }

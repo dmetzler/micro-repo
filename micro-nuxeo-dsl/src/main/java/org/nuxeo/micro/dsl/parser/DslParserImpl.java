@@ -3,22 +3,15 @@ package org.nuxeo.micro.dsl.parser;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.micro.dsl.DslModel;
-import org.nuxeo.micro.dsl.DslModel.DslModelBuilder;
-import org.nuxeo.micro.dsl.features.DocumentTypeFeature;
 import org.nuxeo.micro.dsl.features.DslFeature;
-import org.nuxeo.micro.dsl.features.DslSourceFeature;
-import org.nuxeo.micro.dsl.features.SchemaFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +20,6 @@ public class DslParserImpl implements DslParser {
     private static final Logger log = LoggerFactory.getLogger(DslParserImpl.class);
 
     private ScriptEngine engine;
-
-    private Set<Class<? extends DslFeature>> featureClasses = new HashSet<>();
 
     private DslModel.DslModelBuilder modelBuilder;
 
@@ -49,12 +40,9 @@ public class DslParserImpl implements DslParser {
         } catch (ScriptException | FileNotFoundException e) {
 
             log.error("Unable to compile DSL compilator", e);
-            throw new NuxeoException(e);
+            throw new ParserException(e);
         }
 
-        featureClasses.add(DocumentTypeFeature.class);
-        featureClasses.add(DslSourceFeature.class);
-        featureClasses.add(SchemaFeature.class);
     }
 
     /**
@@ -62,45 +50,37 @@ public class DslParserImpl implements DslParser {
      * @param string
      * @throws ScriptException
      * @throws FileNotFoundException
-     * @since TODO
      */
     private void importJs(ScriptEngine engine, String file) throws FileNotFoundException, ScriptException {
         InputStream is = getClass().getResourceAsStream(file);
         engine.eval(new InputStreamReader(is));
     }
 
-    public void registerFeature(FeatureDescriptor featureDescriptor) {
-        featureClasses.add(featureDescriptor.klass);
-        modelBuilder = null;
-    }
-
     @Override
     @SuppressWarnings("unchecked")
-    public DslModel parse(String dsl) {
+    public DslModel parse(String dsl, Class<? extends DslFeature>... dslFeatures) {
 
-        // TODO make the builder pluggable
-        DslModel model = getDslModelBuilder().build();
-        try {
-            Map<String, Object> result = (Map<String, Object>) ((Invocable) engine).invokeFunction("parse", dsl);
-            Map<String, Object> ast = (Map<String, Object>) result.get("value");
+        DslModel model = DslModel.builder().with(dslFeatures).build();
+        Map<String, Object> ast = getAbstractSyntaxTree(dsl);
 
-            model.setSource(dsl);
-            model.visit(ast);
-            return model;
+        model.visit(ast);
+        return model;
 
-        } catch (NoSuchMethodException | ScriptException e) {
-            throw new NuxeoException(e);
-        }
     }
 
-    private DslModelBuilder getDslModelBuilder() {
-        if (modelBuilder == null) {
-            modelBuilder = DslModel.builder();
+    @SuppressWarnings("unchecked")
+    @Override
+    public Map<String, Object> getAbstractSyntaxTree(String dsl) {
+        try {
+            Map<String, Object> result = (Map<String, Object>) ((Invocable) engine).invokeFunction("parse", dsl);
 
-            for (Class<? extends DslFeature> featureKlass : featureClasses) {
-                modelBuilder.with(featureKlass);
-            }
+            Map<String, Object> ast = (Map<String, Object>) result.get("value");
+            ast.put("src", dsl);
+            return ast;
+
+        } catch (NoSuchMethodException | ScriptException e) {
+            throw new ParserException(e);
         }
-        return modelBuilder;
+
     }
 }

@@ -1,6 +1,7 @@
 package org.nuxeo.graphql.schema;
 
 import static graphql.Scalars.GraphQLString;
+import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLInterfaceType.newInterface;
 import static graphql.schema.GraphQLObjectType.newObject;
@@ -11,13 +12,19 @@ import java.util.Map;
 import java.util.Set;
 
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.schema.DocumentType;
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.graphql.descriptors.AliasDescriptor;
 import org.nuxeo.graphql.descriptors.CrudDescriptor;
 import org.nuxeo.graphql.descriptors.QueryDescriptor;
 import org.nuxeo.graphql.schema.fetcher.DocPropertyDataFetcher;
 import org.nuxeo.graphql.schema.fetcher.DocumentModelDataFetcher;
+import org.nuxeo.graphql.schema.fetcher.DocumentMutationDataFetcher;
+import org.nuxeo.graphql.schema.fetcher.DocumentMutationDataFetcher.Mode;
 import org.nuxeo.graphql.schema.fetcher.NxqlQueryDataFetcher;
+import org.nuxeo.graphql.schema.types.DocumentInputTypeBuilder;
+import org.nuxeo.graphql.schema.types.DocumentTypeBuilder;
+import org.nuxeo.graphql.schema.types.QueryFieldTypeBuilder;
 
 import graphql.TypeResolutionEnvironment;
 import graphql.schema.GraphQLArgument;
@@ -41,13 +48,17 @@ public class NuxeoGQLSchemaManager {
 
     private Map<String, GraphQLInputObjectType> inputTypesForSchema = new HashMap<>();
 
-    private Map<String, AliasDescriptor> aliases;
+    private Map<String, AliasDescriptor> aliases= new HashMap<>();
 
-    private Map<String, QueryDescriptor> queries;
+    private Map<String, QueryDescriptor> queries= new HashMap<>();
 
-    private Map<String, CrudDescriptor> cruds;
+    private Map<String, CrudDescriptor> cruds= new HashMap<>();
 
     private SchemaManager sm;
+
+    public NuxeoGQLSchemaManager(SchemaManager sm) {
+        this.sm = sm;
+    }
 
     public NuxeoGQLSchemaManager(Map<String, AliasDescriptor> aliases, Map<String, QueryDescriptor> queries,
             Map<String, CrudDescriptor> cruds, SchemaManager sm) {
@@ -68,6 +79,10 @@ public class NuxeoGQLSchemaManager {
 
     }
 
+    public SchemaManager getSchemaManager() {
+        return sm;
+    }
+
     private GraphQLObjectType buildQueryType() {
         Builder builder = newObject().name("nuxeo");
         builder.field(newFieldDefinition().name("document")
@@ -82,9 +97,9 @@ public class NuxeoGQLSchemaManager {
                                           .dataFetcher(new NxqlQueryDataFetcher())
                                           .build());
 
-//        for (QueryDescriptor query : queries.values()) {
-//            builder.field(QueryFieldTypeBuilder.newField(query).build());
-//        }
+        for (QueryDescriptor query : queries.values()) {
+            builder.field(QueryFieldTypeBuilder.newField(query, this).build());
+        }
 
         return builder.build();
 
@@ -101,22 +116,22 @@ public class NuxeoGQLSchemaManager {
     }
 
     private void buildMutationForDocType(Builder builder, String docType) {
-//        GraphQLInputObjectType inputType = DocumentInputTypeBuilder.type(docType).build();
-//
-//        builder.field(newFieldDefinition().name("create" + docType)
-//                                          .type(docTypeToGQLType.get(docType))
-//                                          .argument(newArgument().name(docType).type(inputType))
-//                                          .dataFetcher(new DocumentMutationDataFetcher(docType, Mode.CREATE)));
-//
-//        builder.field(newFieldDefinition().name("update" + docType)
-//                                          .type(docTypeToGQLType.get(docType))
-//                                          .argument(newArgument().name(docType).type(inputType))
-//                                          .dataFetcher(new DocumentMutationDataFetcher(docType, Mode.UPDATE)));
-//
-//        builder.field(newFieldDefinition().name("delete" + docType)
-//                                          .type(GraphQLString)
-//                                          .argument(newArgument().name(docType).type(inputType))
-//                                          .dataFetcher(new DocumentMutationDataFetcher(docType, Mode.DELETE)));
+        GraphQLInputObjectType inputType = DocumentInputTypeBuilder.type(docType, this).build();
+
+        builder.field(newFieldDefinition().name("create" + docType)
+                                          .type(docTypeToGQLType.get(docType))
+                                          .argument(newArgument().name(docType).type(inputType))
+                                          .dataFetcher(new DocumentMutationDataFetcher(docType, Mode.CREATE)));
+
+        builder.field(newFieldDefinition().name("update" + docType)
+                                          .type(docTypeToGQLType.get(docType))
+                                          .argument(newArgument().name(docType).type(inputType))
+                                          .dataFetcher(new DocumentMutationDataFetcher(docType, Mode.UPDATE)));
+
+        builder.field(newFieldDefinition().name("delete" + docType)
+                                          .type(GraphQLString)
+                                          .argument(newArgument().name(docType).type(inputType))
+                                          .dataFetcher(new DocumentMutationDataFetcher(docType, Mode.DELETE)));
     }
 
     /**
@@ -129,8 +144,7 @@ public class NuxeoGQLSchemaManager {
             documentInterface = newInterface().name("document")
                                               .field(newFieldDefinition().type(GraphQLString)//
                                                                          .name("_path")
-                                                                         .dataFetcher(
-                                                                                 new DocPropertyDataFetcher())
+                                                                         .dataFetcher(new DocPropertyDataFetcher())
                                                                          .build())
                                               .field(newFieldDefinition().type(GraphQLString)//
                                                                          .name("_id")
@@ -145,13 +159,12 @@ public class NuxeoGQLSchemaManager {
 
             docTypeToGQLType = new HashMap<>();
 
-//            for (DocumentType type : sm.getDocumentTypes()) {
-//                docTypeToGQLType.put(type.getName(), DocumentTypeBuilder.newDocumentType(type).build());
-//            }
+            for (DocumentType type : getSchemaManager().getDocumentTypes()) {
+                docTypeToGQLType.put(type.getName(), DocumentTypeBuilder.newDocumentType(type, this).build());
+            }
         }
 
     }
-
 
     /**
      * Creates a GQL type for a Nuxeo schema

@@ -24,12 +24,6 @@
 
   const ArrayList = Java.type('java.util.ArrayList');
   const Map = Java.type('java.util.HashMap');
-  const DocumentTypeDescriptor = Java.type("org.nuxeo.ecm.core.schema.DocumentTypeDescriptor")
-  const SchemaDescriptor = Java.type("org.nuxeo.ecm.core.schema.SchemaDescriptor")
-  const SchemaBindingDescriptor = Java.type("org.nuxeo.ecm.core.schema.SchemaBindingDescriptor")
-  const AliasDescriptor = Java.type("org.nuxeo.graphql.descriptors.AliasDescriptor")
-  const QueryDescriptor = Java.type("org.nuxeo.graphql.descriptors.QueryDescriptor")
-  const CrudDescriptor = Java.type("org.nuxeo.graphql.descriptors.CrudDescriptor")
 
 
   class NuxeoInterpreter extends nuxeo_dsl.NuxeoInterpreter {
@@ -54,10 +48,14 @@
 
             ast.schemas.map((schema)=> {
 
-              var item = { fields: new ArrayList()}
-            item.descriptor = new SchemaBindingDescriptor()
+              var item = new Map();
+
+              //{ fields: new ArrayList()}
+// item.descriptor = new SchemaBindingDescriptor()
+              item.descriptor = new Map()
             item.descriptor.name = schema.name
             item.descriptor.prefix = schema.prefix
+            item.fields = new ArrayList();
 
               for (var name in schema.fields) {
                 var field = new Map()
@@ -75,28 +73,31 @@
             var aliases = new ArrayList()
             var crud = new ArrayList()
             ast.doctypes.forEach(function(d){
-              var descriptor = new DocumentTypeDescriptor();
+              // new DocumentTypeDescriptor();
+              var descriptor = new Map()
               descriptor.name = d.name
               descriptor.superTypeName = d.extends;
 
+              descriptor.facets = new ArrayList();
               if(d.facets && d.facets.length > 0) {
-                descriptor.facets = d.facets
-              } else {
-                descriptor.facets = [];
+                d.facets.forEach( f => descriptor.facets.add(f))
               }
 
               if(d.schemas && d.schemas.length > 0) {
-                descriptor.schemas = d.schemas.map( s => {
-                  var sd = new SchemaDescriptor()
-                  sd.name = s.name
-                  sd.isLazy = s.lazy
-                  return sd;
+                descriptor.schemas = new ArrayList();
+                d.schemas.forEach( s => {
+// var sd = new SchemaDescriptor()
+                  var sd = new Map()
+                  sd.name = s.name;
+                  sd.isLazy = s.lazy;
+                  descriptor.schemas.add(sd);
                 })
               }
 
               if(d.aliases && d.aliases.length > 0 ) {
                 d.aliases.forEach((alias)=> {
-                  const aliasDesc = new AliasDescriptor()
+// const aliasDesc = new AliasDescriptor()
+                  const aliasDesc = new Map()
                   aliasDesc.name = alias.name
                   aliasDesc.targetDoctype = d.name
                   aliasDesc.type = alias.type
@@ -108,9 +109,7 @@
               }
 
               if(d.hasOwnProperty('crud')) {
-                var crudDesc = new CrudDescriptor()
-                crudDesc.targetDoctype = d.name
-                crud.add(crudDesc)
+                crud.add(d.name)
               }
 
 
@@ -129,7 +128,8 @@
           if (ast.queries && ast.queries.length > 0) {
             const queries = new ArrayList()
             ast.queries.forEach((query)=> {
-              const queryDesc = new QueryDescriptor()
+// const queryDesc = new QueryDescriptor()
+              const queryDesc = new Map()
               queryDesc.name = query.name
               queryDesc.query = query.query
               queryDesc.resultType = query.resultType
@@ -168,9 +168,11 @@
             }
 
               var result = new Map()
+              var ast = NuxeoInterpreterInstance.visit(value)
               result.put("value", NuxeoInterpreterInstance.visit(value))
               result.put("lexErrors", lexResult.errors)
               result.put("parseErrors", "")
+              result.put("src", text)
               return result
           }
 

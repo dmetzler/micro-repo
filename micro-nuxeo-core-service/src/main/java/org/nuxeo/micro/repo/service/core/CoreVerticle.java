@@ -3,8 +3,8 @@ package org.nuxeo.micro.repo.service.core;
 import java.io.IOException;
 
 import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxImplBase;
+import org.nuxeo.micro.repo.proto.utils.GrpcInterceptor;
 import org.nuxeo.micro.repo.service.BaseVerticle;
-import org.nuxeo.micro.repo.service.core.impl.GrpcInterceptor;
 import org.nuxeo.micro.repo.service.core.impl.NuxeoCoreSessionGrpcImpl;
 import org.nuxeo.runtime.jtajca.JtaActivator;
 
@@ -26,6 +26,7 @@ import io.vertx.grpc.VertxServerBuilder;
 
 public class CoreVerticle extends BaseVerticle {
     static final int DEFAULT_PORT = 8787;
+
     private VertxServer rpcServer;
 
     public static void main(String[] args) {
@@ -68,8 +69,13 @@ public class CoreVerticle extends BaseVerticle {
                     ServerInterceptor wrapped = BlockingServerInterceptor.wrap(vertx, interceptor);
 
                     rpcServer = VertxServerBuilder.forAddress(vertx, "0.0.0.0", config.getInteger("port", DEFAULT_PORT))
-                            .addService(ServerInterceptors.intercept(service, wrapped)).build();
+                                                  .addService(ServerInterceptors.intercept(service, wrapped))
+                                                  .build();
                     rpcServer.start();
+
+                    vertx.createHttpServer()
+                         .requestHandler(req -> req.response().end("OK"))
+                         .listen(config.getInteger("port", 8080));
 
                     completionHandler.handle(Future.succeededFuture());
                 } catch (IOException e) {

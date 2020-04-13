@@ -8,6 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 import org.nuxeo.ecm.core.api.impl.NuxeoPrincipalImpl;
+import org.nuxeo.graphql.schema.NuxeoGQLSchemaManager;
 import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc;
 import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxStub;
 import org.nuxeo.micro.repo.service.graphql.model.TenantsOperation;
@@ -42,15 +43,6 @@ public class MetaGraphQLHandler implements Handler<RoutingContext> {
 
     public static final Metadata.Key<String> TENANT_ID_KEY = Metadata.Key.of("tenantId", ASCII_STRING_MARSHALLER);
 
-    String schema = "type Hello {\n" + //
-            "  tenantId: ID!\n" + //
-            "  message: String\n" + //
-            "}\n" + //
-            "\n" + //
-            "type Query {\n" + //
-            "  hello: [Hello]\n" + //
-            "}\n" + "";
-
     protected final NuxeoCoreSessionVertxStub nuxeoSession;
 
     private Vertx vertx;
@@ -74,9 +66,6 @@ public class MetaGraphQLHandler implements Handler<RoutingContext> {
             coreHost = config.getJsonObject("core").getString("host", "localhost");
         }
 
-        System.out.println(String.format("Connecting to %s:%d", coreHost, corePort));
-        System.out.print(config.encodePrettily());
-
         ManagedChannel channel = VertxChannelBuilder.forAddress(vertx, coreHost, corePort).usePlaintext(true).build();
 
         return new MetaGraphQLHandler(vertx, NuxeoCoreSessionGrpc.newVertxStub(channel), config);
@@ -85,6 +74,7 @@ public class MetaGraphQLHandler implements Handler<RoutingContext> {
     @Override
     public void handle(RoutingContext event) {
         String tenantId = event.request().getParam("tenantId");
+        
         GraphQL graphQL = getGraphQL(tenantId);
 
         if (graphQL != null) {
@@ -110,21 +100,8 @@ public class MetaGraphQLHandler implements Handler<RoutingContext> {
             graphql.schema.idl.RuntimeWiring.Builder runtimeWiring = RuntimeWiring.newRuntimeWiring();
 
             Builder builder = NuxeoGQLConfiguration.builder()//
-                    .runtimeWiring(runtimeWiring).configuration(TenantsOperation.class);
-
-//            DataFetcher<CompletionStage<List<Hello>>> dataFetcher = environment -> {
-//
-//                CompletableFuture<List<Hello>> completableFuture = new CompletableFuture<>();
-//                completableFuture.complete(Collections.singletonList(new Hello(tenantId)));
-//
-//                return completableFuture;
-//            };
-//
-//            runtimeWiring.type("TenantQuery", b -> b.dataFetcher("hello", dataFetcher));
-//
-//            SchemaParser schemaParser = new SchemaParser();
-//
-////            TypeDefinitionRegistry parse = schemaParser.parse(schema);
+                                                   .runtimeWiring(runtimeWiring)
+                                                   .configuration(TenantsOperation.class);
 
             TypeDefinitionRegistry typeDefinitionRegistry = builder.getTypeDefinitionRegistry();
 
@@ -132,9 +109,14 @@ public class MetaGraphQLHandler implements Handler<RoutingContext> {
             GraphQLSchema graphQLSchema = schemaGenerator.makeExecutableSchema(typeDefinitionRegistry,
                     runtimeWiring.build()); // (4)
             return GraphQL.newGraphQL(graphQLSchema)//
-                    .build();
+                          .build();
         } else {
-            return null;
+
+            NuxeoGQLSchemaManager gqlManager = new NuxeoGQLSchemaManager(sm);
+
+            GraphQLSchema graphQLSchema = gqlManager.getNuxeoSchema();
+            return GraphQL.newGraphQL(graphQLSchema)//
+                          .build();
         }
 
     }
@@ -148,8 +130,9 @@ public class MetaGraphQLHandler implements Handler<RoutingContext> {
             GraphQL graphQL = getGraphQL(tenantId);
 
             if (graphQL != null) {
-                GraphiQLHandler graphiQLHandler = GraphiQLHandler.create(new GraphiQLHandlerOptions().setEnabled(true)
-                        .setGraphQLUri(String.format("/%s/graphql", tenantId)));
+                GraphiQLHandler graphiQLHandler = GraphiQLHandler.create(
+                        new GraphiQLHandlerOptions().setEnabled(true)
+                                                    .setGraphQLUri(String.format("/%s/graphql", tenantId)));
                 graphiQLHandler.graphiQLRequestHeaders(rc -> {
                     String token = rc.get("token");
                     return MultiMap.caseInsensitiveMultiMap().add(HttpHeaders.AUTHORIZATION, "Bearer " + token);

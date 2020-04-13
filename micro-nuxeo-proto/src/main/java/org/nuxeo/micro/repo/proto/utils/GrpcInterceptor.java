@@ -1,4 +1,4 @@
-package org.nuxeo.micro.repo.service.core.impl;
+package org.nuxeo.micro.repo.proto.utils;
 
 import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 

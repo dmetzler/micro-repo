@@ -53,6 +53,12 @@
     </dependency>
     <dependency>
       <groupId>org.nuxeo.micro-repo</groupId>
+      <artifactId>micro-nuxeo-core-service</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.nuxeo.micro-repo</groupId>
       <artifactId>micro-nuxeo-base-service</artifactId>
     </dependency>
     <dependency>

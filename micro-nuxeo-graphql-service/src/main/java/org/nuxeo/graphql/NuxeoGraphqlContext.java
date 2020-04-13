@@ -1,14 +1,18 @@
 package org.nuxeo.graphql;
 
-import org.nuxeo.ecm.core.api.CoreSession;
+import java.security.Principal;
+
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.platform.el.ExpressionEvaluator;
+import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxStub;
 
 public interface NuxeoGraphqlContext {
 
-    CoreSession getSession();
+    NuxeoCoreSessionVertxStub getSession();
 
     ExpressionEvaluator getEvaluator();
 
     SchemaManager getSchemaManager();
+
+    Principal getPrincipal();
 }

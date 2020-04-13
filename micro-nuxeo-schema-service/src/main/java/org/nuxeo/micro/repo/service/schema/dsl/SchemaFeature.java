@@ -1,4 +1,4 @@
-package org.nuxeo.micro.dsl.features;
+package org.nuxeo.micro.repo.service.schema.dsl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.nuxeo.ecm.core.schema.SchemaBindingDescriptor;
 import org.nuxeo.micro.dsl.DslModel;
+import org.nuxeo.micro.dsl.features.DslFeature;
 
 public class SchemaFeature implements DslFeature {
 
@@ -22,8 +23,14 @@ public class SchemaFeature implements DslFeature {
             List<Map<String, Object>> schemas = (List<Map<String, Object>>) ast.get("schemas");
 
             for (Map<String, Object> schemaDef : schemas) {
-                SchemaBindingDescriptor descriptor = (SchemaBindingDescriptor) schemaDef.get("descriptor");
+
+                Map<String, String> desc = (Map<String, String>) schemaDef.get("descriptor");
+
+                SchemaBindingDescriptor descriptor = new SchemaBindingDescriptor();
+                descriptor.name = desc.get("name");
+                descriptor.prefix = desc.get("prefix");
                 descriptors.add(descriptor);
+
                 List<Map<String, String>> fields = (List<Map<String, String>>) schemaDef.get("fields");
                 fieldsDefs.put(descriptor.name, FieldsDef.fromAst(fields));
             }

@@ -29,6 +29,7 @@
     <module>micro-nuxeo-schema-service</module>
     <module>micro-nuxeo-core-service</module>
     <module>micro-nuxeo-graphql-service</module>
+    <module>micro-nuxeo-dsl-service</module>
 
   </modules>
 
@@ -204,6 +205,11 @@
       <dependency>
         <groupId>org.nuxeo.micro-repo</groupId>
         <artifactId>micro-nuxeo-graphql-service</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.nuxeo.micro-repo</groupId>
+        <artifactId>micro-nuxeo-dsl-service</artifactId>
         <version>${project.version}</version>
       </dependency>
 
