@@ -1,4 +1,4 @@
-package org.nuxeo.vertx.graphql;
+package org.nuxeo.micro.repo.service.graphql.tenant;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

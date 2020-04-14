@@ -1,0 +1,31 @@
+doctype Library extends Folder {
+schemas {
+    common dublincore
+      lib:library { city, country}
+  }
+  aliases {
+    name prop {"dc:title"}
+      city prop {"lib:city"}
+      country prop {"lib:country"}
+      books query { "select * from Book where ecm:parentId = '${this.id}'", "Book"}
+  }
+  crud
+}
+
+doctype Book {
+  schemas {
+    common dublincore
+      bk:book { author, isbn, pageCount integer}
+  }
+  aliases {
+    title prop {"dc:title"}
+      author prop {"bk:author"}
+      isbn  prop {"bk:isbn"}
+      pageCount prop {"bk:pageCount"}
+  }
+  crud
+}
+
+queries {
+  libraries:Library "SELECT * From Library"
+}

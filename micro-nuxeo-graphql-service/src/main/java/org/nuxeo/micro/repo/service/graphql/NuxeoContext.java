@@ -2,11 +2,14 @@ package org.nuxeo.micro.repo.service.graphql;
 
 import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.nuxeo.ecm.core.api.NuxeoPrincipal;
 import org.nuxeo.ecm.core.api.impl.NuxeoPrincipalImpl;
+import org.nuxeo.ecm.core.schema.SchemaManager;
+import org.nuxeo.ecm.platform.el.ExpressionEvaluator;
 import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc;
 import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxStub;
 
@@ -23,10 +26,9 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.impl.RoutingContextDecorator;
 import io.vertx.grpc.VertxChannelBuilder;
 
-public class NuxeoContext extends RoutingContextDecorator {
+public class NuxeoContext extends RoutingContextDecorator implements NuxeoGraphqlContext {
 
     private final NuxeoCoreSessionVertxStub nuxeoSession;
-
 
     public static final Metadata.Key<String> PRINCIPAL_ID_KEY = Metadata.Key.of("principalId", ASCII_STRING_MARSHALLER);
 
@@ -75,8 +77,8 @@ public class NuxeoContext extends RoutingContextDecorator {
             NuxeoPrincipal principal = principalResult.result();
             headers.put(PRINCIPAL_ID_KEY, principal.getPrincipalId());
 
-            NuxeoCoreSessionVertxStub session = nuxeoSession
-                    .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(headers));
+            NuxeoCoreSessionVertxStub session = nuxeoSession.withInterceptors(
+                    MetadataUtils.newAttachHeadersInterceptor(headers));
 
             resultHandler.handle(Future.succeededFuture(session));
 
@@ -85,6 +87,32 @@ public class NuxeoContext extends RoutingContextDecorator {
 
     public Map<String, Object> getCache() {
         return contextCache;
+    }
+
+    @Override
+    public NuxeoCoreSessionVertxStub getSession() {
+        return nuxeoSession;
+    }
+
+    @Override
+    public ExpressionEvaluator getEvaluator() {
+        // TODO Auto-generated method stub
+        // return null;
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public SchemaManager getSchemaManager() {
+        // TODO Auto-generated method stub
+        // return null;
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Principal getPrincipal() {
+        // TODO Auto-generated method stub
+        // return null;
+        throw new UnsupportedOperationException();
     }
 
 }

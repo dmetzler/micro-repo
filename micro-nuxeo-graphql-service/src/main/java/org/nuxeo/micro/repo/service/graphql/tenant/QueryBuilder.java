@@ -1,4 +1,4 @@
-package org.nuxeo.vertx.graphql;
+package org.nuxeo.micro.repo.service.graphql.tenant;
 
 import java.util.ArrayList;
 import java.util.List;

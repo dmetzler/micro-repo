@@ -11,7 +11,8 @@ import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.core.schema.DocumentType;
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.schema.types.Schema;
-import org.nuxeo.graphql.NuxeoGraphqlContext;
+import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxStub;
+import org.nuxeo.micro.repo.service.graphql.NuxeoGraphqlContext;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
@@ -36,32 +37,35 @@ public class DocumentMutationDataFetcher extends AbstractDataFetcher implements 
         Map<String, Object> docInputMap = environment.getArgument(targetDocType);
 
         DocumentModel doc;
-        CoreSession session = ((NuxeoGraphqlContext) environment.getContext()).getSession();
+        NuxeoCoreSessionVertxStub session = ((NuxeoGraphqlContext) environment.getContext()).getSession();
         SchemaManager sm = ((NuxeoGraphqlContext) environment.getContext()).getSchemaManager();
-        doc = getOrCreateDocument(docInputMap, session);
 
-        DocumentType docType = sm.getDocumentType(targetDocType);
-        for (Schema schema : docType.getSchemas()) {
-            String schemaName = schema.getNamespace().hasPrefix() ? schema.getNamespace().prefix : schema.getName();
-            Map<String, Object> dataModelMap = (Map<String, Object>) docInputMap.get(schemaName);
-            if (dataModelMap != null) {
-                for (Entry<String, Object> entry : dataModelMap.entrySet()) {
-                    if (schema.getField(entry.getKey()).getType().isSimpleType()) {
-                        doc.setProperty(schema.getName(), entry.getKey(), entry.getValue());
-                    }
-                }
-            }
-        }
-        switch (mode) {
-        case UPDATE:
-            return session.saveDocument(doc);
-        case DELETE:
-            session.removeDocument(doc.getRef());
-            return null;
-        case CREATE:
-            return session.createDocument(doc);
 
-        }
+
+//        doc = getOrCreateDocument(docInputMap, session);
+//
+//        DocumentType docType = sm.getDocumentType(targetDocType);
+//        for (Schema schema : docType.getSchemas()) {
+//            String schemaName = schema.getNamespace().hasPrefix() ? schema.getNamespace().prefix : schema.getName();
+//            Map<String, Object> dataModelMap = (Map<String, Object>) docInputMap.get(schemaName);
+//            if (dataModelMap != null) {
+//                for (Entry<String, Object> entry : dataModelMap.entrySet()) {
+//                    if (schema.getField(entry.getKey()).getType().isSimpleType()) {
+//                        doc.setProperty(schema.getName(), entry.getKey(), entry.getValue());
+//                    }
+//                }
+//            }
+//        }
+//        switch (mode) {
+//        case UPDATE:
+//            return session.saveDocument(doc);
+//        case DELETE:
+//            session.removeDocument(doc.getRef());
+//            return null;
+//        case CREATE:
+//            return session.createDocument(doc);
+//
+//        }
         return null;
     }
 

@@ -25,6 +25,7 @@ import org.nuxeo.graphql.schema.fetcher.NxqlQueryDataFetcher;
 import org.nuxeo.graphql.schema.types.DocumentInputTypeBuilder;
 import org.nuxeo.graphql.schema.types.DocumentTypeBuilder;
 import org.nuxeo.graphql.schema.types.QueryFieldTypeBuilder;
+import org.nuxeo.micro.repo.proto.Document;
 
 import graphql.TypeResolutionEnvironment;
 import graphql.schema.GraphQLArgument;
@@ -37,6 +38,8 @@ import graphql.schema.GraphQLObjectType.Builder;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLType;
 import graphql.schema.TypeResolver;
+import graphql.schema.idl.RuntimeWiring;
+import io.vertx.ext.web.handler.graphql.VertxDataFetcher;
 
 public class NuxeoGQLSchemaManager {
 
@@ -48,11 +51,11 @@ public class NuxeoGQLSchemaManager {
 
     private Map<String, GraphQLInputObjectType> inputTypesForSchema = new HashMap<>();
 
-    private Map<String, AliasDescriptor> aliases= new HashMap<>();
+    private Map<String, AliasDescriptor> aliases = new HashMap<>();
 
-    private Map<String, QueryDescriptor> queries= new HashMap<>();
+    private Map<String, QueryDescriptor> queries = new HashMap<>();
 
-    private Map<String, CrudDescriptor> cruds= new HashMap<>();
+    private Map<String, CrudDescriptor> cruds = new HashMap<>();
 
     private SchemaManager sm;
 
@@ -84,12 +87,15 @@ public class NuxeoGQLSchemaManager {
     }
 
     private GraphQLObjectType buildQueryType() {
+
+        DocumentModelDataFetcher dmDataFetcher = new DocumentModelDataFetcher();
+
         Builder builder = newObject().name("nuxeo");
         builder.field(newFieldDefinition().name("document")
                                           .type(documentInterface)
                                           .argument(new GraphQLArgument("path", GraphQLString))
                                           .argument(new GraphQLArgument("id", GraphQLString))
-                                          .dataFetcher(new DocumentModelDataFetcher())
+                                          .dataFetcher(new VertxDataFetcher<>(dmDataFetcher::get))
                                           .build())
                .field(newFieldDefinition().name("documents")
                                           .type(new GraphQLList(documentInterface))
@@ -178,8 +184,8 @@ public class NuxeoGQLSchemaManager {
 
             @Override
             public GraphQLObjectType getType(TypeResolutionEnvironment tre) {
-                if (tre.getObject() instanceof DocumentModel) {
-                    return docTypeToGQLType.get(((DocumentModel) tre.getObject()).getType());
+                if (tre.getObject() instanceof Document) {
+                    return docTypeToGQLType.get(((Document) tre.getObject()).getType());
                 } else {
                     return null;
                 }

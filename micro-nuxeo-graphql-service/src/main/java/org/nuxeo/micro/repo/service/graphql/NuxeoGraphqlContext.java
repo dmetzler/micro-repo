@@ -1,4 +1,4 @@
-package org.nuxeo.graphql;
+package org.nuxeo.micro.repo.service.graphql;
 
 import java.security.Principal;
 

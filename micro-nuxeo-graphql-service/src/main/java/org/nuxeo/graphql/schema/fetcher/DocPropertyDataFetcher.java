@@ -1,6 +1,6 @@
 package org.nuxeo.graphql.schema.fetcher;
 
-import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.micro.repo.proto.Document;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
@@ -10,12 +10,12 @@ public class DocPropertyDataFetcher implements DataFetcher<Object> {
     @Override
     public Object get(DataFetchingEnvironment environment) {
         String fieldName = getFieldName(environment);
-        if (environment.getSource() instanceof DocumentModel) {
-            DocumentModel doc = (DocumentModel) environment.getSource();
+        if (environment.getSource() instanceof Document) {
+            Document doc = (Document) environment.getSource();
             if ("_path".equals(fieldName)) {
-                return doc.getPathAsString();
+                return doc.getParentPath() + "/" + doc.getName();
             } else if ("_id".equals(fieldName)) {
-                return doc.getId();
+                return doc.getUuid();
             }
             else if ("_name".equals(fieldName)) {
                 return doc.getName();

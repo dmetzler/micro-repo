@@ -26,12 +26,11 @@ public interface SchemaService {
     String NUXEO_TENANTS_SCHEMA = "__nuxeotenants";
 
     /**
-     * Create a Nuxeo Client which shares its data source with any other Nuxeo
-     * clients created with the same tenant.
+     * Create a Nuxeo Client which shares its data source with any other Nuxeo clients created with the same tenant.
      *
-     * @param vertx    the Vert.x instance
+     * @param vertx the Vert.x instance
      * @param tenantId the pool name
-     * @param config   the configuration
+     * @param config the configuration
      * @return the client
      */
     static void create(Vertx vertx, JsonObject config, Handler<AsyncResult<SchemaService>> completionHandler) {
@@ -42,10 +41,7 @@ public interface SchemaService {
 
     }
 
-
     void getSchema(String tenantId, Handler<AsyncResult<RemoteSchemaManager>> resultHandler);
-
-
 
     static SchemaService createProxy(Vertx vertx) {
         return new SchemaServiceVertxEBProxy(vertx, ADDRESS);

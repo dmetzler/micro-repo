@@ -2,30 +2,14 @@ package org.nuxeo.micro.repo.service.graphql;
 
 import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-
-import org.nuxeo.ecm.core.api.impl.NuxeoPrincipalImpl;
-import org.nuxeo.graphql.schema.NuxeoGQLSchemaManager;
 import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc;
 import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxStub;
-import org.nuxeo.micro.repo.service.graphql.model.TenantsOperation;
-import org.nuxeo.micro.repo.service.schema.SchemaService;
-import org.nuxeo.vertx.graphql.NuxeoGQLConfiguration;
-import org.nuxeo.vertx.graphql.NuxeoGQLConfiguration.Builder;
 
-import graphql.GraphQL;
-import graphql.schema.DataFetcher;
-import graphql.schema.GraphQLSchema;
-import graphql.schema.idl.RuntimeWiring;
-import graphql.schema.idl.SchemaGenerator;
-import graphql.schema.idl.SchemaParser;
-import graphql.schema.idl.TypeDefinitionRegistry;
 import io.grpc.ManagedChannel;
 import io.grpc.Metadata;
 import io.grpc.stub.MetadataUtils;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
@@ -49,14 +33,19 @@ public class MetaGraphQLHandler implements Handler<RoutingContext> {
 
     private JsonObject config;
 
-    protected MetaGraphQLHandler(Vertx vertx, NuxeoCoreSessionVertxStub nuxeoSession, JsonObject config) {
+    private GraphQLService gqlService;
+
+    protected MetaGraphQLHandler(Vertx vertx, JsonObject config, NuxeoCoreSessionVertxStub nuxeoSession,
+            GraphQLService gqlService) {
         this.vertx = vertx;
         this.nuxeoSession = nuxeoSession;
         this.config = config;
+        this.gqlService = gqlService;
 
     }
 
-    public static MetaGraphQLHandler create(Vertx vertx, JsonObject config) {
+    public static void create(Vertx vertx, JsonObject config,
+            Handler<AsyncResult<MetaGraphQLHandler>> completionHandler) {
 
         int corePort = 8787;
         String coreHost = "localhost";
@@ -68,56 +57,40 @@ public class MetaGraphQLHandler implements Handler<RoutingContext> {
 
         ManagedChannel channel = VertxChannelBuilder.forAddress(vertx, coreHost, corePort).usePlaintext(true).build();
 
-        return new MetaGraphQLHandler(vertx, NuxeoCoreSessionGrpc.newVertxStub(channel), config);
+        NuxeoCoreSessionVertxStub nuxeoSession = NuxeoCoreSessionGrpc.newVertxStub(channel);
+
+        GraphQLService.create(vertx, config, gqr -> {
+            if (gqr.succeeded()) {
+                MetaGraphQLHandler handler = new MetaGraphQLHandler(vertx, config, nuxeoSession, gqr.result());
+                completionHandler.handle(Future.succeededFuture(handler));
+            } else {
+                completionHandler.handle(Future.failedFuture(gqr.cause()));
+            }
+        });
+
     }
 
     @Override
     public void handle(RoutingContext event) {
         String tenantId = event.request().getParam("tenantId");
-        
-        GraphQL graphQL = getGraphQL(tenantId);
 
-        if (graphQL != null) {
-            GraphQLHandler gql = GraphQLHandler.create(graphQL).queryContext(rc -> {
+        gqlService.getGraphQL(tenantId, gqlR -> {
 
-                Metadata headers = new Metadata();
-                headers.put(TENANT_ID_KEY, tenantId);
-                return new NuxeoContext(rc,
-                        nuxeoSession.withInterceptors(MetadataUtils.newAttachHeadersInterceptor(headers)));
-            });
-            gql.handle(event);
-        } else {
-            HttpServerResponse response = event.response();
-            response.setStatusCode(404);
-            response.end("Repository not found");
-        }
-    }
+            if (gqlR.succeeded()) {
+                GraphQLHandler gql = GraphQLHandler.create(gqlR.result()).queryContext(rc -> {
 
-    private GraphQL getGraphQL(String tenantId) {
-
-        if (SchemaService.NUXEO_TENANTS_SCHEMA.equals(tenantId)) {
-
-            graphql.schema.idl.RuntimeWiring.Builder runtimeWiring = RuntimeWiring.newRuntimeWiring();
-
-            Builder builder = NuxeoGQLConfiguration.builder()//
-                                                   .runtimeWiring(runtimeWiring)
-                                                   .configuration(TenantsOperation.class);
-
-            TypeDefinitionRegistry typeDefinitionRegistry = builder.getTypeDefinitionRegistry();
-
-            SchemaGenerator schemaGenerator = new SchemaGenerator();
-            GraphQLSchema graphQLSchema = schemaGenerator.makeExecutableSchema(typeDefinitionRegistry,
-                    runtimeWiring.build()); // (4)
-            return GraphQL.newGraphQL(graphQLSchema)//
-                          .build();
-        } else {
-
-            NuxeoGQLSchemaManager gqlManager = new NuxeoGQLSchemaManager(sm);
-
-            GraphQLSchema graphQLSchema = gqlManager.getNuxeoSchema();
-            return GraphQL.newGraphQL(graphQLSchema)//
-                          .build();
-        }
+                    Metadata headers = new Metadata();
+                    headers.put(TENANT_ID_KEY, tenantId);
+                    return new NuxeoContext(rc,
+                            nuxeoSession.withInterceptors(MetadataUtils.newAttachHeadersInterceptor(headers)));
+                });
+                gql.handle(event);
+            } else {
+                HttpServerResponse response = event.response();
+                response.setStatusCode(404);
+                response.end("Repository not found");
+            }
+        });
 
     }
 
@@ -127,22 +100,23 @@ public class MetaGraphQLHandler implements Handler<RoutingContext> {
         graphQLRouter.route("/graphiql/*").handler(event -> {
             String tenantId = event.request().getParam("tenantId");
 
-            GraphQL graphQL = getGraphQL(tenantId);
+            gqlService.getGraphQL(tenantId, gqlR -> {
 
-            if (graphQL != null) {
-                GraphiQLHandler graphiQLHandler = GraphiQLHandler.create(
-                        new GraphiQLHandlerOptions().setEnabled(true)
-                                                    .setGraphQLUri(String.format("/%s/graphql", tenantId)));
-                graphiQLHandler.graphiQLRequestHeaders(rc -> {
-                    String token = rc.get("token");
-                    return MultiMap.caseInsensitiveMultiMap().add(HttpHeaders.AUTHORIZATION, "Bearer " + token);
-                });
-                graphiQLHandler.handle(event);
-            } else {
-                HttpServerResponse response = event.response();
-                response.setStatusCode(404);
-                response.end("Repository not found");
-            }
+                if (gqlR.succeeded()) {
+                    GraphiQLHandler graphiQLHandler = GraphiQLHandler.create(
+                            new GraphiQLHandlerOptions().setEnabled(true)
+                                                        .setGraphQLUri(String.format("/%s/graphql", tenantId)));
+                    graphiQLHandler.graphiQLRequestHeaders(rc -> {
+                        String token = rc.get("token");
+                        return MultiMap.caseInsensitiveMultiMap().add(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+                    });
+                    graphiQLHandler.handle(event);
+                } else {
+                    HttpServerResponse response = event.response();
+                    response.setStatusCode(404);
+                    response.end("Repository not found");
+                }
+            });
         });
 
         graphQLRouter.route("/graphql").handler(CorsHandlerImpl.create(config.getJsonObject("cors")));

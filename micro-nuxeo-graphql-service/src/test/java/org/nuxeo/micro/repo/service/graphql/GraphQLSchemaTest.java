@@ -20,7 +20,12 @@ package org.nuxeo.micro.repo.service.graphql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.LinkedList;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,17 +48,16 @@ import io.vertx.junit5.VertxTestContext;
 @ExtendWith(VertxExtension.class)
 public class GraphQLSchemaTest {
 
-    String schemaDsl = "doctype Library extends Folder {\n" + "schemas {\n" + "    common dublincore\n"
-            + "      lib:library { city, country}\n" + "  }    \n" + "  aliases {\n" + "    name prop {\"dc:title\"}\n"
-            + "      city prop {\"lib:city\"}\n" + "      country prop {\"lib:country\"}        \n"
-            + "      books query { \"select * from Book where ecm:parentId = '${this.id}'\", \"Book\"}\n" + "  }\n"
-            + "  crud\n" + "}";
+    String schemaDsl;
 
     private JsonObject coreConfig;
 
     @BeforeEach
     void deploy_verticle(Vertx vertx, VertxTestContext testContext) throws IOException {
         coreConfig = new JsonObject().put("db", new JsonObject().put("server", "localhost:27017"));
+
+        File dslFile = new File(this.getClass().getResource("/library.nxl").getFile());
+        schemaDsl = new String(Files.readAllBytes(Paths.get(dslFile.getAbsolutePath())));
 
         vertx.deployVerticle(new DslVerticle(), testContext.succeeding(id1 -> {
             vertx.deployVerticle(new SchemaVerticle(), testContext.succeeding(id3 -> {

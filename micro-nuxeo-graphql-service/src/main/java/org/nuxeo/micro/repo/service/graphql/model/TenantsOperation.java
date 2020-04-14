@@ -9,11 +9,11 @@ import org.nuxeo.micro.repo.proto.DocumentRequest;
 import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc;
 import org.nuxeo.micro.repo.proto.QueryRequest;
 import org.nuxeo.micro.repo.service.graphql.NuxeoContext;
-import org.nuxeo.vertx.graphql.ListMetadata;
-import org.nuxeo.vertx.graphql.Mutation;
-import org.nuxeo.vertx.graphql.Query;
-import org.nuxeo.vertx.graphql.QueryBuilder;
-import org.nuxeo.vertx.graphql.Schema;
+import org.nuxeo.micro.repo.service.graphql.tenant.ListMetadata;
+import org.nuxeo.micro.repo.service.graphql.tenant.Mutation;
+import org.nuxeo.micro.repo.service.graphql.tenant.Query;
+import org.nuxeo.micro.repo.service.graphql.tenant.QueryBuilder;
+import org.nuxeo.micro.repo.service.graphql.tenant.Schema;
 
 import graphql.schema.DataFetchingEnvironment;
 import io.vertx.core.Promise;
