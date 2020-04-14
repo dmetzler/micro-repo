@@ -1,7 +1,6 @@
 package org.nuxeo.micro.repo.provider.impl;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,9 +22,7 @@ import org.nuxeo.micro.dsl.DslModel;
 import org.nuxeo.micro.dsl.parser.DslParser;
 import org.nuxeo.micro.dsl.parser.DslParserImpl;
 import org.nuxeo.micro.repo.provider.TenantSchemaUrlResolver;
-import org.nuxeo.micro.repo.service.schema.impl.DocumentTypeFeature;
-import org.nuxeo.micro.repo.service.schema.impl.SchemaFeature;
-import org.nuxeo.micro.repo.service.schema.impl.SchemaFeature.FieldsDef;
+import org.nuxeo.micro.repo.provider.impl.SchemaFeature.FieldsDef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -139,10 +139,8 @@ public class GraphqlServiceTest {
 
                 RoutingContext routingContext = mockRoutinContext("/");
 
-                int corePort = 8787;
-                String coreHost = "localhost";
 
-                ManagedChannel channel = VertxChannelBuilder.forAddress(vertx, coreHost, corePort)
+                ManagedChannel channel = VertxChannelBuilder.forAddress(vertx, "localhost", 8787)
                                                             .usePlaintext(true)
                                                             .build();
 
