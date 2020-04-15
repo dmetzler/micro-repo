@@ -38,6 +38,7 @@ import org.nuxeo.micro.repo.service.core.CoreVerticle;
 import org.nuxeo.micro.repo.service.dsl.impl.DslVerticle;
 import org.nuxeo.micro.repo.service.schema.SchemaService;
 import org.nuxeo.micro.repo.service.schema.impl.SchemaVerticle;
+import org.nuxeo.micro.repo.service.tenant.TenantService;
 import org.nuxeo.runtime.transaction.TransactionHelper;
 
 import io.vertx.core.Vertx;
@@ -65,7 +66,7 @@ public class GraphQLSchemaTest {
                     vertx.deployVerticle(new GraphQLVerticle(), testContext.succeeding(id4 -> {
 
                         CoreSessionService.create(vertx, coreConfig, testContext.succeeding(sessionService -> {
-                            sessionService.session(SchemaService.NUXEO_TENANTS_SCHEMA, "dmetzler@nuxeo.com",
+                            sessionService.session(TenantService.NUXEO_TENANTS_SCHEMA, "dmetzler@nuxeo.com",
                                     testContext.succeeding(session -> {
                                         session.removeDocument(new PathRef("/library"));
                                         testContext.completeNow();
@@ -87,7 +88,7 @@ public class GraphQLSchemaTest {
         schemaService.getSchema("library", testContext.failing(t -> {
 
             CoreSessionService.create(vertx, coreConfig, testContext.succeeding(sessionService -> {
-                sessionService.session(SchemaService.NUXEO_TENANTS_SCHEMA, "dmetzler@nuxeo.com",
+                sessionService.session(TenantService.NUXEO_TENANTS_SCHEMA, "dmetzler@nuxeo.com",
                         testContext.succeeding(session -> {
 
                             // When I create a tenant document

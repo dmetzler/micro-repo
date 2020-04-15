@@ -23,7 +23,7 @@ public interface SchemaService {
      */
     String EVENT_ADDRESS = "nuxeo.schema";
 
-    String NUXEO_TENANTS_SCHEMA = "__nuxeotenants";
+
 
     /**
      * Create a Nuxeo Client which shares its data source with any other Nuxeo clients created with the same tenant.

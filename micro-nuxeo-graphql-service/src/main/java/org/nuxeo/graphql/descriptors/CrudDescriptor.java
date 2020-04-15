@@ -6,6 +6,11 @@ import org.nuxeo.common.xmap.annotation.XObject;
 @XObject("crud")
 public class CrudDescriptor {
 
+
     @XNode("@targetDoctype")
     public String targetDoctype;
+
+    public CrudDescriptor(String targetDocType) {
+        targetDoctype = targetDocType;
+    }
 }

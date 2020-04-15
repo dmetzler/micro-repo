@@ -9,14 +9,12 @@
     <artifactId>micro-nuxeo-parent</artifactId>
     <version>0.0.8-SNAPSHOT</version>
   </parent>
-  <artifactId>micro-nuxeo-schema-service</artifactId>
-  <name>Micro Nuxeo :: Schema Service</name>
+  <artifactId>micro-nuxeo-tenant-service</artifactId>
+  <name>Micro Nuxeo :: Tenant Service</name>
 
 
   <properties>
-    <vertx.verticle>org.nuxeo.micro.repo.service.schema.impl.SchemaVerticle</vertx.verticle>
-    <vertx.version>3.8.3</vertx.version>
-    <fabric8-vertx-maven-plugin.projectVersion>1.0.9</fabric8-vertx-maven-plugin.projectVersion>
+    <vertx.verticle>org.nuxeo.micro.repo.service.dsl.impl.TenantVerticle</vertx.verticle>
   </properties>
 
 
@@ -41,27 +39,11 @@
   <dependencies>
     <dependency>
       <groupId>org.nuxeo.micro-repo</groupId>
-      <artifactId>micro-nuxeo-schema</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.nuxeo.micro-repo</groupId>
-      <artifactId>micro-nuxeo-dsl</artifactId>
+      <artifactId>micro-nuxeo-proto</artifactId>
     </dependency>
     <dependency>
       <groupId>org.nuxeo.micro-repo</groupId>
       <artifactId>micro-nuxeo-base-service</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.nuxeo.micro-repo</groupId>
-      <artifactId>micro-nuxeo-dsl-service</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.nuxeo.micro-repo</groupId>
-      <artifactId>micro-nuxeo-tenant-service</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.nuxeo.micro-repo</groupId>
-      <artifactId>micro-nuxeo-proto</artifactId>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
@@ -83,10 +65,6 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.dom4j</groupId>
-      <artifactId>dom4j</artifactId>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
@@ -117,7 +95,7 @@
     </dependency>
   </dependencies>
   <build>
-    <finalName>micro-nuxeo-schema-${project.version}</finalName>
+    <finalName>micro-nuxeo-dsl-${project.version}</finalName>
     <plugins>
       <plugin>
         <groupId>io.fabric8</groupId>

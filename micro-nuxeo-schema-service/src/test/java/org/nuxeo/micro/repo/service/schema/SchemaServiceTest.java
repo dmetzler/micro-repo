@@ -29,6 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.nuxeo.micro.repo.service.schema.impl.SchemaVerticle;
+import org.nuxeo.micro.repo.service.tenant.TenantService;
 
 import io.vertx.core.Vertx;
 import io.vertx.junit5.VertxExtension;
@@ -62,7 +63,7 @@ public class SchemaServiceTest {
             if (ar.succeeded()) {
                 SchemaService ss = ar.result();
 
-                ss.getSchema(SchemaService.NUXEO_TENANTS_SCHEMA, sar -> {
+                ss.getSchema(TenantService.NUXEO_TENANTS_SCHEMA, sar -> {
                     if (sar.succeeded()) {
                         assertThat(sar.result().getDocumentType("Workspace")).isNotNull();
                         testContext.completeNow();
@@ -83,7 +84,7 @@ public class SchemaServiceTest {
             if (ar.succeeded()) {
                 SchemaService ss = ar.result();
 
-                ss.getSchema(SchemaService.NUXEO_TENANTS_SCHEMA, sar -> {
+                ss.getSchema(TenantService.NUXEO_TENANTS_SCHEMA, sar -> {
                     if (sar.succeeded()) {
                         assertThat(sar.result().getDocumentType("Tenant")).isNotNull();
                         testContext.completeNow();
@@ -103,7 +104,7 @@ public class SchemaServiceTest {
 
         SchemaService ss = builder.build(SchemaService.class);
         // or with delivery options:
-        ss.getSchema(SchemaService.NUXEO_TENANTS_SCHEMA, ar -> {
+        ss.getSchema(TenantService.NUXEO_TENANTS_SCHEMA, ar -> {
             if (ar.succeeded()) {
                 assertThat(ar.result().getDocumentType("Workspace")).isNotNull();
                 testContext.completeNow();

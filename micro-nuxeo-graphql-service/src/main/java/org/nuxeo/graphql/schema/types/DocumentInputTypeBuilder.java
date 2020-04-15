@@ -59,45 +59,49 @@ public class DocumentInputTypeBuilder extends GraphQLInputObjectType.Builder {
 
     private GraphQLInputObjectType inputTypeForSchema(String schemaName) {
         Schema s = sm.getSchemaManager().getSchema(schemaName);
+        if (!sm.getInputTypeRegistry().containsKey(schemaName)) {
+            graphql.schema.GraphQLInputObjectType.Builder schemaBuilder = GraphQLInputObjectType.newInputObject()
+                                                                                                .name("ischema_"
+                                                                                                        + schemaName);
 
-        graphql.schema.GraphQLInputObjectType.Builder schemaBuilder = GraphQLInputObjectType.newInputObject()
-                                                                                            .name("ischema_"
-                                                                                                    + schemaName);
-
-        for (Field f : s.getFields()) {
-            if (!f.getName().getLocalName().matches("[_A-Za-z][_0-9A-Za-z]*")) {
-                continue;
-            }
-
-            Type t = f.getType();
-            if (t.isSimpleType()) {
-                graphql.schema.GraphQLInputObjectField.Builder fieldBuilder = GraphQLInputObjectField.newInputObjectField()
-                                                                                                     .name(f.getName()
-                                                                                                            .getLocalName());
-                if (t instanceof StringType) {
-                    fieldBuilder.type(GraphQLString);
-                    schemaBuilder.field(fieldBuilder.build());
-                } else if (t instanceof BooleanType) {
-                    fieldBuilder.type(GraphQLBoolean);
-                    schemaBuilder.field(fieldBuilder.build());
-                } else if (t instanceof DateType) {
-                    fieldBuilder.type(GraphQLString);
-                    schemaBuilder.field(fieldBuilder.build());
-                } else if (t instanceof DoubleType) {
-                    fieldBuilder.type(GraphQLFloat);
-                    schemaBuilder.field(fieldBuilder.build());
-                } else if (t instanceof IntegerType) {
-                    fieldBuilder.type(GraphQLInt);
-                    schemaBuilder.field(fieldBuilder.build());
-                } else if (t instanceof LongType) {
-                    fieldBuilder.type(GraphQLLong);
-                    schemaBuilder.field(fieldBuilder.build());
+            for (Field f : s.getFields()) {
+                if (!f.getName().getLocalName().matches("[_A-Za-z][_0-9A-Za-z]*")) {
+                    continue;
                 }
 
+                Type t = f.getType();
+                if (t.isSimpleType()) {
+                    graphql.schema.GraphQLInputObjectField.Builder fieldBuilder = GraphQLInputObjectField.newInputObjectField()
+                                                                                                         .name(f.getName()
+                                                                                                                .getLocalName());
+                    if (t instanceof StringType) {
+                        fieldBuilder.type(GraphQLString);
+                        schemaBuilder.field(fieldBuilder.build());
+                    } else if (t instanceof BooleanType) {
+                        fieldBuilder.type(GraphQLBoolean);
+                        schemaBuilder.field(fieldBuilder.build());
+                    } else if (t instanceof DateType) {
+                        fieldBuilder.type(GraphQLString);
+                        schemaBuilder.field(fieldBuilder.build());
+                    } else if (t instanceof DoubleType) {
+                        fieldBuilder.type(GraphQLFloat);
+                        schemaBuilder.field(fieldBuilder.build());
+                    } else if (t instanceof IntegerType) {
+                        fieldBuilder.type(GraphQLInt);
+                        schemaBuilder.field(fieldBuilder.build());
+                    } else if (t instanceof LongType) {
+                        fieldBuilder.type(GraphQLLong);
+                        schemaBuilder.field(fieldBuilder.build());
+                    }
+
+                }
             }
+
+            sm.getInputTypeRegistry().put(schemaName, schemaBuilder.build());
         }
 
-        return schemaBuilder.build();
+        return sm.getInputTypeRegistry().get(schemaName);
+
     }
 
     public static DocumentInputTypeBuilder type(String docType, NuxeoGQLSchemaManager sm) {

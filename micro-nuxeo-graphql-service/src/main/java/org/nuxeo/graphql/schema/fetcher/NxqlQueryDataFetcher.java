@@ -12,42 +12,57 @@ import org.nuxeo.ecm.platform.el.ELServiceServiceImpl;
 import org.nuxeo.ecm.platform.el.ExpressionEvaluator;
 import org.nuxeo.micro.repo.proto.Document;
 import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxStub;
+import org.nuxeo.micro.repo.proto.QueryRequest;
 
-import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import io.vertx.core.Promise;
 
-public class NxqlQueryDataFetcher extends AbstractDataFetcher implements DataFetcher<List<Document>> {
+public class NxqlQueryDataFetcher extends AbstractDataFetcher {
 
-    @Override
-    public List<Document> get(DataFetchingEnvironment environment) {
+    public void get(DataFetchingEnvironment environment, Promise<List<Document>> future) {
+
+
         NuxeoCoreSessionVertxStub session = getSession(environment.getContext());
         if (session == null) {
-            return null;
+            future.complete(Collections.emptyList());;
         }
 
-        ExpressionEvaluator el = getEl(environment.getContext());
-        String finalQuery = getQuery(environment);
-        ELService elService = new ELServiceServiceImpl();
-        ELContext elContext = elService.createELContext();
-        el.bindValue(elContext, "principal", getPrincipal(environment.getContext()));
+        getPrincipal(environment.getContext(), pr -> {
+            if(pr.succeeded()) {
+                ExpressionEvaluator el = getEl(environment.getContext());
+                String finalQuery = getQuery(environment);
+                ELService elService = new ELServiceServiceImpl();
+                ELContext elContext = elService.createELContext();
+                el.bindValue(elContext, "principal", pr.result());
 
-        if (environment.getArguments().size() > 0) {
-            for (Entry<String, Object> paramEntry : environment.getArguments().entrySet()) {
-                el.bindValue(elContext, paramEntry.getKey(), paramEntry.getValue());
+                if (environment.getArguments().size() > 0) {
+                    for (Entry<String, Object> paramEntry : environment.getArguments().entrySet()) {
+                        el.bindValue(elContext, paramEntry.getKey(), paramEntry.getValue());
+                    }
+                }
+
+                if (environment.getSource() instanceof DocumentModel) {
+                    DocumentModel doc = (DocumentModel) environment.getSource();
+                    el.bindValue(elContext, "this", doc);
+                }
+
+                finalQuery = el.evaluateExpression(elContext, finalQuery, String.class);
+
+                QueryRequest qreq = QueryRequest.newBuilder().setNxql(finalQuery).build();
+                session.query(qreq, qrr ->{
+                    if(qrr.succeeded()) {
+                        future.complete(qrr.result().getDocsList());
+                    } else {
+                        future.fail(qrr.cause());
+                    }
+                });
+
+            } else {
+                future.fail(pr.cause());
             }
-        }
+        });
 
-        if (environment.getSource() instanceof DocumentModel) {
-            DocumentModel doc = (DocumentModel) environment.getSource();
-            el.bindValue(elContext, "this", doc);
-        }
 
-        finalQuery = el.evaluateExpression(elContext, finalQuery, String.class);
-
-        // session.query(request, response);
-        // return session.query(finalQuery);
-
-        return Collections.emptyList();
     }
 
     protected String getQuery(DataFetchingEnvironment environment) {

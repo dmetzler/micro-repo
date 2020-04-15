@@ -4,6 +4,7 @@ import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 
 import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc;
 import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxStub;
+import org.nuxeo.micro.repo.service.schema.SchemaService;
 
 import io.grpc.ManagedChannel;
 import io.grpc.Metadata;
@@ -35,12 +36,15 @@ public class MetaGraphQLHandler implements Handler<RoutingContext> {
 
     private GraphQLService gqlService;
 
+    private SchemaService schemaService;
+
     protected MetaGraphQLHandler(Vertx vertx, JsonObject config, NuxeoCoreSessionVertxStub nuxeoSession,
-            GraphQLService gqlService) {
+            GraphQLService gqlService, SchemaService schemaService) {
         this.vertx = vertx;
         this.nuxeoSession = nuxeoSession;
         this.config = config;
         this.gqlService = gqlService;
+        this.schemaService = schemaService;
 
     }
 
@@ -58,13 +62,20 @@ public class MetaGraphQLHandler implements Handler<RoutingContext> {
         ManagedChannel channel = VertxChannelBuilder.forAddress(vertx, coreHost, corePort).usePlaintext(true).build();
 
         NuxeoCoreSessionVertxStub nuxeoSession = NuxeoCoreSessionGrpc.newVertxStub(channel);
+        SchemaService.create(vertx, config, ssr -> {
+            if (ssr.succeeded()) {
 
-        GraphQLService.create(vertx, config, gqr -> {
-            if (gqr.succeeded()) {
-                MetaGraphQLHandler handler = new MetaGraphQLHandler(vertx, config, nuxeoSession, gqr.result());
-                completionHandler.handle(Future.succeededFuture(handler));
+                GraphQLService.create(vertx, config, gqr -> {
+                    if (gqr.succeeded()) {
+                        MetaGraphQLHandler handler = new MetaGraphQLHandler(vertx, config, nuxeoSession, gqr.result(),
+                                ssr.result());
+                        completionHandler.handle(Future.succeededFuture(handler));
+                    } else {
+                        completionHandler.handle(Future.failedFuture(gqr.cause()));
+                    }
+                });
             } else {
-                completionHandler.handle(Future.failedFuture(gqr.cause()));
+                completionHandler.handle(Future.failedFuture(ssr.cause()));
             }
         });
 
@@ -75,16 +86,23 @@ public class MetaGraphQLHandler implements Handler<RoutingContext> {
         String tenantId = event.request().getParam("tenantId");
 
         gqlService.getGraphQL(tenantId, gqlR -> {
-
             if (gqlR.succeeded()) {
-                GraphQLHandler gql = GraphQLHandler.create(gqlR.result()).queryContext(rc -> {
+                schemaService.getSchema(tenantId, sr -> {
+                    if (sr.succeeded()) {
+                        GraphQLHandler gql = GraphQLHandler.create(gqlR.result()).queryContext(rc -> {
 
-                    Metadata headers = new Metadata();
-                    headers.put(TENANT_ID_KEY, tenantId);
-                    return new NuxeoContext(rc,
-                            nuxeoSession.withInterceptors(MetadataUtils.newAttachHeadersInterceptor(headers)));
+                            Metadata headers = new Metadata();
+                            headers.put(TENANT_ID_KEY, tenantId);
+                            return new NuxeoContext(rc,
+                                    nuxeoSession.withInterceptors(MetadataUtils.newAttachHeadersInterceptor(headers)), sr.result());
+                        });
+                        gql.handle(event);
+                    } else {
+                        HttpServerResponse response = event.response();
+                        response.setStatusCode(404);
+                        response.end("Repository not found");
+                    }
                 });
-                gql.handle(event);
             } else {
                 HttpServerResponse response = event.response();
                 response.setStatusCode(404);

@@ -19,12 +19,17 @@
 package org.nuxeo.micro.repo.service.graphql.impl;
 
 import org.nuxeo.ecm.core.schema.SchemaManager;
+import org.nuxeo.graphql.descriptors.GraphQLFeature;
 import org.nuxeo.graphql.schema.NuxeoGQLSchemaManager;
+import org.nuxeo.micro.dsl.DslModel;
+import org.nuxeo.micro.repo.service.dsl.NuxeoDslService;
 import org.nuxeo.micro.repo.service.graphql.GraphQLService;
 import org.nuxeo.micro.repo.service.graphql.model.TenantsOperation;
 import org.nuxeo.micro.repo.service.graphql.tenant.NuxeoGQLConfiguration;
 import org.nuxeo.micro.repo.service.graphql.tenant.NuxeoGQLConfiguration.Builder;
 import org.nuxeo.micro.repo.service.schema.SchemaService;
+import org.nuxeo.micro.repo.service.tenant.TenantConfiguration;
+import org.nuxeo.micro.repo.service.tenant.TenantService;
 
 import graphql.GraphQL;
 import graphql.schema.GraphQLSchema;
@@ -45,15 +50,22 @@ public class GraphQLServiceImpl implements GraphQLService {
 
     private SchemaService schemaService;
 
+    private TenantService tenantService;
+
+    private NuxeoDslService dslService;
+
     public GraphQLServiceImpl(Vertx vertx, JsonObject config) {
         this.vertx = vertx;
         this.config = config;
         schemaService = SchemaService.createProxy(vertx);
+        tenantService = TenantService.createProxy(vertx);
+        dslService = NuxeoDslService.createProxy(vertx);
+
     }
 
     @Override
     public void getGraphQL(String tenantId, Handler<AsyncResult<GraphQL>> completionHandler) {
-        if (SchemaService.NUXEO_TENANTS_SCHEMA.equals(tenantId)) {
+        if (TenantService.NUXEO_TENANTS_SCHEMA.equals(tenantId)) {
 
             graphql.schema.idl.RuntimeWiring.Builder runtimeWiring = RuntimeWiring.newRuntimeWiring();
 
@@ -68,16 +80,38 @@ public class GraphQLServiceImpl implements GraphQLService {
                     runtimeWiring.build());
             completionHandler.handle(Future.succeededFuture(GraphQL.newGraphQL(graphQLSchema).build()));
         } else {
+            tenantService.getTenantConfiguration(tenantId, cr -> {
 
-            schemaService.getSchema(tenantId, sr -> {
-                if (sr.succeeded()) {
-                    SchemaManager sm = sr.result();
-                    NuxeoGQLSchemaManager gqlManager = new NuxeoGQLSchemaManager(sm);
-                    GraphQLSchema graphQLSchema = gqlManager.getNuxeoSchema();
+                if (cr.succeeded()) {
+                    TenantConfiguration tenantConfiguration = cr.result();
+                    dslService.getAbstracSyntaxTree(tenantConfiguration.getDsl(), dslr -> {
+                        if (dslr.succeeded()) {
 
-                    completionHandler.handle(Future.succeededFuture(GraphQL.newGraphQL(graphQLSchema).build()));
+                            DslModel model = DslModel.builder().with(GraphQLFeature.class).build();
+                            model.visit(dslr.result());
+                            GraphQLFeature feature = model.getFeature(GraphQLFeature.class);
+
+                            schemaService.getSchema(tenantId, sr -> {
+                                if (sr.succeeded()) {
+                                    SchemaManager sm = sr.result();
+                                    NuxeoGQLSchemaManager gqlManager = new NuxeoGQLSchemaManager(feature.getAliases(),
+                                            feature.getQueries(), feature.getCruds(), sm);
+                                    GraphQLSchema graphQLSchema = gqlManager.getNuxeoSchema();
+
+                                    completionHandler.handle(
+                                            Future.succeededFuture(GraphQL.newGraphQL(graphQLSchema).build()));
+                                } else {
+                                    completionHandler.handle(Future.failedFuture(sr.cause()));
+                                }
+
+                            });
+                        } else {
+                            completionHandler.handle(Future.failedFuture(dslr.cause()));
+                        }
+
+                    });
                 } else {
-                    completionHandler.handle(Future.failedFuture(sr.cause()));
+                    completionHandler.handle(Future.failedFuture(cr.cause()));
                 }
             });
 

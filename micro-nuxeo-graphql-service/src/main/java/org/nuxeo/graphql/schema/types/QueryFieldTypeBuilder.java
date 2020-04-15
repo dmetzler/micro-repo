@@ -9,6 +9,7 @@ import org.nuxeo.graphql.schema.fetcher.QueryDataFetcher;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLFieldDefinition.Builder;
+import io.vertx.ext.web.handler.graphql.VertxDataFetcher;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 
@@ -38,7 +39,8 @@ public class QueryFieldTypeBuilder extends Builder {
             fieldBuilder.type(new GraphQLList(sm.docTypeToGQLType(query.resultType)));
         }
 
-        fieldBuilder.dataFetcher(new QueryDataFetcher(query.query));
+        QueryDataFetcher df  = new QueryDataFetcher(query.query);
+        fieldBuilder.dataFetcher(new VertxDataFetcher<>(df::get) );
         return fieldBuilder.build();
 
     }

@@ -2,6 +2,7 @@ package org.nuxeo.graphql.schema.fetcher;
 
 import org.nuxeo.ecm.core.api.DataModel;
 import org.nuxeo.micro.repo.proto.Document;
+import org.nuxeo.micro.repo.proto.Document.Property;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
@@ -23,7 +24,9 @@ public class DocumentPropertyDataFetcher implements DataFetcher<Object> {
         } else if (source instanceof Document) {
             Document doc = (Document) source;
 
-            return doc.getPropertiesMap().get(property).getScalarValue(0).getStrValue();
+            Property prop = doc.getPropertiesMap().get(property);
+
+            return prop != null ? prop.getScalarValue(0).getStrValue() : null;
         }
         return null;
     }

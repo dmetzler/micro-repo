@@ -33,6 +33,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLObjectType.Builder;
+import io.vertx.ext.web.handler.graphql.VertxDataFetcher;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
 
@@ -106,7 +107,8 @@ public class DocumentTypeBuilder extends GraphQLObjectType.Builder {
         if ("prop".equals(alias.type)) {
             return new DocumentPropertyDataFetcher(alias.args.get(0));
         } else if ("query".equals(alias.type)) {
-            return new QueryDataFetcher(alias.args.get(0));
+            QueryDataFetcher queryDataFetcher = new QueryDataFetcher(alias.args.get(0));
+            return new VertxDataFetcher<>(queryDataFetcher::get);
         } else {
             return null;
         }

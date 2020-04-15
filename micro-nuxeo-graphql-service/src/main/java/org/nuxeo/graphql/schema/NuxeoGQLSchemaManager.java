@@ -89,6 +89,7 @@ public class NuxeoGQLSchemaManager {
     private GraphQLObjectType buildQueryType() {
 
         DocumentModelDataFetcher dmDataFetcher = new DocumentModelDataFetcher();
+        NxqlQueryDataFetcher nxqlDataFetcher = new NxqlQueryDataFetcher();
 
         Builder builder = newObject().name("nuxeo");
         builder.field(newFieldDefinition().name("document")
@@ -100,7 +101,7 @@ public class NuxeoGQLSchemaManager {
                .field(newFieldDefinition().name("documents")
                                           .type(new GraphQLList(documentInterface))
                                           .argument(new GraphQLArgument("nxql", new GraphQLNonNull(GraphQLString)))
-                                          .dataFetcher(new NxqlQueryDataFetcher())
+                                          .dataFetcher(new VertxDataFetcher<>(nxqlDataFetcher::get))
                                           .build());
 
         for (QueryDescriptor query : queries.values()) {

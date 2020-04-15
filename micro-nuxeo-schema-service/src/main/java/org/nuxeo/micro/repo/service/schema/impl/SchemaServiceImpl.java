@@ -33,6 +33,8 @@ import org.nuxeo.micro.repo.service.schema.SchemaService;
 import org.nuxeo.micro.repo.service.schema.dsl.DocumentTypeFeature;
 import org.nuxeo.micro.repo.service.schema.dsl.SchemaFeature;
 import org.nuxeo.micro.repo.service.schema.dsl.SchemaFeature.FieldsDef;
+import org.nuxeo.micro.repo.service.tenant.TenantConfiguration;
+import org.nuxeo.micro.repo.service.tenant.TenantService;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -54,6 +56,8 @@ public class SchemaServiceImpl implements SchemaService {
     private Vertx vertx;
 
     private JsonObject config;
+
+    private TenantService tenantService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SchemaServiceImpl.class);
 
@@ -105,11 +109,12 @@ public class SchemaServiceImpl implements SchemaService {
     public SchemaServiceImpl(Vertx vertx, JsonObject config) {
         this.vertx = vertx;
         this.config = config;
+        tenantService = TenantService.createProxy(vertx);
     }
 
     @Override
     public void getSchema(String tenantId, Handler<AsyncResult<RemoteSchemaManager>> resultHandler) {
-        if (SchemaService.NUXEO_TENANTS_SCHEMA.equals(tenantId)) {
+        if (TenantService.NUXEO_TENANTS_SCHEMA.equals(tenantId)) {
             SchemaManagerImpl sm = new SchemaManagerImpl(FileUtils.getTempDirectory());
             sm.registerConfiguration(new DefaultTypeConfiguration());
             buildSchemasAndTypes(sm);
@@ -129,36 +134,14 @@ public class SchemaServiceImpl implements SchemaService {
             resultHandler.handle(Future.succeededFuture(new RemoteSchemaManager(sm)));
         } else {
 
-            int corePort = 8787;
-            String coreHost = "localhost";
-
-            if (config.getJsonObject("core") != null) {
-                corePort = config.getJsonObject("core").getInteger("port", 8787);
-                coreHost = config.getJsonObject("core").getString("host", "localhost");
-            }
-
-            ManagedChannel channel = VertxChannelBuilder.forAddress(vertx, coreHost, corePort)
-                                                        .usePlaintext(true)
-                                                        .build();
-
-            Metadata headers = new Metadata();
-            headers.put(GrpcInterceptor.TENANTID_METADATA_KEY, SchemaService.NUXEO_TENANTS_SCHEMA);
-
-
-            NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxStub nuxeoSession = NuxeoCoreSessionGrpc.newVertxStub(
-                    channel).withInterceptors(MetadataUtils.newAttachHeadersInterceptor(headers));
-
-            DocumentRequest req = DocumentRequest.newBuilder().setPath("/" + tenantId).build();
-
-            nuxeoSession.getDocument(req, dr -> {
-                if (!dr.succeeded()) {
+            tenantService.getTenantConfiguration(tenantId, cr -> {
+                if (!cr.succeeded()) {
                     resultHandler.handle(Future.failedFuture("Tenant Not Found"));
                 } else {
-                    Document doc = dr.result();
-                    String dsl = doc.getPropertiesMap().get("tenant:schemaDef").getScalarValue(0).getStrValue();
+                    TenantConfiguration conf = cr.result();
 
                     NuxeoDslService parser = NuxeoDslService.createProxy(vertx);
-                    parser.getAbstracSyntaxTree(dsl, rh -> {
+                    parser.getAbstracSyntaxTree(conf.getDsl(), rh -> {
                         if (!rh.succeeded()) {
                             resultHandler.handle(Future.failedFuture("Failed to parse schema definition"));
                         } else {
