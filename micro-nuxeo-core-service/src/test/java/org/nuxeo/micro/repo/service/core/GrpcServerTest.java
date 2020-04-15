@@ -16,8 +16,8 @@ import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc;
 import org.nuxeo.micro.repo.proto.QueryRequest;
 import org.nuxeo.micro.repo.proto.utils.DocumentBuilder;
 import org.nuxeo.micro.repo.proto.utils.GrpcInterceptor;
-import org.nuxeo.micro.repo.service.schema.SchemaService;
 import org.nuxeo.micro.repo.service.schema.impl.SchemaVerticle;
+import org.nuxeo.micro.repo.service.tenant.TenantService;
 
 import io.grpc.ManagedChannel;
 import io.grpc.Metadata;
@@ -46,7 +46,7 @@ public class GrpcServerTest {
                         .usePlaintext(true).build();
 
                 Metadata headers = new Metadata();
-                headers.put(GrpcInterceptor.TENANTID_METADATA_KEY, SchemaService.NUXEO_TENANTS_SCHEMA);
+                headers.put(GrpcInterceptor.TENANTID_METADATA_KEY, TenantService.NUXEO_TENANTS_SCHEMA);
                 nuxeoSession = NuxeoCoreSessionGrpc.newVertxStub(channel)
                         .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(headers));
                 testContext.completeNow();

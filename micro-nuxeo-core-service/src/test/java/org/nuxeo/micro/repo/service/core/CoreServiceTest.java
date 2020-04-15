@@ -32,8 +32,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentNotFoundException;
 import org.nuxeo.ecm.core.api.PathRef;
-import org.nuxeo.micro.repo.service.schema.SchemaService;
 import org.nuxeo.micro.repo.service.schema.impl.SchemaVerticle;
+import org.nuxeo.micro.repo.service.tenant.TenantService;
 import org.nuxeo.runtime.jtajca.JtaActivator;
 
 import io.vertx.core.Vertx;
@@ -66,7 +66,7 @@ public class CoreServiceTest {
     void can_use_create_document(Vertx vertx, VertxTestContext testContext) throws Throwable {
         CoreSessionService.create(vertx, config, testContext.succeeding(css -> {
 
-            css.session(SchemaService.NUXEO_TENANTS_SCHEMA, "Administrator",
+            css.session(TenantService.NUXEO_TENANTS_SCHEMA, "Administrator",
                     testContext.succeeding(session -> testContext.verify(() -> {
 
                         DocumentModel doc = session.createDocumentModel("/", "Tenants", "Folder");

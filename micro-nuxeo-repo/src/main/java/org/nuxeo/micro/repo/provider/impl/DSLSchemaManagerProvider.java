@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -47,8 +48,11 @@ public class DSLSchemaManagerProvider extends CoreSchemaManagerProvider {
 
             if (resource != null) {
                 String dsl = IOUtils.toString(resource.openStream(), Charset.defaultCharset());
-                DslModel model = dslparser.parse(dsl);
+                Map<String, Object> ast = dslparser.getAbstractSyntaxTree(dsl);
 
+
+                DslModel model = DslModel.builder().with(SchemaFeature.class, DocumentTypeFeature.class).build();
+                model.visit(ast);
                 SchemaFeature schemaFeature = model.getFeature(SchemaFeature.class);
 
                 schemaFeature.getShemaBindings().forEach(sb -> {
