@@ -41,8 +41,12 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 public class GraphQLServiceImpl implements GraphQLService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GraphQLServiceImpl.class);
 
     private Vertx vertx;
 
@@ -101,16 +105,19 @@ public class GraphQLServiceImpl implements GraphQLService {
                                     completionHandler.handle(
                                             Future.succeededFuture(GraphQL.newGraphQL(graphQLSchema).build()));
                                 } else {
+                                    LOG.error("Failed getting schema for: {}", tenantId, sr.cause());
                                     completionHandler.handle(Future.failedFuture(sr.cause()));
                                 }
 
                             });
                         } else {
+                            LOG.error("Failed getting AST for: {}", tenantId, dslr.cause());
                             completionHandler.handle(Future.failedFuture(dslr.cause()));
                         }
 
                     });
                 } else {
+                    LOG.error("Failed getting Tenant for: {}", tenantId, cr.cause());
                     completionHandler.handle(Future.failedFuture(cr.cause()));
                 }
             });

@@ -163,12 +163,12 @@ class NuxeoDSLParser extends chevrotain.Parser {
 
 
           $.RULE("aliasDef", () => {
-              $.CONSUME(Identifier)              
+              $.CONSUME(Identifier)
               $.CONSUME2(Identifier)
               $.CONSUME2(LCurly)
               $.AT_LEAST_ONE_SEP({SEP: Comma, DEF: () => {
                 $.CONSUME3(StringLiteral)
-              }})              
+              }})
               $.CONSUME2(RCurly)
           })
 
@@ -188,10 +188,10 @@ class NuxeoDSLParser extends chevrotain.Parser {
               })
               $.OPTION2(() => {
                 $.CONSUME(Colon)
-                $.CONSUME3(Identifier)                
+                $.CONSUME3(Identifier)
               })
 
-              $.CONSUME3(StringLiteral)              
+              $.CONSUME3(StringLiteral)
           })
 
           $.RULE("queryParams", () => {
@@ -313,7 +313,7 @@ class NuxeoDSLParser extends chevrotain.Parser {
 
         if(ctx.queryList.length > 0) {
           result.queries = this.visit(ctx.queryList)
-        }        
+        }
 
 
         return result
@@ -331,7 +331,7 @@ class NuxeoDSLParser extends chevrotain.Parser {
             }
             inlineSchema.push(schema)
 
-            doctype.schemas = doctype.schemas.filter((s)=>s.name !== schema.name)            
+            doctype.schemas = doctype.schemas.filter((s)=>s.name !== schema.name)
             doctype.schemas.push({name: schema.name, lazy: schema.lazy})
           }
         })
@@ -363,7 +363,7 @@ class NuxeoDSLParser extends chevrotain.Parser {
 
         if(ctx.Crud.length > 0) {
           doctype.crud = {}
-        }       
+        }
 
         return doctype
       }
@@ -391,14 +391,14 @@ class NuxeoDSLParser extends chevrotain.Parser {
         return []
       }
 
-          
+
       aliasDef(ctx) {
         const alias = {}
         alias.name = ctx.Identifier[0].image
         alias.type = ctx.Identifier[1].image
         alias.args = ctx.StringLiteral.map((s) => s.image.substr(0,s.image.length-1).substr(1))
         return alias
-      }      
+      }
 
       queryList(ctx) {
         if(ctx.queryDef.length > 0){
@@ -407,10 +407,10 @@ class NuxeoDSLParser extends chevrotain.Parser {
         return []
       }
 
-          
+
       queryDef(ctx) {
         const query = {}
-        query.name = ctx.Identifier.shift().image
+        query.name = ctx.Identifier[0].image
         const s = ctx.StringLiteral[0].image
         query.query = s.substr(0,s.length-1).substr(1)
 
@@ -421,19 +421,19 @@ class NuxeoDSLParser extends chevrotain.Parser {
         }
 
 
-        
 
-        query.resultType = ctx.Identifier[0] ? ctx.Identifier[0].image : "document"
+
+        query.resultType = ctx.Identifier[1] ? ctx.Identifier[1].image : "document"
         return query
-      } 
+      }
 
 
       queryParams(ctx) {
         if(ctx.Identifier.length > 0) {
           return ctx.Identifier.map((p)=> p.image)
-        } 
+        }
 
-      }     
+      }
 
       schemaRef(ctx) {
 
@@ -449,9 +449,9 @@ class NuxeoDSLParser extends chevrotain.Parser {
 
         }
 
-        
+
         if(ctx.schemaBody.length > 0) {
-          result.fields = this.visit(ctx.schemaBody)        
+          result.fields = this.visit(ctx.schemaBody)
         }
 
         return result

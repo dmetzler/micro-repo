@@ -28,6 +28,7 @@ import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc;
 import org.nuxeo.micro.repo.proto.utils.GrpcInterceptor;
 import org.nuxeo.micro.repo.service.dsl.AbstractSyntaxTree;
 import org.nuxeo.micro.repo.service.dsl.NuxeoDslService;
+import org.nuxeo.micro.repo.service.schema.DefaultTypeConfiguration;
 import org.nuxeo.micro.repo.service.schema.RemoteSchemaManager;
 import org.nuxeo.micro.repo.service.schema.SchemaService;
 import org.nuxeo.micro.repo.service.schema.dsl.DocumentTypeFeature;
@@ -136,7 +137,7 @@ public class SchemaServiceImpl implements SchemaService {
 
             tenantService.getTenantConfiguration(tenantId, cr -> {
                 if (!cr.succeeded()) {
-                    resultHandler.handle(Future.failedFuture("Tenant Not Found"));
+                    resultHandler.handle(Future.failedFuture(String.format("Tenant [%s] Not Found: %s", tenantId,cr.cause().getMessage())));
                 } else {
                     TenantConfiguration conf = cr.result();
 

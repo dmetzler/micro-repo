@@ -128,6 +128,7 @@
           if (ast.queries && ast.queries.length > 0) {
             const queries = new ArrayList()
             ast.queries.forEach((query)=> {
+
 // const queryDesc = new QueryDescriptor()
               const queryDesc = new Map()
               queryDesc.name = query.name
@@ -136,6 +137,7 @@
               queryDesc.args = new ArrayList()
               query.params.forEach((p) => queryDesc.args.add(p))
               queries.add(queryDesc)
+
             })
             result.put("queries", queries)
           }

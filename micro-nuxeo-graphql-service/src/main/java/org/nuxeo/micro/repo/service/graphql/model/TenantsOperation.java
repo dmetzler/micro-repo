@@ -32,8 +32,11 @@ public class TenantsOperation {
         QueryRequest qr = QueryRequest.newBuilder().setNxql(query).build();
         session.query(qr, docResp -> {
             if (docResp.succeeded()) {
-                List<Tenant> result = docResp.result().getDocsList().stream().map(Tenant::from)
-                        .collect(Collectors.toList());
+                List<Tenant> result = docResp.result()
+                                             .getDocsList()
+                                             .stream()
+                                             .map(Tenant::from)
+                                             .collect(Collectors.toList());
 
                 NuxeoContext ctx = env.getContext();
                 ctx.getCache().put("_allLibrariesMeta", new ListMetadata((long) docResp.result().getTotalCount()));
@@ -46,14 +49,29 @@ public class TenantsOperation {
 
     }
 
+    @Query("Tenant")
+    public void libraryById(DataFetchingEnvironment env, NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxStub session,
+            Promise<Tenant> fut) {
+        String id = env.getArgument("id");
+        DocumentRequest dr = DocumentRequest.newBuilder().setId(id).build();
+
+        session.getDocument(dr, docResp -> {
+            if (docResp.succeeded()) {
+                fut.complete(Tenant.from(docResp.result()));
+            } else {
+                fut.fail(docResp.cause());
+            }
+        });
+    }
+
     @SuppressWarnings("unchecked")
     @Query("_allTenantsMeta")
     public void allTenantsMeta(DataFetchingEnvironment env, NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxStub session,
-            Promise<List<Tenant>> fut) {
+            Promise<ListMetadata> fut) {
 
         NuxeoContext ctx = env.getContext();
         if (ctx.getCache().containsKey("_allLibrariesMeta")) {
-            fut.complete((List<Tenant>) ctx.getCache().get("_allLibrariesMeta"));
+            fut.complete((ListMetadata) ctx.getCache().get("_allLibrariesMeta"));
         } else {
 
             QueryBuilder qb = new QueryBuilder().from("Tenant");
@@ -63,11 +81,15 @@ public class TenantsOperation {
             QueryRequest qr = QueryRequest.newBuilder().setNxql(query).build();
             session.query(qr, docResp -> {
                 if (docResp.succeeded()) {
-                    List<Tenant> result = docResp.result().getDocsList().stream().map(Tenant::from)
-                            .collect(Collectors.toList());
+                    List<Tenant> result = docResp.result()
+                                                 .getDocsList()
+                                                 .stream()
+                                                 .map(Tenant::from)
+                                                 .collect(Collectors.toList());
 
-                    ctx.getCache().put("_allLibrariesMeta", new ListMetadata((long) docResp.result().getTotalCount()));
-                    fut.complete(result);
+                    ListMetadata metadata = new ListMetadata((long) docResp.result().getTotalCount());
+                    ctx.getCache().put("_allLibrariesMeta", metadata);
+                    fut.complete(metadata);
 
                 } else {
                     fut.fail(docResp.cause());
@@ -97,8 +119,11 @@ public class TenantsOperation {
             } else {
                 Document doc = tenant.toDocument();
 
-                DocumentCreationRequest req = DocumentCreationRequest.newBuilder().setPath("/")
-                        .setName(tenant.getName()).setDocument(doc).build();
+                DocumentCreationRequest req = DocumentCreationRequest.newBuilder()
+                                                                     .setPath("/")
+                                                                     .setName(tenant.getName())
+                                                                     .setDocument(doc)
+                                                                     .build();
 
                 session.createDocument(req, cr -> {
                     if (cr.succeeded()) {
@@ -112,7 +137,7 @@ public class TenantsOperation {
 
     }
 
-//    // updateTenant(name: String!, city: String!, country: String!): Tenant
+    // // updateTenant(name: String!, city: String!, country: String!): Tenant
     @Mutation("updateTenant")
     public void updateTenant(DataFetchingEnvironment env, NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxStub session,
             Promise<Tenant> fut) {

@@ -33,10 +33,14 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.grpc.VertxChannelBuilder;
 
 public class TenantServiceImpl implements TenantService {
 
+
+    private static final Logger LOG = LoggerFactory.getLogger(TenantServiceImpl.class );
     private Vertx vertx;
 
     private NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxStub coreSession;
@@ -51,6 +55,8 @@ public class TenantServiceImpl implements TenantService {
             corePort = config.getJsonObject("core").getInteger("port", 8787);
             coreHost = config.getJsonObject("core").getString("host", "localhost");
         }
+
+        LOG.info("Connecting gRPC server on {}:{}", coreHost, corePort);
 
         ManagedChannel channel = VertxChannelBuilder.forAddress(vertx, coreHost, corePort).usePlaintext(true).build();
 
@@ -69,10 +75,11 @@ public class TenantServiceImpl implements TenantService {
 
             coreSession.getDocument(req, dr -> {
                 if (!dr.succeeded()) {
-                    resultHandler.handle(Future.failedFuture("Tenant Not Found"));
+                    String error = String.format("Tenant [%s] Not Found: %s", tenantId, dr.cause().getMessage());
+                    LOG.error(error);
+                    resultHandler.handle(Future.failedFuture(error));
                 } else {
                     Document doc = dr.result();
-
                     resultHandler.handle(Future.succeededFuture(TenantConfiguration.from(doc)));
                 }
             });

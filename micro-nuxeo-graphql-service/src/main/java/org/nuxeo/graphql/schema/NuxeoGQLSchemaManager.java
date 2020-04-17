@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.schema.DocumentType;
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.graphql.descriptors.AliasDescriptor;
@@ -38,7 +37,6 @@ import graphql.schema.GraphQLObjectType.Builder;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLType;
 import graphql.schema.TypeResolver;
-import graphql.schema.idl.RuntimeWiring;
 import io.vertx.ext.web.handler.graphql.VertxDataFetcher;
 
 public class NuxeoGQLSchemaManager {
@@ -125,20 +123,25 @@ public class NuxeoGQLSchemaManager {
     private void buildMutationForDocType(Builder builder, String docType) {
         GraphQLInputObjectType inputType = DocumentInputTypeBuilder.type(docType, this).build();
 
+
+        DocumentMutationDataFetcher creationFetcher = new DocumentMutationDataFetcher(docType, Mode.CREATE);
+        DocumentMutationDataFetcher updateFetcher = new DocumentMutationDataFetcher(docType, Mode.UPDATE);
+        DocumentMutationDataFetcher deleteFetcher = new DocumentMutationDataFetcher(docType, Mode.DELETE);
+
         builder.field(newFieldDefinition().name("create" + docType)
                                           .type(docTypeToGQLType.get(docType))
                                           .argument(newArgument().name(docType).type(inputType))
-                                          .dataFetcher(new DocumentMutationDataFetcher(docType, Mode.CREATE)));
+                                          .dataFetcher(new VertxDataFetcher<>(creationFetcher::get)));
 
         builder.field(newFieldDefinition().name("update" + docType)
                                           .type(docTypeToGQLType.get(docType))
                                           .argument(newArgument().name(docType).type(inputType))
-                                          .dataFetcher(new DocumentMutationDataFetcher(docType, Mode.UPDATE)));
+                                          .dataFetcher(new VertxDataFetcher<>(updateFetcher::get)));
 
         builder.field(newFieldDefinition().name("delete" + docType)
                                           .type(GraphQLString)
                                           .argument(newArgument().name(docType).type(inputType))
-                                          .dataFetcher(new DocumentMutationDataFetcher(docType, Mode.DELETE)));
+                                          .dataFetcher(new VertxDataFetcher<>(deleteFetcher::get)));
     }
 
     /**

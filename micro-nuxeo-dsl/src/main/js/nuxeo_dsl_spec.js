@@ -1,6 +1,7 @@
 "use strict"
 const expect = require("chai").expect
 const parse = require("./nuxeo_dsl").parse
+const fs= require("fs")
 
 describe("Nuxeo DSL", () => {
     context("Document type", () => {
@@ -59,7 +60,7 @@ describe("Nuxeo DSL", () => {
             let inputText =
                 "doctype myDoc extends File {" +
                 "\r\n   facets {" +
-                "\r\n      Folderish" +                
+                "\r\n      Folderish" +
                 "\r\n   }" +
                 "\r\n}"
             let result = parse(inputText)
@@ -153,14 +154,14 @@ describe("Nuxeo DSL", () => {
                   {
                         name:"myDoc",
                         extends: "Document",
-                        schemas: [                              
+                        schemas: [
                               {
-                                name: "custom", 
-                                lazy: false                                
+                                name: "custom",
+                                lazy: false
                             },
                             {
-                                name: "scheme", 
-                                lazy: false                                
+                                name: "scheme",
+                                lazy: false
                             }
                         ]
 
@@ -248,8 +249,23 @@ describe("Nuxeo DSL", () => {
                   {name: "library", params:["name"], query: "SELECT * FROM Library WHERE dc:title= '$name'", resultType: "document" },
                   {name: "librari", params:["name"], query: "SELECT * FROM Library WHERE dc:title= '$name'", resultType: "Library" }
                 ]
-                  
+
             })
+        })
+    })
+
+
+    context("Query Debug", () => {
+      it("Can be defined", () => {
+// let inputText =
+// "queries {\n libraries:Library \"SELECT * FROM Library\"\n}"
+
+            let inputText = fs.readFileSync('./src/main/js/library.nxl', 'utf8')
+            let result = parse(inputText)
+
+            console.log(JSON.stringify(result, null, 2))
+
+            expect(result.value.queries.length).to.equal(1)
         })
     })
 

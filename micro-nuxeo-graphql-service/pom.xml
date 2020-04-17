@@ -49,7 +49,7 @@
     <dependency>
       <groupId>org.nuxeo.micro-repo</groupId>
       <artifactId>micro-nuxeo-schema-service</artifactId>
-      <classifier>client</classifier>
+<!--       <classifier>client</classifier> -->
     </dependency>
     <dependency>
       <groupId>org.nuxeo.micro-repo</groupId>

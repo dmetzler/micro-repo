@@ -26,7 +26,7 @@ public class TenantVerticle extends BaseVerticle {
     @Override
     public void startWithConfig(JsonObject config, Handler<AsyncResult<Void>> completionHandler) {
         binder = new ServiceBinder(vertx);
-        TenantService.create(vertx, new JsonObject(), ar -> {
+        TenantService.create(vertx, config, ar -> {
             if (ar.succeeded()) {
                 TenantService ts = ar.result();
 

@@ -58,6 +58,7 @@
     <dependency>
       <groupId>org.nuxeo.micro-repo</groupId>
       <artifactId>micro-nuxeo-tenant-service</artifactId>
+<!--       <classifier>client</classifier> -->
     </dependency>
     <dependency>
       <groupId>org.nuxeo.micro-repo</groupId>

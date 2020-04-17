@@ -218,6 +218,12 @@
         <artifactId>micro-nuxeo-tenant-service</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.nuxeo.micro-repo</groupId>
+        <artifactId>micro-nuxeo-tenant-service</artifactId>
+        <classifier>client</classifier>
+        <version>${project.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>commons-collections</groupId>

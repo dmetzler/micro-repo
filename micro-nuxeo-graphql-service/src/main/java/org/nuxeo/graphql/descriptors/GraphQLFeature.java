@@ -1,12 +1,14 @@
 package org.nuxeo.graphql.descriptors;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.nuxeo.micro.dsl.DslModel;
 import org.nuxeo.micro.dsl.features.DslFeature;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class GraphQLFeature implements DslFeature {
 

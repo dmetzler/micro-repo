@@ -1,20 +1,25 @@
 package org.nuxeo.micro.repo.service.graphql;
 
 import org.nuxeo.micro.repo.service.BaseVerticle;
+import org.nuxeo.micro.repo.service.schema.impl.SchemaVerticle;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.ext.auth.ChainAuth;
 import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.ext.auth.oauth2.OAuth2Auth;
 import io.vertx.ext.auth.oauth2.OAuth2ClientOptions;
 import io.vertx.ext.auth.oauth2.OAuth2FlowType;
+import io.vertx.ext.cluster.infinispan.InfinispanClusterManager;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.ChainAuthHandler;
 import io.vertx.ext.web.handler.JWTAuthHandler;
 import io.vertx.ext.web.handler.OAuth2AuthHandler;
@@ -24,7 +29,18 @@ import io.vertx.ext.web.sstore.LocalSessionStore;
 public class GraphQLVerticle extends BaseVerticle {
 
     public static void main(String[] args) {
-        Vertx.vertx().deployVerticle(new GraphQLVerticle());
+        ClusterManager mgr = new InfinispanClusterManager();
+
+        VertxOptions options = new VertxOptions().setClusterManager(mgr);
+
+        Vertx.clusteredVertx(options, res -> {
+            if (res.succeeded()) {
+                Vertx vertx = res.result();
+                vertx.deployVerticle(new GraphQLVerticle());
+            } else {
+                // failed!
+            }
+        });
     }
 
     @Override
@@ -40,6 +56,9 @@ public class GraphQLVerticle extends BaseVerticle {
 
         // setupAuthentication(config, router, jwksKeys);
         Integer port = config.getInteger("port", 8080);
+
+
+        router.route().handler(BodyHandler.create());
 
         MetaGraphQLHandler.create(vertx, config, ar -> {
             if (ar.succeeded()) {

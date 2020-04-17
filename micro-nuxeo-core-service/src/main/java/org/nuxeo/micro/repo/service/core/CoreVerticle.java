@@ -25,7 +25,9 @@ import io.vertx.grpc.VertxServer;
 import io.vertx.grpc.VertxServerBuilder;
 
 public class CoreVerticle extends BaseVerticle {
-    static final int DEFAULT_PORT = 8787;
+    static final int DEFAULT_PORT = 8080;
+
+    static final int GRPC_DEFAULT_PORT = 8787;
 
     private VertxServer rpcServer;
 
@@ -68,14 +70,14 @@ public class CoreVerticle extends BaseVerticle {
                     GrpcInterceptor interceptor = new GrpcInterceptor();
                     ServerInterceptor wrapped = BlockingServerInterceptor.wrap(vertx, interceptor);
 
-                    rpcServer = VertxServerBuilder.forAddress(vertx, "0.0.0.0", config.getInteger("port", DEFAULT_PORT))
+                    rpcServer = VertxServerBuilder.forAddress(vertx, "0.0.0.0", config.getInteger("grpcPort", GRPC_DEFAULT_PORT))
                                                   .addService(ServerInterceptors.intercept(service, wrapped))
                                                   .build();
                     rpcServer.start();
 
                     vertx.createHttpServer()
                          .requestHandler(req -> req.response().end("OK"))
-                         .listen(config.getInteger("port", 8080));
+                         .listen(config.getInteger("port", DEFAULT_PORT));
 
                     completionHandler.handle(Future.succeededFuture());
                 } catch (IOException e) {

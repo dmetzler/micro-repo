@@ -172,6 +172,7 @@ public class GraphqlServiceTest {
                     System.out.println(result);
                     Map<String, Object> document = (Map<String, Object>) queryResult.get("document");
                     assertThat(document.get("_id")).isNotNull();
+
                     testContext.completeNow();
                 })));
 
@@ -258,6 +259,24 @@ public class GraphqlServiceTest {
 
     @SuppressWarnings("unchecked")
     @Test
+    void should_be_able_to_use_named_queries(Vertx vertx, VertxTestContext testContext) throws Exception {
+
+        String query = "{libraries { _path}}";
+
+        executeQuery(vertx, query, testContext.succeeding(result -> testContext.verify(() -> {
+            if (result.getErrors().size() > 0) {
+                throw new NuxeoException(Joiner.on(", ").join(result.getErrors()));
+            }
+            Map<String, Map<String, Object>> queryResult = result.getData();
+            assertThat((List<Object>) queryResult.get("libraries")).hasSize(2);
+
+            testContext.completeNow();
+        })));
+
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
     void can_create_a_document(Vertx vertx, VertxTestContext testContext) throws Exception {
 
         String query = "mutation createLibrary( $library: LibraryInput!) { createLibrary(Library: $library) { _id  dc { title }  }}";
@@ -287,6 +306,26 @@ public class GraphqlServiceTest {
         })));
 
     }
+
+    @Test
+    void can_use_aliases(Vertx vertx, VertxTestContext testContext) throws Throwable {
+
+        executeQuery(vertx, " {document(path:\"/Test\") { _id _path ... on Library {city} }}",
+                testContext.succeeding(result -> testContext.verify(() -> {
+                    if (result.getErrors().size() > 0) {
+                        throw new NuxeoException(Joiner.on(", ").join(result.getErrors()));
+                    }
+
+                    Map<String, Object> queryResult = result.getData();
+
+                    System.out.println(result);
+                    Map<String, Object> document = (Map<String, Object>) queryResult.get("document");
+                    assertThat(document.get("city")).isEqualTo("Irvine");
+                    testContext.completeNow();
+                })));
+
+    }
+
 
     private void executeQuery(Vertx vertx, String query, Map<String, Object> params,
             Handler<AsyncResult<ExecutionResult>> completionHandler) {

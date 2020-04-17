@@ -7,8 +7,9 @@ import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxStub
 import graphql.schema.DataFetchingEnvironment;
 import io.vertx.core.Promise;
 
-public class DocumentModelDataFetcher extends AbstractDataFetcher {
+public class DocumentModelDataFetcher extends AbstractDataFetcher<Document> {
 
+    @Override
     public void get(DataFetchingEnvironment environment, Promise<Document> future) {
         String path = environment.getArgument("path");
         String id = environment.getArgument("id");

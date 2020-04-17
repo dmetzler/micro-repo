@@ -17,6 +17,8 @@ import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.graphql.GraphQLHandler;
@@ -27,6 +29,8 @@ import io.vertx.grpc.VertxChannelBuilder;
 public class MetaGraphQLHandler implements Handler<RoutingContext> {
 
     public static final Metadata.Key<String> TENANT_ID_KEY = Metadata.Key.of("tenantId", ASCII_STRING_MARSHALLER);
+
+    private static final Logger LOG = LoggerFactory.getLogger(MetaGraphQLHandler.class);
 
     protected final NuxeoCoreSessionVertxStub nuxeoSession;
 
@@ -62,20 +66,15 @@ public class MetaGraphQLHandler implements Handler<RoutingContext> {
         ManagedChannel channel = VertxChannelBuilder.forAddress(vertx, coreHost, corePort).usePlaintext(true).build();
 
         NuxeoCoreSessionVertxStub nuxeoSession = NuxeoCoreSessionGrpc.newVertxStub(channel);
-        SchemaService.create(vertx, config, ssr -> {
-            if (ssr.succeeded()) {
+        SchemaService schemaService = SchemaService.createProxy(vertx);
 
-                GraphQLService.create(vertx, config, gqr -> {
-                    if (gqr.succeeded()) {
-                        MetaGraphQLHandler handler = new MetaGraphQLHandler(vertx, config, nuxeoSession, gqr.result(),
-                                ssr.result());
-                        completionHandler.handle(Future.succeededFuture(handler));
-                    } else {
-                        completionHandler.handle(Future.failedFuture(gqr.cause()));
-                    }
-                });
+        GraphQLService.create(vertx, config, gqr -> {
+            if (gqr.succeeded()) {
+                MetaGraphQLHandler handler = new MetaGraphQLHandler(vertx, config, nuxeoSession, gqr.result(),
+                        schemaService);
+                completionHandler.handle(Future.succeededFuture(handler));
             } else {
-                completionHandler.handle(Future.failedFuture(ssr.cause()));
+                completionHandler.handle(Future.failedFuture(gqr.cause()));
             }
         });
 
@@ -94,19 +93,22 @@ public class MetaGraphQLHandler implements Handler<RoutingContext> {
                             Metadata headers = new Metadata();
                             headers.put(TENANT_ID_KEY, tenantId);
                             return new NuxeoContext(rc,
-                                    nuxeoSession.withInterceptors(MetadataUtils.newAttachHeadersInterceptor(headers)), sr.result());
+                                    nuxeoSession.withInterceptors(MetadataUtils.newAttachHeadersInterceptor(headers)),
+                                    sr.result());
                         });
                         gql.handle(event);
                     } else {
+                        LOG.warn(sr.cause(), sr.cause());
                         HttpServerResponse response = event.response();
                         response.setStatusCode(404);
-                        response.end("Repository not found");
+                        response.end("SS Repository not found: " + sr.cause().getMessage());
                     }
                 });
             } else {
+                LOG.warn(gqlR.cause(), gqlR.cause());
                 HttpServerResponse response = event.response();
                 response.setStatusCode(404);
-                response.end("Repository not found");
+                response.end("GQL Repository not found: " + gqlR.cause().getMessage());
             }
         });
 
@@ -130,6 +132,7 @@ public class MetaGraphQLHandler implements Handler<RoutingContext> {
                     });
                     graphiQLHandler.handle(event);
                 } else {
+                    LOG.warn(gqlR.cause());
                     HttpServerResponse response = event.response();
                     response.setStatusCode(404);
                     response.end("Repository not found");

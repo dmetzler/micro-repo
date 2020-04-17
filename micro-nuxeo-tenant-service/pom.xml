@@ -14,7 +14,7 @@
 
 
   <properties>
-    <vertx.verticle>org.nuxeo.micro.repo.service.dsl.impl.TenantVerticle</vertx.verticle>
+    <vertx.verticle>org.nuxeo.micro.repo.service.tenant.impl.TenantVerticle</vertx.verticle>
   </properties>
 
 
@@ -95,7 +95,7 @@
     </dependency>
   </dependencies>
   <build>
-    <finalName>micro-nuxeo-dsl-${project.version}</finalName>
+    <finalName>micro-nuxeo-tenant-${project.version}</finalName>
     <plugins>
       <plugin>
         <groupId>io.fabric8</groupId>
@@ -154,7 +154,7 @@
             <configuration>
               <classifier>client</classifier>
               <includes>
-                <include>org/nuxeo/micro/repo/service/schema/*</include>
+                <include>org/nuxeo/micro/repo/service/tenant/*</include>
               </includes>
             </configuration>
           </execution>

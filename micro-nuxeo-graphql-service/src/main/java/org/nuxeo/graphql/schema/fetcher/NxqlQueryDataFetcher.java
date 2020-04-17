@@ -17,18 +17,18 @@ import org.nuxeo.micro.repo.proto.QueryRequest;
 import graphql.schema.DataFetchingEnvironment;
 import io.vertx.core.Promise;
 
-public class NxqlQueryDataFetcher extends AbstractDataFetcher {
+public class NxqlQueryDataFetcher extends AbstractDataFetcher<List<Document>> {
 
+    @Override
     public void get(DataFetchingEnvironment environment, Promise<List<Document>> future) {
-
 
         NuxeoCoreSessionVertxStub session = getSession(environment.getContext());
         if (session == null) {
-            future.complete(Collections.emptyList());;
+            future.complete(Collections.emptyList());
         }
 
         getPrincipal(environment.getContext(), pr -> {
-            if(pr.succeeded()) {
+            if (pr.succeeded()) {
                 ExpressionEvaluator el = getEl(environment.getContext());
                 String finalQuery = getQuery(environment);
                 ELService elService = new ELServiceServiceImpl();
@@ -49,8 +49,8 @@ public class NxqlQueryDataFetcher extends AbstractDataFetcher {
                 finalQuery = el.evaluateExpression(elContext, finalQuery, String.class);
 
                 QueryRequest qreq = QueryRequest.newBuilder().setNxql(finalQuery).build();
-                session.query(qreq, qrr ->{
-                    if(qrr.succeeded()) {
+                session.query(qreq, qrr -> {
+                    if (qrr.succeeded()) {
                         future.complete(qrr.result().getDocsList());
                     } else {
                         future.fail(qrr.cause());
@@ -62,10 +62,10 @@ public class NxqlQueryDataFetcher extends AbstractDataFetcher {
             }
         });
 
-
     }
 
     protected String getQuery(DataFetchingEnvironment environment) {
         return environment.getArgument("nxql");
     }
+
 }

@@ -1,4 +1,4 @@
-package org.nuxeo.micro.repo.service.schema.impl;
+package org.nuxeo.micro.repo.service.schema;
 
 import org.nuxeo.ecm.core.schema.TypeConfiguration;
 

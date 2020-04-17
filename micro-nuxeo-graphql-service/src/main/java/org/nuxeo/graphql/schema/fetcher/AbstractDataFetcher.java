@@ -3,15 +3,18 @@ package org.nuxeo.graphql.schema.fetcher;
 import org.nuxeo.ecm.core.api.NuxeoPrincipal;
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.platform.el.ExpressionEvaluator;
+import org.nuxeo.micro.repo.proto.Document;
 import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxStub;
 import org.nuxeo.micro.repo.service.graphql.NuxeoGraphqlContext;
 
+import graphql.schema.DataFetchingEnvironment;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 
-public abstract class AbstractDataFetcher  {
+public abstract class AbstractDataFetcher<T> {
 
-
+    public abstract void get(DataFetchingEnvironment environment, Promise<T> future);
 
     protected NuxeoCoreSessionVertxStub getSession(Object ctx) {
         if (ctx instanceof NuxeoGraphqlContext) {
