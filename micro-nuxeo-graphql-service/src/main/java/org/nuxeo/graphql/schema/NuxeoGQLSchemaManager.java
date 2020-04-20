@@ -1,6 +1,7 @@
 package org.nuxeo.graphql.schema;
 
 import static graphql.Scalars.GraphQLString;
+import static graphql.Scalars.GraphQLLong;
 import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLInterfaceType.newInterface;
@@ -34,6 +35,7 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLObjectType.Builder;
+import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLType;
 import graphql.schema.TypeResolver;
@@ -57,8 +59,11 @@ public class NuxeoGQLSchemaManager {
 
     private SchemaManager sm;
 
+    private DocumentModelDataFetcher dmDataFetcher;
+
     public NuxeoGQLSchemaManager(SchemaManager sm) {
         this.sm = sm;
+        dmDataFetcher = new DocumentModelDataFetcher();
     }
 
     public NuxeoGQLSchemaManager(Map<String, AliasDescriptor> aliases, Map<String, QueryDescriptor> queries,
@@ -67,6 +72,8 @@ public class NuxeoGQLSchemaManager {
         this.queries = queries;
         this.cruds = cruds;
         this.sm = sm;
+
+        dmDataFetcher = new DocumentModelDataFetcher();
     }
 
     public GraphQLSchema getNuxeoSchema() {
@@ -86,7 +93,6 @@ public class NuxeoGQLSchemaManager {
 
     private GraphQLObjectType buildQueryType() {
 
-        DocumentModelDataFetcher dmDataFetcher = new DocumentModelDataFetcher();
         NxqlQueryDataFetcher nxqlDataFetcher = new NxqlQueryDataFetcher();
 
         Builder builder = newObject().name("nuxeo");
@@ -106,8 +112,40 @@ public class NuxeoGQLSchemaManager {
             builder.field(QueryFieldTypeBuilder.newField(query, this).build());
         }
 
+        for (CrudDescriptor crud : cruds.values()) {
+            buildQueriesForDocType(builder, crud.targetDoctype);
+        }
+
         return builder.build();
 
+    }
+
+    private void buildQueriesForDocType(Builder builder, String docType) {
+        QueryDescriptor qd = new QueryDescriptor();
+        qd.query = String.format("SELECT * FROM %s", docType);
+        qd.resultType = docType;
+        qd.name = String.format("all%s", plural(docType));
+
+        // allDocType
+        QueryFieldTypeBuilder allField = QueryFieldTypeBuilder.newField(qd, this);
+        builder.field(allField.build());
+        // _allDocTypeMeta
+        builder.field(allField.buildMeta());
+
+        builder.field(newFieldDefinition().name(docType)
+                                          .type(docTypeToGQLType.get(docType))
+                                          .argument(new GraphQLArgument("id", GraphQLString))
+                                          .dataFetcher(new VertxDataFetcher<>(dmDataFetcher::get))
+                                          .build());
+
+    }
+
+    public static String plural(String objectName) {
+        if (objectName.endsWith("y")) {
+            return String.format("%sies", objectName.substring(0, objectName.length() - 1));
+        } else {
+            return String.format("%ss", objectName);
+        }
     }
 
     private Builder buildMutationType() {
@@ -123,25 +161,34 @@ public class NuxeoGQLSchemaManager {
     private void buildMutationForDocType(Builder builder, String docType) {
         GraphQLInputObjectType inputType = DocumentInputTypeBuilder.type(docType, this).build();
 
+        DocumentMutationDataFetcher creationFetcher = new DocumentMutationDataFetcher(docType, Mode.CREATE,this);
+        DocumentMutationDataFetcher updateFetcher = new DocumentMutationDataFetcher(docType, Mode.UPDATE,this);
+        DocumentMutationDataFetcher deleteFetcher = new DocumentMutationDataFetcher(docType, Mode.DELETE,this);
 
-        DocumentMutationDataFetcher creationFetcher = new DocumentMutationDataFetcher(docType, Mode.CREATE);
-        DocumentMutationDataFetcher updateFetcher = new DocumentMutationDataFetcher(docType, Mode.UPDATE);
-        DocumentMutationDataFetcher deleteFetcher = new DocumentMutationDataFetcher(docType, Mode.DELETE);
 
-        builder.field(newFieldDefinition().name("create" + docType)
-                                          .type(docTypeToGQLType.get(docType))
-                                          .argument(newArgument().name(docType).type(inputType))
-                                          .dataFetcher(new VertxDataFetcher<>(creationFetcher::get)));
+        builder.field(creationFetcher.buildFieldDefinition(this));
+        builder.field(updateFetcher.buildFieldDefinition(this));
+        builder.field(deleteFetcher.buildFieldDefinition(this));
 
-        builder.field(newFieldDefinition().name("update" + docType)
-                                          .type(docTypeToGQLType.get(docType))
-                                          .argument(newArgument().name(docType).type(inputType))
-                                          .dataFetcher(new VertxDataFetcher<>(updateFetcher::get)));
 
-        builder.field(newFieldDefinition().name("delete" + docType)
-                                          .type(GraphQLString)
-                                          .argument(newArgument().name(docType).type(inputType))
-                                          .dataFetcher(new VertxDataFetcher<>(deleteFetcher::get)));
+//        builder.field(newFieldDefinition().name("create" + docType)
+//                                          .type(docTypeToGQLType.get(docType))
+//                                          .argument(newArgument().name(docType).type(inputType))
+//                                          .argument(newArgument().name("parentPath").type(GraphQLString))
+//                                          .argument(newArgument().name("name").type(GraphQLString))
+//
+//                                          .dataFetcher(new VertxDataFetcher<>(creationFetcher::get)));
+
+//        builder.field(newFieldDefinition().name("update" + docType)
+//                                          .type(docTypeToGQLType.get(docType))
+//                                          .argument(newArgument().name("id").type(GraphQLString))
+//                                          .argument(newArgument().name(docType).type(inputType))
+//                                          .dataFetcher(new VertxDataFetcher<>(updateFetcher::get)));
+//
+//        builder.field(newFieldDefinition().name("delete" + docType)
+//                                          .type(docTypeToGQLType.get(docType))
+//                                          .argument(newArgument().name("id").type(GraphQLString))
+//                                          .dataFetcher(new VertxDataFetcher<>(deleteFetcher::get)));
     }
 
     /**
@@ -150,7 +197,16 @@ public class NuxeoGQLSchemaManager {
      * @return
      */
     private void buildNuxeoTypes() {
+
         if (documentInterface == null) {
+
+            docTypeToGQLType = new HashMap<>();
+            GraphQLObjectType listMetadata = newObject().name("ListMetadata")
+                                                        .field(newFieldDefinition().name("count").type(GraphQLLong))
+                                                        .build();
+
+            docTypeToGQLType.put("__metaData", listMetadata);
+
             documentInterface = newInterface().name("document")
                                               .field(newFieldDefinition().type(GraphQLString)//
                                                                          .name("_path")
@@ -161,13 +217,15 @@ public class NuxeoGQLSchemaManager {
                                                                          .dataFetcher(new DocPropertyDataFetcher())
                                                                          .build())
                                               .field(newFieldDefinition().type(GraphQLString)//
+                                                                         .name("id")
+                                                                         .dataFetcher(new DocPropertyDataFetcher())
+                                                                         .build())
+                                              .field(newFieldDefinition().type(GraphQLString)//
                                                                          .name("_name")
                                                                          .dataFetcher(new DocPropertyDataFetcher())
                                                                          .build())
                                               .typeResolver(getNuxeoDocumentTypeResolver())
                                               .build();
-
-            docTypeToGQLType = new HashMap<>();
 
             for (DocumentType type : getSchemaManager().getDocumentTypes()) {
                 docTypeToGQLType.put(type.getName(), DocumentTypeBuilder.newDocumentType(type, this).build());
@@ -201,8 +259,9 @@ public class NuxeoGQLSchemaManager {
         return documentInterface;
     }
 
-    public GraphQLType docTypeToGQLType(String resultType) {
+    public GraphQLObjectType docTypeToGQLType(String resultType) {
         return docTypeToGQLType.get(resultType);
+
     }
 
     public Map<String, GraphQLInputObjectType> getInputTypeRegistry() {
@@ -215,6 +274,10 @@ public class NuxeoGQLSchemaManager {
 
     public Map<String, AliasDescriptor> getAliases() {
         return aliases;
+    }
+
+    public GraphQLObjectType getListMetadataType() {
+        return docTypeToGQLType.get("__metaData");
     }
 
 }

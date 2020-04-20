@@ -27,12 +27,12 @@ const LibraryTitle = ({ record }) => {
 };
 
 export const LibraryList = props => (
-    <List filters={<LibraryFilter/>} {...props}>
+    <List {...props}>
         <Datagrid rowClick="edit">
             <TextField source="name" />
             <TextField source="city" />
             <TextField source="country" />
-            <TextField source="creator" />
+            <TextField label="Creator" source="dc.creator" />
         </Datagrid>
     </List>
 );
@@ -54,6 +54,7 @@ export const LibraryEdit = props => (
 export const LibraryCreate = props => (
     <Create {...props}>
         <SimpleForm>
+            <TextInput source="parentPath" />
             <TextInput source="name" />
             <TextInput source="city" />
             <TextInput source="country" />

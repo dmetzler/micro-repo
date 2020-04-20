@@ -5,6 +5,8 @@ import graphql.schema.DataFetchingEnvironment;
 public class QueryDataFetcher extends NxqlQueryDataFetcher {
     private String query;
 
+
+
     public QueryDataFetcher(String query) {
         this.query = query;
     }
@@ -13,4 +15,6 @@ public class QueryDataFetcher extends NxqlQueryDataFetcher {
     protected String getQuery(DataFetchingEnvironment environment) {
         return query;
     }
+
+
 }

@@ -1,5 +1,8 @@
 package org.nuxeo.graphql.schema.types;
+
 import static graphql.Scalars.GraphQLString;
+import static graphql.Scalars.GraphQLInt;
+import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 
 import org.nuxeo.graphql.descriptors.QueryDescriptor;
@@ -16,22 +19,35 @@ import graphql.schema.GraphQLNonNull;
 public class QueryFieldTypeBuilder extends Builder {
 
     private QueryDescriptor query;
+
     private NuxeoGQLSchemaManager sm;
+
+    private QueryDataFetcher df;
+
 
     private QueryFieldTypeBuilder(QueryDescriptor query, NuxeoGQLSchemaManager sm) {
         this.query = query;
         this.sm = sm;
+        df = new QueryDataFetcher(query.query);
     }
+
 
     @Override
     public GraphQLFieldDefinition build() {
 
         Builder fieldBuilder = newFieldDefinition().name(query.name);
-        if (query.args.size() > 0) {
+
+        if (!query.args.isEmpty()) {
             for (String arg : query.args) {
-                fieldBuilder.argument(new GraphQLArgument(arg, new GraphQLNonNull(GraphQLString)));
+                fieldBuilder.argument(newArgument().name(arg).type(new GraphQLNonNull(GraphQLString)));
             }
         }
+
+
+        fieldBuilder.argument(newArgument().name("page").type(GraphQLInt));
+        fieldBuilder.argument(newArgument().name("perPage").type(GraphQLInt));
+        fieldBuilder.argument(newArgument().name("sortField").type(GraphQLString));
+        fieldBuilder.argument(newArgument().name("filter").type(GraphQLString));
 
         if ("document".equals(query.resultType)) {
             fieldBuilder.type(new GraphQLList(sm.getDocumentInterface()));
@@ -39,8 +55,35 @@ public class QueryFieldTypeBuilder extends Builder {
             fieldBuilder.type(new GraphQLList(sm.docTypeToGQLType(query.resultType)));
         }
 
-        QueryDataFetcher df  = new QueryDataFetcher(query.query);
-        fieldBuilder.dataFetcher(new VertxDataFetcher<>(df::get) );
+
+        fieldBuilder.dataFetcher(new VertxDataFetcher<>(df::get));
+        return fieldBuilder.build();
+
+    }
+
+
+    public GraphQLFieldDefinition buildMeta() {
+        Builder fieldBuilder = newFieldDefinition().name(String.format("_%sMeta",query.name));
+
+        if (query.args.size() > 0) {
+            for (String arg : query.args) {
+                fieldBuilder.argument(new GraphQLArgument(arg, new GraphQLNonNull(GraphQLString)));
+            }
+        }
+
+        fieldBuilder.argument(newArgument().name("page").type(GraphQLInt));
+        fieldBuilder.argument(newArgument().name("perPage").type(GraphQLInt));
+        fieldBuilder.argument(newArgument().name("sortField").type(GraphQLString));
+        fieldBuilder.argument(newArgument().name("filter").type(GraphQLString));
+
+
+
+        fieldBuilder.type(sm.getListMetadataType());
+
+
+
+
+        fieldBuilder.dataFetcher(new VertxDataFetcher<>(df::getMeta));
         return fieldBuilder.build();
 
     }
@@ -48,4 +91,5 @@ public class QueryFieldTypeBuilder extends Builder {
     public static QueryFieldTypeBuilder newField(QueryDescriptor query, NuxeoGQLSchemaManager sm) {
         return new QueryFieldTypeBuilder(query, sm);
     }
+
 }

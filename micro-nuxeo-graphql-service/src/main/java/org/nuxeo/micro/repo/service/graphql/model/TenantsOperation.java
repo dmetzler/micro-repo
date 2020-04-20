@@ -21,6 +21,11 @@ import io.vertx.core.Promise;
 @Schema("tenant.graphqls")
 public class TenantsOperation {
 
+    /**
+     *
+     */
+    private static final String _ALL_LIBRARIES_META = "_allLibrariesMeta";
+
     @Query("allTenants")
     public void allLibraries(DataFetchingEnvironment env, NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxStub session,
             Promise<List<Tenant>> fut) {
@@ -39,7 +44,7 @@ public class TenantsOperation {
                                              .collect(Collectors.toList());
 
                 NuxeoContext ctx = env.getContext();
-                ctx.getCache().put("_allLibrariesMeta", new ListMetadata((long) docResp.result().getTotalCount()));
+                ctx.getCache().put(_ALL_LIBRARIES_META, new ListMetadata((long) docResp.result().getTotalCount()));
                 fut.complete(result);
 
             } else {
@@ -70,8 +75,8 @@ public class TenantsOperation {
             Promise<ListMetadata> fut) {
 
         NuxeoContext ctx = env.getContext();
-        if (ctx.getCache().containsKey("_allLibrariesMeta")) {
-            fut.complete((ListMetadata) ctx.getCache().get("_allLibrariesMeta"));
+        if (ctx.getCache().containsKey(_ALL_LIBRARIES_META)) {
+            fut.complete((ListMetadata) ctx.getCache().get(_ALL_LIBRARIES_META));
         } else {
 
             QueryBuilder qb = new QueryBuilder().from("Tenant");
@@ -81,14 +86,8 @@ public class TenantsOperation {
             QueryRequest qr = QueryRequest.newBuilder().setNxql(query).build();
             session.query(qr, docResp -> {
                 if (docResp.succeeded()) {
-                    List<Tenant> result = docResp.result()
-                                                 .getDocsList()
-                                                 .stream()
-                                                 .map(Tenant::from)
-                                                 .collect(Collectors.toList());
-
                     ListMetadata metadata = new ListMetadata((long) docResp.result().getTotalCount());
-                    ctx.getCache().put("_allLibrariesMeta", metadata);
+                    ctx.getCache().put(_ALL_LIBRARIES_META, metadata);
                     fut.complete(metadata);
 
                 } else {

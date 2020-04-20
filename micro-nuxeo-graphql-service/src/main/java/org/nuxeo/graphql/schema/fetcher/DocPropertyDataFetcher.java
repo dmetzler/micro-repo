@@ -14,9 +14,10 @@ public class DocPropertyDataFetcher implements DataFetcher<Object> {
             Document doc = (Document) environment.getSource();
             if ("_path".equals(fieldName)) {
                 return doc.getParentPath() + "/" + doc.getName();
-            } else if ("_id".equals(fieldName)) {
+            } else if ("_id".equals(fieldName) || "id".equals(fieldName)) {
                 return doc.getUuid();
             }
+
             else if ("_name".equals(fieldName)) {
                 return doc.getName();
             }

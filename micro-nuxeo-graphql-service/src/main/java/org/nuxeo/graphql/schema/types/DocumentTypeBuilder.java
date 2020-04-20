@@ -52,17 +52,22 @@ public class DocumentTypeBuilder extends GraphQLObjectType.Builder {
     public GraphQLObjectType build() {
 
         Builder builder = newObject().name(type.getName()).withInterface(sm.getDocumentInterface());
+        DocPropertyDataFetcher propertyDatafetcher = new DocPropertyDataFetcher();
         builder.field(newFieldDefinition().type(GraphQLString)//
                                           .name("_path")
-                                          .dataFetcher(new DocPropertyDataFetcher())
+                                          .dataFetcher(propertyDatafetcher)
                                           .build())
                .field(newFieldDefinition().type(GraphQLString)//
                                           .name("_id")
-                                          .dataFetcher(new DocPropertyDataFetcher())
+                                          .dataFetcher(propertyDatafetcher)
                                           .build())
                .field(newFieldDefinition().type(GraphQLString)//
+                       .name("id")
+                       .dataFetcher(propertyDatafetcher)
+                       .build())
+               .field(newFieldDefinition().type(GraphQLString)//
                                           .name("_name")
-                                          .dataFetcher(new DocPropertyDataFetcher())
+                                          .dataFetcher(propertyDatafetcher)
                                           .build());
 
         for (Schema schema : type.getSchemas()) {

@@ -46,26 +46,28 @@ class App extends Component {
 
 
     componentDidMount() {
+      buildGraphQLProvider({ clientOptions: { uri: 'http://micro-nuxeo-graphql-service-int-dmetzler-micro.apps.prod.nuxeo.io/library/graphql' }})
+            .then(dataProvider => this.setState({ dataProvider }));
 
-      const httpLink = createHttpLink({
-        uri: 'http://localhost:8080/graphql/',
-      });
+      // const httpLink = createHttpLink({
+      //   uri: 'http://localhost:8080/graphql/',
+      // });
 
 
 
-      this.getToken().then( token => {
-        const authLink = setContext((_, { headers }) => {
-          return {
-            headers: {
-              ...headers,
-              authorization: token ? `Bearer ${token.id_token}` : "",
-            }
-          }
-        });
+      // this.getToken().then( token => {
+      //   const authLink = setContext((_, { headers }) => {
+      //     return {
+      //       headers: {
+      //         ...headers,
+      //         authorization: token ? `Bearer ${token.id_token}` : "",
+      //       }
+      //     }
+      //   });
 
-        buildGraphQLProvider({ clientOptions: { link: authLink.concat(httpLink) }})
-          .then(dataProvider => this.setState({ dataProvider }));
-      })
+      //   buildGraphQLProvider({ clientOptions: { link: authLink.concat(httpLink) }})
+      //     .then(dataProvider => this.setState({ dataProvider }));
+      // })
 
 
     }
@@ -78,15 +80,17 @@ class App extends Component {
         }
 
         return (
-            <Admin dataProvider={dataProvider}
-                   authProvider={authProvider}
-                   loginPage={LoginPage}>
+            <Admin dataProvider={dataProvider}>
 
                 <Resource name="Library"
                           list={LibraryList}
                           edit={LibraryEdit}
                           create={LibraryCreate}
                           icon={LibraryIcon}/>
+
+                <Resource name="Book"
+                          list={ListGuesser}
+                          />
             </Admin>
         );
     }

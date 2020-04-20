@@ -3,7 +3,6 @@ import {
   List,
   Edit,
   Create,
-  Filter,
   SimpleForm,
   TextInput,
   DisabledInput,
@@ -11,16 +10,7 @@ import {
   TextField
 } from 'react-admin';
 
-import RichTextInput from 'ra-input-rich-text';
-
-
-const TenantFilter = (props) => (
-    <Filter {...props}>
-        <TextInput label="Search" source="q" alwaysOn />
-        <TextInput label="City" source="city" />
-        <TextInput label="Country" source="country" />
-    </Filter>
-);
+import NxlInput from './ra-codemirror-input';
 
 const TenantTitle = ({ record }) => {
     return <span>Tenant
@@ -31,7 +21,7 @@ export const TenantList = props => (
     <List {...props}>
         <Datagrid rowClick="edit">
             <TextField source="name" />
-            <TextField source="Id" source="id"/>
+            <TextField label="Id" source="id"/>
         </Datagrid>
     </List>
 );
@@ -41,9 +31,11 @@ export const TenantList = props => (
 export const TenantEdit = props => (
     <Edit title={<TenantTitle />} {...props}>
         <SimpleForm>
+
             <DisabledInput label="Id" source="id" />
             <DisabledInput label="Name" source="name" />
-            <TextInput multiline source="schemaDef" />
+
+            <NxlInput label="Schema Definition" source="schemaDef"/>
         </SimpleForm>
     </Edit>
 );

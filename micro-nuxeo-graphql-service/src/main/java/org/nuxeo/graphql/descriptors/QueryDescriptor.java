@@ -20,7 +20,7 @@ public class QueryDescriptor {
     public String query;
 
     @XNodeList(value = "args/arg", type = ArrayList.class, componentType = String.class)
-    public List<String> args;
+    public List<String> args = new ArrayList<>();
 
     public QueryDescriptor() {
 

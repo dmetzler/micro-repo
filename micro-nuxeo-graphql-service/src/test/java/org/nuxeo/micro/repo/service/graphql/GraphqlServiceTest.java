@@ -36,8 +36,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentRef;
+import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc;
@@ -279,17 +280,16 @@ public class GraphqlServiceTest {
     @Test
     void can_create_a_document(Vertx vertx, VertxTestContext testContext) throws Exception {
 
-        String query = "mutation createLibrary( $library: LibraryInput!) { createLibrary(Library: $library) { _id  dc { title }  }}";
+        String query = "mutation createLibrary( $parentPath: String!, $name:String!, $dc: ischema_dublincore!, $city: String!) { createLibrary(parentPath: $parentPath, name: $name, dc: $dc, city: $city ) { _id  dc { title }  }}";
 
         Map<String, Object> params = new HashMap<String, Object>();
-        Map<String, Object> subparams = new HashMap<String, Object>();
 
-        subparams.put("_path", "/");
-        subparams.put("_name", "myNewLibrary");
+        params.put("parentPath", "/");
+        params.put("name", "myNewLibrary");
+        params.put("city", "Irvine");
         Map<String, String> dc = new HashMap<String, String>();
-        dc.put("title", "title");
-        subparams.put("dc", dc);
-        params.put("library", subparams);
+        dc.put("source", "title");
+        params.put("dc", dc);
 
         executeQuery(vertx, query, params, testContext.succeeding(result -> testContext.verify(() -> {
             if (result.getErrors().size() > 0) {
@@ -299,7 +299,69 @@ public class GraphqlServiceTest {
 
             sessionService.session(TENANT_ID, "dmetzler@nuxeo.com",
                     testContext.succeeding(session -> testContext.verify(() -> {
-                        assertThat(session.exists(new PathRef("/myNewLibrary"))).isTrue();
+                        PathRef docRef = new PathRef("/myNewLibrary");
+                        assertThat(session.exists(docRef)).isTrue();
+
+                        DocumentModel doc = session.getDocument(docRef);
+                        assertThat(doc.getPropertyValue("dc:source")).isEqualTo("title");
+                        assertThat(doc.getPropertyValue("lib:city")).isEqualTo("Irvine");
+                        testContext.completeNow();
+                    })));
+
+        })));
+
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void can_update_a_document(Vertx vertx, VertxTestContext testContext) throws Exception {
+
+        String query = "mutation updateLibrary( $id: String!, $dc: ischema_dublincore!, $city: String!) { updateLibrary(id: $id, dc: $dc, city: $city ) { _id  dc { title }  }}";
+
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("id",docId);
+        params.put("city", "Irvine modified");
+        Map<String, String> dc = new HashMap<String, String>();
+        dc.put("source", "source modified");
+        params.put("dc", dc);
+
+        executeQuery(vertx, query, params, testContext.succeeding(result -> testContext.verify(() -> {
+            if (result.getErrors().size() > 0) {
+                throw new NuxeoException(Joiner.on(", ").join(result.getErrors()));
+            }
+            System.out.println(result);
+
+            sessionService.session(TENANT_ID, "dmetzler@nuxeo.com",
+                    testContext.succeeding(session -> testContext.verify(() -> {
+                        DocumentRef docRef = new IdRef(docId);
+                        assertThat(session.exists(docRef)).isTrue();
+
+                        DocumentModel doc = session.getDocument(docRef);
+                        assertThat(doc.getPropertyValue("dc:source")).isEqualTo("source modified");
+                        assertThat(doc.getPropertyValue("lib:city")).isEqualTo("Irvine modified");
+                        testContext.completeNow();
+                    })));
+
+        })));
+
+    }
+
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void can_delete_a_document(Vertx vertx, VertxTestContext testContext) throws Exception {
+
+        String query = "mutation { deleteLibrary(id: \"" + docId + "\") { _id   }}";
+
+        executeQuery(vertx, query, testContext.succeeding(result -> testContext.verify(() -> {
+            if (result.getErrors().size() > 0) {
+                throw new NuxeoException(Joiner.on(", ").join(result.getErrors()));
+            }
+            System.out.println(result);
+
+            sessionService.session(TENANT_ID, "dmetzler@nuxeo.com",
+                    testContext.succeeding(session -> testContext.verify(() -> {
+                        assertThat(session.exists(new IdRef(docId))).isFalse();
                         testContext.completeNow();
                     })));
 
@@ -326,6 +388,47 @@ public class GraphqlServiceTest {
 
     }
 
+    @Test
+    void can_query_types(Vertx vertx, VertxTestContext testContext) throws Throwable {
+
+        executeQuery(vertx, " { allLibraries { _id _path city} _allLibrariesMeta { count }}",
+                testContext.succeeding(result -> testContext.verify(() -> {
+                    if (result.getErrors().size() > 0) {
+                        throw new NuxeoException(Joiner.on(", ").join(result.getErrors()));
+                    }
+
+                    Map<String, Object> queryResult = result.getData();
+
+                    List<Map<String, Object>> documents = (List<Map<String, Object>>) queryResult.get("allLibraries");
+                    assertThat(documents).hasSize(2);
+                    assertThat(documents.get(0).get("city")).isEqualTo("Irvine");
+
+                    Map<String, Object> meta = (Map<String, Object>) queryResult.get("_allLibrariesMeta");
+                    assertThat(meta).containsEntry("count", 2L);
+
+                    testContext.completeNow();
+                })));
+
+    }
+
+    @Test
+    void can_get_Type(Vertx vertx, VertxTestContext testContext) throws Throwable {
+
+        executeQuery(vertx, " { Library(id: \"" + docId + "\") { _id _path city} }",
+                testContext.succeeding(result -> testContext.verify(() -> {
+                    if (result.getErrors().size() > 0) {
+                        throw new NuxeoException(Joiner.on(", ").join(result.getErrors()));
+                    }
+
+                    Map<String, Object> queryResult = result.getData();
+
+                    Map<String, Object> document = (Map<String, Object>) queryResult.get("Library");
+                    assertThat(document.get("city")).isEqualTo("Irvine");
+
+                    testContext.completeNow();
+                })));
+
+    }
 
     private void executeQuery(Vertx vertx, String query, Map<String, Object> params,
             Handler<AsyncResult<ExecutionResult>> completionHandler) {

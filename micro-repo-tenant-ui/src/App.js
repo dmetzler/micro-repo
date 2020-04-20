@@ -1,7 +1,7 @@
 // in App.js
 import React, { Component } from 'react';
 import buildGraphQLProvider from 'ra-data-graphql-simple';
-import { Admin, Resource, AUTH_LOGIN, ListGuesser, EditGuesser } from 'react-admin';
+import { Admin, Resource, AUTH_LOGIN } from 'react-admin';
 import authProvider from "./authProvider"
 import LoginPage from "./LoginPage"
 import { TenantList, TenantCreate, TenantEdit } from "./Tenant"
@@ -9,7 +9,6 @@ import { TenantList, TenantCreate, TenantEdit } from "./Tenant"
 import { createHttpLink } from 'apollo-link-http';
 import { setContext } from 'apollo-link-context';
 
-import LibraryIcon from '@material-ui/icons/LibraryBooks';
 
 class App extends Component {
     constructor() {
@@ -46,7 +45,7 @@ class App extends Component {
 
 
     componentDidMount() {
-      buildGraphQLProvider({ clientOptions: { uri: 'http://micro-nuxeo-graphql-service-int-dmetzler-micro.apps.prod.nuxeo.io/nuxeotenants/graphql' }})
+      buildGraphQLProvider({ clientOptions: { uri: 'http://micro.apps.prod.nuxeo.io/nuxeotenants/graphql' }})
             .then(dataProvider => this.setState({ dataProvider }));
 
 
