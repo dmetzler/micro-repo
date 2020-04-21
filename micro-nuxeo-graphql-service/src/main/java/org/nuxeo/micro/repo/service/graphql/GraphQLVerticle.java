@@ -1,13 +1,13 @@
 package org.nuxeo.micro.repo.service.graphql;
 
 import org.nuxeo.micro.repo.service.BaseVerticle;
-import org.nuxeo.micro.repo.service.schema.impl.SchemaVerticle;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.spi.cluster.ClusterManager;
@@ -19,6 +19,8 @@ import io.vertx.ext.auth.oauth2.OAuth2ClientOptions;
 import io.vertx.ext.auth.oauth2.OAuth2FlowType;
 import io.vertx.ext.cluster.infinispan.InfinispanClusterManager;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.client.HttpResponse;
+import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.ChainAuthHandler;
 import io.vertx.ext.web.handler.JWTAuthHandler;
@@ -47,46 +49,42 @@ public class GraphQLVerticle extends BaseVerticle {
     public void startWithConfig(JsonObject config, Handler<AsyncResult<Void>> completionHandler) {
         long start = System.currentTimeMillis();
         Router router = Router.router(vertx);
-        // WebClient client = WebClient.create(vertx);
-        // client.getAbs(config.getString("jwtIssuer") + "/.well-known/jwks.json").ssl(true).send(result -> {
-        // if (result.succeeded()) {
-        // // Obtain response
-        // HttpResponse<Buffer> response = result.result();
-        // JsonArray jwksKeys = response.bodyAsJsonObject().getJsonArray("keys");
 
-        // setupAuthentication(config, router, jwksKeys);
-        Integer port = config.getInteger("port", 8080);
+        WebClient client = WebClient.create(vertx);
+        client.getAbs(config.getString("jwtIssuer") + "/.well-known/jwks.json").ssl(true).send(result -> {
+            if (result.succeeded()) {
+                // Obtain response
+                HttpResponse<Buffer> jwksResponse = result.result();
+                JsonArray jwksKeys = jwksResponse.bodyAsJsonObject().getJsonArray("keys");
 
+                setupAuthentication(config, router, jwksKeys);
+                router.route().handler(BodyHandler.create());
+                router.route().handler(GraphQLCorsHandler.create(config.getJsonObject("cors")));
+                Integer port = config.getInteger("port", 8080);
 
-        router.route().handler(BodyHandler.create());
+                MetaGraphQLHandler.create(vertx, config, ar -> {
+                    if (ar.succeeded()) {
 
-        MetaGraphQLHandler.create(vertx, config, ar -> {
-            if (ar.succeeded()) {
+                        router.mountSubRouter("/:tenantId", ar.result().router());
 
-                router.mountSubRouter("/:tenantId", ar.result().router());
-
-                vertx.createHttpServer()//
-                     .requestHandler(router)//
-                     .listen(port, http -> {
-                         if (http.succeeded()) {
-                             log.info(String.format("HTTP server started on port %d", port));
-                             log.info(String.format("Started [%s] in %dms", this.getClass().getCanonicalName(),
-                                     System.currentTimeMillis() - start));
-                             completionHandler.handle(Future.succeededFuture());
-                         } else {
-                             completionHandler.handle(Future.failedFuture(http.cause()));
-                         }
-                     });
+                        vertx.createHttpServer()//
+                             .requestHandler(router)//
+                             .listen(port, http -> {
+                                 if (http.succeeded()) {
+                                     log.info(String.format("HTTP server started on port %d", port));
+                                     log.info(String.format("Started [%s] in %dms", this.getClass().getCanonicalName(),
+                                             System.currentTimeMillis() - start));
+                                     completionHandler.handle(Future.succeededFuture());
+                                 } else {
+                                     completionHandler.handle(Future.failedFuture(http.cause()));
+                                 }
+                             });
+                    } else {
+                        completionHandler.handle(Future.failedFuture(ar.cause()));
+                    }
+                });
             } else {
-                completionHandler.handle(Future.failedFuture(ar.cause()));
-                vertx.createHttpServer()
-
-                     .requestHandler(req -> req.response()
-                                               .setStatusCode(500)
-                                               .setStatusMessage(ar.cause().getMessage())
-                                               .end("KO"))
-                     .listen(port);
-
+                completionHandler.handle(Future.failedFuture(result.cause()));
             }
         });
 

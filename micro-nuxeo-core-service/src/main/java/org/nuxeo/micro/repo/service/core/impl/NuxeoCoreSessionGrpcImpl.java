@@ -8,6 +8,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.DocumentNotFoundException;
 import org.nuxeo.ecm.core.api.DocumentRef;
+import org.nuxeo.ecm.core.api.DocumentSecurityException;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.PathRef;
@@ -34,8 +35,11 @@ import io.vertx.core.json.JsonObject;
 public class NuxeoCoreSessionGrpcImpl extends NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxImplBase {
 
     private Vertx vertx;
+
     private JsonObject config;
+
     private CoreSessionService coreSessionService;
+
     private DocumentModelMapper dmm = new DocumentModelMapper();
 
     public NuxeoCoreSessionGrpcImpl(Vertx vertx, JsonObject config, CoreSessionService coreSessionService) {
@@ -58,7 +62,7 @@ public class NuxeoCoreSessionGrpcImpl extends NuxeoCoreSessionGrpc.NuxeoCoreSess
 
     @Override
     public void createDocument(DocumentCreationRequest request, Promise<Document> response) {
-        coreSessionService.session(getCurrentSchema(), "dmetzler@nuxeo.com", sh -> {
+        coreSessionService.session(getCurrentSchema(), getCurrentUserName(), sh -> {
             if (sh.failed()) {
                 response.fail(sh.cause());
             } else {
@@ -86,13 +90,9 @@ public class NuxeoCoreSessionGrpcImpl extends NuxeoCoreSessionGrpc.NuxeoCoreSess
         });
     }
 
-    private String getCurrentSchema() {
-        return GrpcInterceptor.TENANT_ID_KEY.get();
-    }
-
     @Override
     public void getDocument(DocumentRequest request, Promise<Document> response) {
-        coreSessionService.session(getCurrentSchema(), "dmetzler@nuxeo.com", sh -> {
+        coreSessionService.session(getCurrentSchema(), getCurrentUserName(), sh -> {
             if (sh.failed()) {
                 response.fail(sh.cause());
             } else {
@@ -107,6 +107,8 @@ public class NuxeoCoreSessionGrpcImpl extends NuxeoCoreSessionGrpc.NuxeoCoreSess
                     response.complete(result);
                 } catch (DocumentNotFoundException e) {
                     response.fail(new StatusException(Status.NOT_FOUND));
+                } catch (DocumentSecurityException e) {
+                    response.fail(new StatusException(Status.PERMISSION_DENIED));
                 }
 
             }
@@ -115,7 +117,7 @@ public class NuxeoCoreSessionGrpcImpl extends NuxeoCoreSessionGrpc.NuxeoCoreSess
 
     @Override
     public void updateDocument(Document request, Promise<Document> response) {
-        coreSessionService.session(getCurrentSchema(), "dmetzler@nuxeo.com", sh -> {
+        coreSessionService.session(getCurrentSchema(), getCurrentUserName(), sh -> {
             if (sh.failed()) {
                 response.fail(sh.cause());
             } else {
@@ -139,7 +141,7 @@ public class NuxeoCoreSessionGrpcImpl extends NuxeoCoreSessionGrpc.NuxeoCoreSess
 
     @Override
     public void deleteDocument(Document request, Promise<Document> response) {
-        coreSessionService.session(getCurrentSchema(), "dmetzler@nuxeo.com", sh -> {
+        coreSessionService.session(getCurrentSchema(), getCurrentUserName(), sh -> {
             if (sh.failed()) {
                 response.fail(sh.cause());
             } else {
@@ -158,7 +160,7 @@ public class NuxeoCoreSessionGrpcImpl extends NuxeoCoreSessionGrpc.NuxeoCoreSess
 
     @Override
     public void query(QueryRequest request, Promise<QueryResult> response) {
-        coreSessionService.session(getCurrentSchema(), "dmetzler@nuxeo.com", sh -> {
+        coreSessionService.session(getCurrentSchema(), getCurrentUserName(), sh -> {
             if (sh.failed()) {
                 response.fail(sh.cause());
             } else {
@@ -167,13 +169,21 @@ public class NuxeoCoreSessionGrpcImpl extends NuxeoCoreSessionGrpc.NuxeoCoreSess
 
                 Builder builder = QueryResult.newBuilder().setTotalCount(result.size());
 
-                builder.addAllDocs(
-                        result.stream().map(d -> dmm.toDocument(d, session.getRepository().getSchemaManager()))
-                                .collect(Collectors.toList()));
+                builder.addAllDocs(result.stream()
+                                         .map(d -> dmm.toDocument(d, session.getRepository().getSchemaManager()))
+                                         .collect(Collectors.toList()));
                 response.complete(builder.build());
 
             }
         });
+    }
+
+    private String getCurrentSchema() {
+        return GrpcInterceptor.TENANT_ID_KEY.get();
+    }
+
+    private String getCurrentUserName() {
+        return GrpcInterceptor.PRINCIPAL_ID_KEY.get();
     }
 
     private DocumentRef getDocumentRefFromRequest(DocumentRequest request) {

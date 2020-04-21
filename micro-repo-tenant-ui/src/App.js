@@ -45,29 +45,26 @@ class App extends Component {
 
 
     componentDidMount() {
-      buildGraphQLProvider({ clientOptions: { uri: 'http://micro.apps.prod.nuxeo.io/nuxeotenants/graphql' }})
-            .then(dataProvider => this.setState({ dataProvider }));
 
-
-      // const httpLink = createHttpLink({
-      //   uri: 'http://localhost:8080/graphql/',
-      // });
+      const httpLink = createHttpLink({
+        uri: 'https://micro.apps.prod.nuxeo.io/nuxeotenants/graphql',
+      });
 
 
 
-      //this.getToken().then( token => {
-      //   const authLink = setContext((_, { headers }) => {
-      //     return {
-      //       headers: {
-      //         ...headers,
-      //         authorization: token ? `Bearer ${token.id_token}` : "",
-      //       }
-      //     }
-      //   });
+      this.getToken().then( token => {
+        const authLink = setContext((_, { headers }) => {
+          return {
+            headers: {
+              ...headers,
+              authorization: token ? `Bearer ${token.id_token}` : "",
+            }
+          }
+        });
 
-      //   buildGraphQLProvider({ clientOptions: { link: authLink.concat(httpLink) }})
-      //     .then(dataProvider => this.setState({ dataProvider }));
-      // })
+        buildGraphQLProvider({ clientOptions: { link: authLink.concat(httpLink) }})
+          .then(dataProvider => this.setState({ dataProvider }));
+      })
 
 
     }

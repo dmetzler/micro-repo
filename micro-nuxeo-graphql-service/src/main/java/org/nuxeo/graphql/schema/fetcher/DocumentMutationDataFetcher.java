@@ -13,9 +13,7 @@ import static graphql.schema.GraphQLInputObjectType.newInputObject;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.lang3.StringUtils;
 import org.nuxeo.ecm.core.schema.DocumentType;
-import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.schema.types.Field;
 import org.nuxeo.ecm.core.schema.types.Schema;
 import org.nuxeo.ecm.core.schema.types.Type;
@@ -34,10 +32,9 @@ import org.nuxeo.micro.repo.proto.Document.Property.ScalarProperty;
 import org.nuxeo.micro.repo.proto.DocumentCreationRequest;
 import org.nuxeo.micro.repo.proto.DocumentRequest;
 import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxStub;
-import org.nuxeo.micro.repo.service.graphql.NuxeoGraphqlContext;
+import org.nuxeo.micro.repo.service.graphql.NuxeoContext;
 
 import graphql.schema.DataFetchingEnvironment;
-import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInputObjectType;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -66,39 +63,47 @@ public class DocumentMutationDataFetcher extends AbstractDataFetcher<Document> {
     @Override
     public void get(DataFetchingEnvironment environment, Promise<Document> future) {
 
-        NuxeoCoreSessionVertxStub session = getSession(environment.getContext());
+        NuxeoContext ctx = environment.getContext();
 
-        getOrCreateDocument(environment, session, sdocr -> {
-            if (sdocr.succeeded()) {
-                org.nuxeo.micro.repo.proto.Document.Builder docBuilder = Document.newBuilder(sdocr.result());
+        ctx.session(sr -> {
+            if (sr.succeeded()) {
+                NuxeoCoreSessionVertxStub session = sr.result();
+                getOrCreateDocument(environment, session, sdocr -> {
+                    if (sdocr.succeeded()) {
+                        org.nuxeo.micro.repo.proto.Document.Builder docBuilder = Document.newBuilder(sdocr.result());
 
-                hydrateDocArguments(environment, docBuilder);
+                        hydrateDocArguments(environment, docBuilder);
 
-                switch (mode) {
-                case UPDATE:
-                    session.updateDocument(docBuilder.build(), future);
-                    break;
-                case DELETE:
-                    session.deleteDocument(docBuilder.build(), future);
-                    break;
-                case CREATE:
-                    String path = environment.getArgument("parentPath");
-                    String name = environment.getArgument("name");
+                        switch (mode) {
+                        case UPDATE:
+                            session.updateDocument(docBuilder.build(), future);
+                            break;
+                        case DELETE:
+                            session.deleteDocument(docBuilder.build(), future);
+                            break;
+                        case CREATE:
+                            String path = environment.getArgument("parentPath");
+                            String name = environment.getArgument("name");
 
-                    docBuilder.setType(targetDocType);
+                            docBuilder.setType(targetDocType);
 
-                    DocumentCreationRequest req = DocumentCreationRequest.newBuilder()
-                                                                         .setPath(path)
-                                                                         .setName(name)
-                                                                         .setDocument(docBuilder.build())
-                                                                         .build();
-                    session.createDocument(req, future);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Mode is not supported");
-                }
+                            DocumentCreationRequest req = DocumentCreationRequest.newBuilder()
+                                                                                 .setPath(path)
+                                                                                 .setName(name)
+                                                                                 .setDocument(docBuilder.build())
+                                                                                 .build();
+                            session.createDocument(req, future);
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Mode is not supported");
+                        }
+                    } else {
+                        future.fail(sdocr.cause());
+                    }
+                });
+
             } else {
-                future.fail(sdocr.cause());
+                future.fail(sr.cause());
             }
         });
 
@@ -211,12 +216,12 @@ public class DocumentMutationDataFetcher extends AbstractDataFetcher<Document> {
 
     private void addPropertyFields(graphql.schema.GraphQLFieldDefinition.Builder fieldBuilder,
             NuxeoGQLSchemaManager sm) {
-//        for (Schema schema : sm.getSchemaManager().getDocumentType(targetDocType).getSchemas()) {
-//            String name = schema.getNamespace().hasPrefix() ? schema.getNamespace().prefix : schema.getName();
-//            GraphQLInputObjectType inputTypeForSchema = inputTypeForSchema(schema.getName(), sm);
-//            fieldBuilder.argument(newArgument().name(name).type(inputTypeForSchema));
-//
-//        }
+        // for (Schema schema : sm.getSchemaManager().getDocumentType(targetDocType).getSchemas()) {
+        // String name = schema.getNamespace().hasPrefix() ? schema.getNamespace().prefix : schema.getName();
+        // GraphQLInputObjectType inputTypeForSchema = inputTypeForSchema(schema.getName(), sm);
+        // fieldBuilder.argument(newArgument().name(name).type(inputTypeForSchema));
+        //
+        // }
 
         for (Entry<String, AliasDescriptor> entry : sm.getAliases().entrySet()) {
             AliasDescriptor alias = entry.getValue();

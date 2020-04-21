@@ -62,6 +62,7 @@ public class TenantServiceImpl implements TenantService {
 
         Metadata headers = new Metadata();
         headers.put(GrpcInterceptor.TENANTID_METADATA_KEY, TenantService.NUXEO_TENANTS_SCHEMA);
+        headers.put(GrpcInterceptor.PRINCIPALID_METADATA_KEY, "system@nuxeo.com");
 
         coreSession = NuxeoCoreSessionGrpc.newVertxStub(channel)
                                           .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(headers));

@@ -280,7 +280,7 @@ public class GraphqlServiceTest {
     @Test
     void can_create_a_document(Vertx vertx, VertxTestContext testContext) throws Exception {
 
-        String query = "mutation createLibrary( $parentPath: String!, $name:String!, $dc: ischema_dublincore!, $city: String!) { createLibrary(parentPath: $parentPath, name: $name, dc: $dc, city: $city ) { _id  dc { title }  }}";
+        String query = "mutation createLibrary( $parentPath: String!, $name:String!, $city: String!) { createLibrary(parentPath: $parentPath, name: $name, city: $city ) { _id  dc { title }  }}";
 
         Map<String, Object> params = new HashMap<String, Object>();
 
@@ -303,7 +303,7 @@ public class GraphqlServiceTest {
                         assertThat(session.exists(docRef)).isTrue();
 
                         DocumentModel doc = session.getDocument(docRef);
-                        assertThat(doc.getPropertyValue("dc:source")).isEqualTo("title");
+                        //assertThat(doc.getPropertyValue("dc:source")).isEqualTo("title");
                         assertThat(doc.getPropertyValue("lib:city")).isEqualTo("Irvine");
                         testContext.completeNow();
                     })));
@@ -316,7 +316,7 @@ public class GraphqlServiceTest {
     @Test
     void can_update_a_document(Vertx vertx, VertxTestContext testContext) throws Exception {
 
-        String query = "mutation updateLibrary( $id: String!, $dc: ischema_dublincore!, $city: String!) { updateLibrary(id: $id, dc: $dc, city: $city ) { _id  dc { title }  }}";
+        String query = "mutation updateLibrary( $id: String!, $city: String!) { updateLibrary(id: $id, city: $city ) { _id  dc { title }  }}";
 
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("id",docId);
@@ -337,7 +337,7 @@ public class GraphqlServiceTest {
                         assertThat(session.exists(docRef)).isTrue();
 
                         DocumentModel doc = session.getDocument(docRef);
-                        assertThat(doc.getPropertyValue("dc:source")).isEqualTo("source modified");
+                        //assertThat(doc.getPropertyValue("dc:source")).isEqualTo("source modified");
                         assertThat(doc.getPropertyValue("lib:city")).isEqualTo("Irvine modified");
                         testContext.completeNow();
                     })));
@@ -446,6 +446,8 @@ public class GraphqlServiceTest {
 
                         Metadata headers = new Metadata();
                         headers.put(GrpcInterceptor.TENANTID_METADATA_KEY, TENANT_ID);
+
+                        headers.put(GrpcInterceptor.PRINCIPALID_METADATA_KEY, "test@nuxeo.com");
 
                         NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxStub nuxeoSession = NuxeoCoreSessionGrpc.newVertxStub(
                                 channel).withInterceptors(MetadataUtils.newAttachHeadersInterceptor(headers));

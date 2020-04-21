@@ -82,6 +82,7 @@ public class MetaGraphQLHandler implements Handler<RoutingContext> {
 
     @Override
     public void handle(RoutingContext event) {
+
         String tenantId = event.request().getParam("tenantId");
 
         gqlService.getGraphQL(tenantId, gqlR -> {
@@ -126,6 +127,7 @@ public class MetaGraphQLHandler implements Handler<RoutingContext> {
                     GraphiQLHandler graphiQLHandler = GraphiQLHandler.create(
                             new GraphiQLHandlerOptions().setEnabled(true)
                                                         .setGraphQLUri(String.format("/%s/graphql", tenantId)));
+
                     graphiQLHandler.graphiQLRequestHeaders(rc -> {
                         String token = rc.get("token");
                         return MultiMap.caseInsensitiveMultiMap().add(HttpHeaders.AUTHORIZATION, "Bearer " + token);

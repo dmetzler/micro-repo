@@ -3,9 +3,13 @@ import { UserManager } from 'oidc-client';
 
 
 
-const issuer = 'https://dev-7w3c59hg.auth0.com';
-const clientId = "p4eef1RSRzxUyxlvJDbyQB3T2dg2tMRG" //process.env.REACT_APP_CLIENT_ID;
-const redirectUri = "http://localhost:3000/" //process.env.REACT_APP_REDIRECT_URI;
+// const issuer = 'https://dev-7w3c59hg.auth0.com';
+// const clientId = "p4eef1RSRzxUyxlvJDbyQB3T2dg2tMRG" //process.env.REACT_APP_CLIENT_ID;
+// const redirectUri = "http://localhost:3000/" //process.env.REACT_APP_REDIRECT_URI;
+
+const issuer = window._env_.OAUTH_ISSUER
+const clientId = window._env_.OAUTH_CLIENT_ID
+const redirectUri = window._env_.OAUTH_REDIRECT_URI
 
 const getProfileFromToken = (tokenJson) => {
     const token = JSON.parse(tokenJson);

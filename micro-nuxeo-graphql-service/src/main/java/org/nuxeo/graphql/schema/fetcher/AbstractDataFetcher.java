@@ -16,13 +16,6 @@ public abstract class AbstractDataFetcher<T> {
 
     public abstract void get(DataFetchingEnvironment environment, Promise<T> future);
 
-    protected NuxeoCoreSessionVertxStub getSession(Object ctx) {
-        if (ctx instanceof NuxeoGraphqlContext) {
-            return ((NuxeoGraphqlContext) ctx).getSession();
-        }
-        return null;
-    }
-
     protected void getPrincipal(Object ctx, Handler<AsyncResult<NuxeoPrincipal>> completionHandler) {
         if (ctx instanceof NuxeoGraphqlContext) {
             ((NuxeoGraphqlContext) ctx).getPrincipal(completionHandler);

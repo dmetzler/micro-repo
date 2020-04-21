@@ -1,12 +1,4 @@
-db:
-  type: mongodb
-  server: localhost:27017
-  dbname: nuxeo
-
-core:
-  port: 8787
-  host: micro-nuxeo-core-service
-
+port: 8084
 
 jwtIssuer: https://dev-XXXXXX.auth0.com
 
@@ -18,8 +10,3 @@ oauth:
   authorizationPath: /authorize
   userInfoPath: /userinfo
   redirect_uri: http://localhost:8080/callback
-
-port: 8080
-
-nuxeo:
-  tenantId: library

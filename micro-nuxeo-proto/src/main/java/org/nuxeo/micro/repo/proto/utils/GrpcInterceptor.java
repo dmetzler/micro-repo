@@ -18,9 +18,16 @@ import io.vertx.core.logging.LoggerFactory;
 public class GrpcInterceptor implements ServerInterceptor {
 
     private static final Logger log = LoggerFactory.getLogger(GrpcInterceptor.class);
+
     public static final Metadata.Key<String> TENANTID_METADATA_KEY = Metadata.Key.of("tenantId",
             ASCII_STRING_MARSHALLER);
+
+    public static final Metadata.Key<String> PRINCIPALID_METADATA_KEY = Metadata.Key.of("principalId",
+            ASCII_STRING_MARSHALLER);
+
     public static final Context.Key<String> TENANT_ID_KEY = Context.key("tenantId");
+
+    public static final Context.Key<String> PRINCIPAL_ID_KEY = Context.key("principalId");
 
     @SuppressWarnings("rawtypes")
     private static final ServerCall.Listener NOOP_LISTENER = new ServerCall.Listener() {
@@ -32,10 +39,17 @@ public class GrpcInterceptor implements ServerInterceptor {
             ServerCallHandler<ReqT, RespT> next) {
 
         String tenantId = headers.get(TENANTID_METADATA_KEY);
+        String principalId = headers.get(PRINCIPALID_METADATA_KEY);
 
         Context ctx = Context.current();
         if (StringUtils.isNotBlank(tenantId)) {
             ctx = ctx.withValue(TENANT_ID_KEY, tenantId);
+
+            if (StringUtils.isNotBlank(principalId)) {
+                ctx = ctx.withValue(PRINCIPAL_ID_KEY, principalId);
+            } else {
+                log.warn("No principalId in request");
+            }
         } else {
             log.error("No tenantId in headers");
 
