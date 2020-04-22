@@ -25,6 +25,8 @@ public interface TenantService {
 
     String NUXEO_TENANTS_SCHEMA = "nuxeotenants";
 
+    String INVALIDATION_ADDRESS = "nuxeo.tenant.invalidate";
+
     static void create(Vertx vertx, JsonObject config, Handler<AsyncResult<TenantService>> completionHandler) {
         vertx.executeBlocking(future -> {
             TenantService result = new TenantServiceImpl(vertx, config);
@@ -35,6 +37,10 @@ public interface TenantService {
 
     static TenantService createProxy(Vertx vertx) {
         return new TenantServiceVertxEBProxy(vertx, ADDRESS);
+    }
+
+    static TenantService createProxyWithCache(Vertx vertx) {
+        return new TenantServiceWithCache(vertx, createProxy(vertx));
     }
 
     void getTenantConfiguration(String tenantId, Handler<AsyncResult<TenantConfiguration>> completionHandler);

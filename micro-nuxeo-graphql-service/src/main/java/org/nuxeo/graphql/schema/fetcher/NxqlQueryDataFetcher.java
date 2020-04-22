@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 
 import javax.el.ELContext;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.jgroups.util.UUID;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.platform.el.ELService;
@@ -23,7 +24,7 @@ import io.vertx.core.logging.LoggerFactory;
 
 public class NxqlQueryDataFetcher extends AbstractDataFetcher<List<Document>> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(NxqlQueryDataFetcher.class);
+    private static final Logger LOG = LoggerFactory.getLogger( NxqlQueryDataFetcher.class );
 
     private String id;
 
@@ -50,17 +51,24 @@ public class NxqlQueryDataFetcher extends AbstractDataFetcher<List<Document>> {
                         }
                     }
 
-                    if (environment.getSource() instanceof DocumentModel) {
-                        DocumentModel doc = (DocumentModel) environment.getSource();
+                    if (environment.getSource() instanceof Document) {
+                        Document doc = (Document) environment.getSource();
                         el.bindValue(elContext, "this", doc);
                     }
 
                     finalQuery = el.evaluateExpression(elContext, finalQuery, String.class);
 
                     QueryRequest qreq = QueryRequest.newBuilder().setNxql(finalQuery).build();
+
+                    LOG.info("Start query: " + finalQuery);
+
+                    final StopWatch watch = new StopWatch();
+                    watch.start();
+
                     session.query(qreq, qrr -> {
                         if (qrr.succeeded()) {
                             ctx.getCache().put(getMeta(), Long.valueOf(qrr.result().getDocsList().size()));
+                            LOG.info("Took {}ms to execute query", watch.getTime());
                             future.complete(qrr.result().getDocsList());
                         } else {
                             future.fail(qrr.cause());
@@ -82,11 +90,9 @@ public class NxqlQueryDataFetcher extends AbstractDataFetcher<List<Document>> {
             future.complete(new ListMetadata((Long) ctx.getCache().get(getMeta())));
         } else {
 
-
             ctx.session(sr -> {
                 if (sr.succeeded()) {
                     NuxeoCoreSessionVertxStub session = sr.result();
-
 
                     ctx.getPrincipal(pr -> {
 
@@ -95,7 +101,7 @@ public class NxqlQueryDataFetcher extends AbstractDataFetcher<List<Document>> {
                         ELService elService = new ELServiceServiceImpl();
                         ELContext elContext = elService.createELContext();
 
-                        // el.bindValue(elContext, "principal", pr.result());
+                        el.bindValue(elContext, "principal", pr.result());
 
                         if (environment.getArguments().size() > 0) {
                             for (Entry<String, Object> paramEntry : environment.getArguments().entrySet()) {

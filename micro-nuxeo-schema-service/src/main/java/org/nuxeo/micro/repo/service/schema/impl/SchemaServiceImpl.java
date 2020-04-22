@@ -110,7 +110,7 @@ public class SchemaServiceImpl implements SchemaService {
     public SchemaServiceImpl(Vertx vertx, JsonObject config) {
         this.vertx = vertx;
         this.config = config;
-        tenantService = TenantService.createProxy(vertx);
+        tenantService = TenantService.createProxyWithCache(vertx);
     }
 
     @Override

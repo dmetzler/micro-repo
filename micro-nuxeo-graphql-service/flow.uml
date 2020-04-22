@@ -1,0 +1,64 @@
+@startuml
+autonumber
+actor User
+User -> GraphQLService
+activate GraphQLService
+participant DSLService
+GraphQLService -> SchemaService: getSchemaForTenant
+activate GraphQLService #FFBBBB
+activate SchemaService 
+
+
+SchemaService -> TenantService: getConfig for Tenant
+activate TenantService
+TenantService -> CoreService: query on nuxeotenant
+activate CoreService
+CoreService -> SchemaService: get nuxeotenant schema
+activate SchemaService #FFBBBB
+SchemaService -> SchemaService: build nuxeotenant schema
+note left
+  **nuxeotenant**
+  schema is
+  hardcoded in 
+  SchemaService
+end note
+SchemaService --> CoreService
+deactivate SchemaService
+CoreService --> TenantService
+deactivate CoreService
+TenantService -->SchemaService
+deactivate TenantService
+SchemaService -> DSLService: parse config
+activate DSLService
+DSLService --> SchemaService: AST
+deactivate DSLService
+SchemaService --> GraphQLService
+deactivate SchemaService
+GraphQLService -> TenantService: getConfig for Tenant
+activate TenantService
+TenantService --> GraphQLService
+deactivate TenantService
+GraphQLService -> DSLService: parse config
+activate DSLService
+DSLService --> GraphQLService: AST
+deactivate DSLService
+deactivate GraphQLService
+GraphQLService -> CoreService: execute request on Tenant
+activate GraphQLService #BBFFBB
+activate CoreService
+CoreService -> SchemaService: getSchemaForTenant
+activate SchemaService
+SchemaService --> CoreService
+deactivate SchemaService
+database MongoDB
+
+CoreService -> MongoDB: execute Request
+activate MongoDB
+MongoDB --> CoreService
+deactivate MongoDB
+CoreService --> GraphQLService
+deactivate CoreService
+deactivate GraphQLService
+GraphQLService --> User
+deactivate GraphQLService
+@enduml

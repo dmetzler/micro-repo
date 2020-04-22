@@ -28,6 +28,7 @@ import org.nuxeo.micro.repo.service.graphql.model.TenantsOperation;
 import org.nuxeo.micro.repo.service.graphql.tenant.NuxeoGQLConfiguration;
 import org.nuxeo.micro.repo.service.graphql.tenant.NuxeoGQLConfiguration.Builder;
 import org.nuxeo.micro.repo.service.schema.SchemaService;
+import org.nuxeo.micro.repo.service.tenant.TenantCache;
 import org.nuxeo.micro.repo.service.tenant.TenantConfiguration;
 import org.nuxeo.micro.repo.service.tenant.TenantService;
 
@@ -43,14 +44,11 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.web.handler.graphql.GraphQLHandler;
 
-public class GraphQLServiceImpl implements GraphQLService {
+public class GraphQLServiceImpl extends TenantCache<GraphQL> implements GraphQLService {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphQLServiceImpl.class);
-
-    private Vertx vertx;
-
-    private JsonObject config;
 
     private SchemaService schemaService;
 
@@ -58,22 +56,28 @@ public class GraphQLServiceImpl implements GraphQLService {
 
     private NuxeoDslService dslService;
 
+    private Vertx vertx;
+
     public GraphQLServiceImpl(Vertx vertx, JsonObject config) {
+        super(vertx);
         this.vertx = vertx;
-        this.config = config;
-        schemaService = SchemaService.createProxy(vertx);
-        tenantService = TenantService.createProxy(vertx);
+        schemaService = SchemaService.createProxyWithCache(vertx);
+        tenantService = TenantService.createProxyWithCache(vertx);
         dslService = NuxeoDslService.createProxy(vertx);
 
     }
 
     @Override
     public void getGraphQL(String tenantId, Handler<AsyncResult<GraphQL>> completionHandler) {
+        get(tenantId, completionHandler, this::retrieveGraphQL);
+    }
+
+    public void retrieveGraphQL(String tenantId, Handler<AsyncResult<GraphQL>> completionHandler) {
         if (TenantService.NUXEO_TENANTS_SCHEMA.equals(tenantId)) {
 
             graphql.schema.idl.RuntimeWiring.Builder runtimeWiring = RuntimeWiring.newRuntimeWiring();
 
-            Builder builder = NuxeoGQLConfiguration.builder()//
+            Builder builder = NuxeoGQLConfiguration.builder(vertx)//
                                                    .runtimeWiring(runtimeWiring)
                                                    .configuration(TenantsOperation.class);
 
@@ -125,5 +129,7 @@ public class GraphQLServiceImpl implements GraphQLService {
         }
 
     }
+
+
 
 }

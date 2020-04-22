@@ -19,4 +19,7 @@ public interface GraphQLService {
     }
 
     void getGraphQL(String tenantId, Handler<AsyncResult<GraphQL>> completionHandler);
+
+
+
 }

@@ -1,16 +1,14 @@
-// in App.js
 import React, { Component } from 'react';
 import buildGraphQLProvider from 'ra-data-graphql-simple';
-import { Admin, Resource, AUTH_LOGIN } from 'react-admin';
+import { AUTH_LOGIN } from 'react-admin';
 import authProvider from "./authProvider"
-import LoginPage from "./LoginPage"
-import { TenantList, TenantCreate, TenantEdit } from "./Tenant"
 
 import { createHttpLink } from 'apollo-link-http';
 import { setContext } from 'apollo-link-context';
 
+import LibraryIcon from '@material-ui/icons/LibraryBooks';
 
-class App extends Component {
+class MicroRepo extends Component {
     constructor() {
         super();
         this.state = { dataProvider: null };
@@ -43,11 +41,19 @@ class App extends Component {
       }
     }
 
+    getGraphQLEndpoint() {
+      var microRepoUrl = window._env_.MICRO_REPO_URL;
+      var tenantId = window._env_.TENANT_ID;
+      return [microRepoUrl,tenantId,"graphql"].join("/");
+    }
+
 
     componentDidMount() {
+      // buildGraphQLProvider({ clientOptions: { uri: 'https://micro.apps.prod.nuxeo.io/library/graphql' }})
+      //       .then(dataProvider => this.setState({ dataProvider }));
 
       const httpLink = createHttpLink({
-        uri: [ window._env_.MICRO_REPO_ENDPOINT, "nuxeotenants/graphql"].join("/")
+        uri: this.getGraphQLEndpoint(),
       });
 
 
@@ -69,26 +75,7 @@ class App extends Component {
 
     }
 
-    render() {
-        const { dataProvider } = this.state;
 
-        if (!dataProvider) {
-            return <div>Loading</div>;
-        }
-
-        return (
-            <Admin dataProvider={dataProvider}
-                   authProvider={authProvider}
-                   loginPage={LoginPage}>
-
-                <Resource name="Tenant"
-                          list={TenantList}
-                          edit={TenantEdit}
-                          create={TenantCreate}
-                          />
-            </Admin>
-        );
-    }
 }
 
-export default App;
+export default MicroRepo;

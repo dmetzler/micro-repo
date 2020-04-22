@@ -23,8 +23,6 @@ public interface SchemaService {
      */
     String EVENT_ADDRESS = "nuxeo.schema";
 
-
-
     /**
      * Create a Nuxeo Client which shares its data source with any other Nuxeo clients created with the same tenant.
      *
@@ -46,4 +44,9 @@ public interface SchemaService {
     static SchemaService createProxy(Vertx vertx) {
         return new SchemaServiceVertxEBProxy(vertx, ADDRESS);
     }
+
+    static SchemaService createProxyWithCache(Vertx vertx) {
+        return new SchemaServiceWithCache(vertx, createProxy(vertx));
+    }
+
 }

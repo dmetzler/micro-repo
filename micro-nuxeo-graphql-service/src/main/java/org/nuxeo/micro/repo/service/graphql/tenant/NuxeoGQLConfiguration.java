@@ -4,6 +4,7 @@ import static graphql.schema.idl.RuntimeWiring.newRuntimeWiring;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -26,6 +27,7 @@ import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.handler.graphql.VertxDataFetcher;
@@ -37,17 +39,22 @@ public class NuxeoGQLConfiguration {
     private NuxeoGQLConfiguration() {
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public static Builder builder(Vertx vertx) {
+        return new Builder(vertx);
     }
 
     public static class Builder {
 
         private List<Class<?>> configurationClasses = new ArrayList<>();
+
         private Object configuration;
+
         private graphql.schema.idl.RuntimeWiring.Builder runtimeWiring;
 
-        public Builder() {
+        private Vertx vertx;
+
+        public Builder(Vertx vertx) {
+            this.vertx = vertx;
             runtimeWiring = newRuntimeWiring();
         }
 
@@ -61,7 +68,7 @@ public class NuxeoGQLConfiguration {
             return this;
         }
 
-        public GraphQLSchema getGraphQLSchema() {
+        public GraphQLSchema getGraphQLSchema(Vertx vertx) {
             TypeDefinitionRegistry typeDefinitionRegistry = null;
             SchemaParser schemaParser = new SchemaParser();
 
@@ -69,6 +76,7 @@ public class NuxeoGQLConfiguration {
 
                 try {
                     this.configuration = configurationClass.newInstance();
+
                 } catch (ReflectiveOperationException e) {
                     log.error("Unable to instantiate GQL configuration file", e);
                     continue;
@@ -113,7 +121,15 @@ public class NuxeoGQLConfiguration {
             for (Class<?> configurationClass : configurationClasses) {
 
                 try {
-                    this.configuration = configurationClass.newInstance();
+                    try {
+                        Constructor<?> constructor = configurationClass.getConstructor(Vertx.class);
+                        this.configuration = constructor.newInstance(vertx);
+
+                    } catch (NoSuchMethodException e) {
+
+                        this.configuration = configurationClass.newInstance();
+                    }
+
                 } catch (ReflectiveOperationException e) {
                     log.error("Unable to instantiate GQL configuration file", e);
                     continue;
@@ -152,9 +168,9 @@ public class NuxeoGQLConfiguration {
 
         public GraphQL build() {
 
-            return GraphQL.newGraphQL(getGraphQLSchema())//
-                    .mutationExecutionStrategy(new AsyncExecutionStrategy(new NuxeoDataFetcherExceptionHandler()))//
-                    .build();
+            return GraphQL.newGraphQL(getGraphQLSchema(vertx))//
+                          .mutationExecutionStrategy(new AsyncExecutionStrategy(new NuxeoDataFetcherExceptionHandler()))//
+                          .build();
         }
 
         private <T> void configureMethod(graphql.schema.idl.RuntimeWiring.Builder runtimeWiring, Method method,
@@ -174,7 +190,6 @@ public class NuxeoGQLConfiguration {
             }
 
             final String name = queryName;
-
 
             runtimeWiring.type(type, builder -> builder.dataFetcher(name,
                     new VertxDataFetcher<T>((DataFetchingEnvironment env, Promise<T> fut) -> {

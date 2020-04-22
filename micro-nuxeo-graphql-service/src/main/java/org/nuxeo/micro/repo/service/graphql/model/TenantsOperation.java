@@ -14,9 +14,11 @@ import org.nuxeo.micro.repo.service.graphql.tenant.Mutation;
 import org.nuxeo.micro.repo.service.graphql.tenant.Query;
 import org.nuxeo.micro.repo.service.graphql.tenant.QueryBuilder;
 import org.nuxeo.micro.repo.service.graphql.tenant.Schema;
+import org.nuxeo.micro.repo.service.tenant.TenantCache;
 
 import graphql.schema.DataFetchingEnvironment;
 import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 
 @Schema("tenant.graphqls")
 public class TenantsOperation {
@@ -25,6 +27,15 @@ public class TenantsOperation {
      *
      */
     private static final String _ALL_LIBRARIES_META = "_allLibrariesMeta";
+
+    private Vertx vertx;
+
+    /**
+     *
+     */
+    public TenantsOperation(Vertx vertx) {
+        this.vertx = vertx;
+    }
 
     @Query("allTenants")
     public void allLibraries(DataFetchingEnvironment env, NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxStub session,
@@ -125,6 +136,7 @@ public class TenantsOperation {
                                                                      .build();
 
                 session.createDocument(req, cr -> {
+                    TenantCache.invalidateTenant(name, vertx);
                     if (cr.succeeded()) {
                         fut.complete(Tenant.from(cr.result()));
                     } else {
@@ -151,7 +163,9 @@ public class TenantsOperation {
 
                 tenant = Tenant.builder(tenant).schemaDef(schemaDef).build();
 
+
                 session.updateDocument(tenant.toDocument(), ur -> {
+                    TenantCache.invalidateTenant(Tenant.from(dr.result()).getName(), vertx);
                     if (ur.succeeded()) {
                         fut.complete(Tenant.from(ur.result()));
                     } else {
@@ -177,6 +191,7 @@ public class TenantsOperation {
             if (dr.succeeded()) {
 
                 session.deleteDocument(dr.result(), ur -> {
+                    TenantCache.invalidateTenant(Tenant.from(dr.result()).getName(), vertx);
                     if (ur.succeeded()) {
                         fut.complete(Tenant.from(ur.result()));
                     } else {

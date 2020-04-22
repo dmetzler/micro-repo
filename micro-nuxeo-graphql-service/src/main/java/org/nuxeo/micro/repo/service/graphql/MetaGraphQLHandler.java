@@ -2,8 +2,10 @@ package org.nuxeo.micro.repo.service.graphql;
 
 import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc;
 import org.nuxeo.micro.repo.proto.NuxeoCoreSessionGrpc.NuxeoCoreSessionVertxStub;
+import org.nuxeo.micro.repo.proto.utils.GrpcInterceptor;
 import org.nuxeo.micro.repo.service.schema.SchemaService;
 
 import io.grpc.ManagedChannel;
@@ -28,8 +30,6 @@ import io.vertx.grpc.VertxChannelBuilder;
 
 public class MetaGraphQLHandler implements Handler<RoutingContext> {
 
-    public static final Metadata.Key<String> TENANT_ID_KEY = Metadata.Key.of("tenantId", ASCII_STRING_MARSHALLER);
-
     private static final Logger LOG = LoggerFactory.getLogger(MetaGraphQLHandler.class);
 
     protected final NuxeoCoreSessionVertxStub nuxeoSession;
@@ -45,6 +45,7 @@ public class MetaGraphQLHandler implements Handler<RoutingContext> {
     protected MetaGraphQLHandler(Vertx vertx, JsonObject config, NuxeoCoreSessionVertxStub nuxeoSession,
             GraphQLService gqlService, SchemaService schemaService) {
         this.vertx = vertx;
+
         this.nuxeoSession = nuxeoSession;
         this.config = config;
         this.gqlService = gqlService;
@@ -66,7 +67,7 @@ public class MetaGraphQLHandler implements Handler<RoutingContext> {
         ManagedChannel channel = VertxChannelBuilder.forAddress(vertx, coreHost, corePort).usePlaintext(true).build();
 
         NuxeoCoreSessionVertxStub nuxeoSession = NuxeoCoreSessionGrpc.newVertxStub(channel);
-        SchemaService schemaService = SchemaService.createProxy(vertx);
+        SchemaService schemaService = SchemaService.createProxyWithCache(vertx);
 
         GraphQLService.create(vertx, config, gqr -> {
             if (gqr.succeeded()) {
@@ -84,6 +85,8 @@ public class MetaGraphQLHandler implements Handler<RoutingContext> {
     public void handle(RoutingContext event) {
 
         String tenantId = event.request().getParam("tenantId");
+        final StopWatch watch = new StopWatch();
+        watch.start();
 
         gqlService.getGraphQL(tenantId, gqlR -> {
             if (gqlR.succeeded()) {
@@ -92,7 +95,7 @@ public class MetaGraphQLHandler implements Handler<RoutingContext> {
                         GraphQLHandler gql = GraphQLHandler.create(gqlR.result()).queryContext(rc -> {
 
                             Metadata headers = new Metadata();
-                            headers.put(TENANT_ID_KEY, tenantId);
+                            headers.put(GrpcInterceptor.TENANTID_METADATA_KEY, tenantId);
                             return new NuxeoContext(rc,
                                     nuxeoSession.withInterceptors(MetadataUtils.newAttachHeadersInterceptor(headers)),
                                     sr.result());

@@ -27,8 +27,8 @@ class TenantVerticleTest {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Test
-    void can_use_create_document(Vertx vertx, VertxTestContext testContext) throws Throwable {
-        TenantService tenantService = TenantService.createProxy(vertx);
+    void can_get_the_service(Vertx vertx, VertxTestContext testContext) throws Throwable {
+        TenantService tenantService = TenantService.createProxyWithCache(vertx);
 
         assertThat(tenantService).isNotNull();
 
