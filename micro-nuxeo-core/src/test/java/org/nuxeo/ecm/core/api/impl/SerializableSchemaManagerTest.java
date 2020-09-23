@@ -20,6 +20,8 @@ import org.nuxeo.ecm.core.schema.SchemaManagerImpl;
 public class SerializableSchemaManagerTest {
     private List<String> schemas = Arrays.asList(new String[] {  "common", "uid", "dublincore" });
 
+
+    
     @Test
     public void schema_manager_can_be_serialized() throws Exception {
 
